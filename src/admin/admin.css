@@ -1,0 +1,282 @@
+/* 팀 검토자 화면은 PC 기준이고, 휴대폰에서는 한 줄씩 쌓아 보여 줍니다(맨 아래 @media). */
+.admin {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--bg);
+  font-size: 16px;
+}
+.admin__header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.admin__header nav {
+  display: flex;
+  gap: 4px;
+}
+.admin__header nav a {
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-weight: 600;
+}
+.admin__header nav a.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.admin__user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.admin__banner {
+  margin: 0;
+  padding: 8px 24px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-weight: 600;
+}
+.admin__page {
+  max-width: 960px;
+  padding: 24px;
+}
+.admin-login {
+  width: min(400px, 100%);
+  text-align: left;
+}
+
+/* 머리글·안내 띠 아래 남은 높이를 다 쓰고, 목록과 상세는 각자 스크롤합니다. */
+.review {
+  flex: 1 1 0;
+  min-height: 420px;
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  grid-template-rows: minmax(0, 1fr);
+}
+.review__back {
+  display: none;
+}
+.review__list {
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  background: var(--surface);
+}
+.review__list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.review__detail {
+  overflow-y: auto;
+  padding: 20px 24px 48px;
+}
+.tabs {
+  position: sticky;
+  top: 0;
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.tabs button {
+  flex: 1;
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tabs button.is-on {
+  background: var(--brand);
+  color: #fff;
+}
+.review-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+}
+.review-item.is-on {
+  background: var(--brand-soft);
+}
+.review-item__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.review-photos {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.review-photos figure {
+  margin: 0;
+  width: 260px;
+}
+.review-photos figure.is-hidden img {
+  opacity: 0.3;
+}
+.review-photos img,
+.review-photos .blob-missing {
+  width: 260px;
+  height: 200px;
+  object-fit: contain;
+  background: #222;
+  border-radius: 8px;
+}
+.review-photos figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--muted);
+}
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+}
+.review-map {
+  position: relative;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.admin select,
+.admin input:not([type='checkbox']) {
+  max-width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.admin .row > input {
+  flex: 1;
+  min-width: 200px;
+}
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--surface);
+}
+.table th,
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.table th {
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 태블릿·휴대폰: 목록 → 기록을 누르면 그 자리에 상세(‘목록으로’로 돌아감) */
+@media (max-width: 900px) {
+  .review {
+    flex: none;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+  .review__list {
+    border-right: 0;
+    overflow: visible;
+  }
+  .review__detail {
+    overflow: visible;
+    padding: 12px 16px 48px;
+  }
+  .review.has-selection .review__list,
+  .review:not(.has-selection) .review__detail {
+    display: none;
+  }
+  .review__back {
+    display: inline-flex;
+    margin: 0 0 8px -8px;
+    padding: 0 10px;
+  }
+  .review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 휴대폰 */
+@media (max-width: 640px) {
+  .admin__header {
+    gap: 4px 12px;
+    padding: calc(10px + var(--safe-top)) 16px 0;
+  }
+  .admin__header > strong {
+    flex: 1;
+    min-width: 0;
+    font-size: 16px;
+  }
+  .admin__user {
+    margin-left: 0;
+    min-width: 0;
+    font-size: 14px;
+  }
+  .admin__header nav {
+    order: 1;
+    flex: 1 0 100%;
+    margin: 0 -16px;
+    padding: 4px 12px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .admin__header nav a {
+    flex: none;
+    white-space: nowrap;
+  }
+  .admin__banner {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .admin__page {
+    padding: 16px 16px 40px;
+  }
+  .review-photos figure,
+  .review-photos img,
+  .review-photos .blob-missing {
+    width: 100%;
+  }
+  .review-photos img,
+  .review-photos .blob-missing {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+  .review-map {
+    height: 260px;
+  }
+  .admin .row > input {
+    min-width: 0;
+    flex-basis: 100%;
+  }
+  .admin .row > select {
+    flex: 1 1 100%;
+  }
+  /* 칸이 많은 표(검토 이력)는 표 안에서만 옆으로 밀어 봅니다. */
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+}

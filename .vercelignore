@@ -1,0 +1,9 @@
+node_modules
+dist
+dev-dist
+scripts/data
+.env
+.env.*
+*.local
+supabase/.temp
+supabase/.branches

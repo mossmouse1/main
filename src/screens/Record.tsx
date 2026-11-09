@@ -1,0 +1,772 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
+import { Icon } from '../components/Icon';
+import { BlobImage } from '../components/Layout';
+import { ParkMap } from '../components/ParkMap';
+import { SpeciesArt } from '../components/SpeciesArt';
+import { DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
+import { useContent } from '../content/ContentProvider';
+import { candidatesFromTaxon, candidatesFromZone, searchTaxa, taxonById, zoneById } from '../content/helpers';
+import { CATEGORY_LABEL, type Content, type Taxon } from '../content/types';
+import { db, getMeta, setMeta } from '../data/db';
+import { addPhotos, discardDraft, pickTaxon, removePhoto, setObserver, startDraft, updateDraft } from '../data/draft';
+import { saveObservation } from '../data/observations';
+import { track } from '../data/track';
+import type { MediaSource, PickSource, RecordDraft } from '../data/types';
+import { useSeason } from '../hooks';
+import { withEul, withRo } from '../lib/josa';
+import { distanceM, findZone, formatDistance, inBounds, type LatLng } from '../lib/geo';
+import { captureFrame, getPosition, hardwareZoomRange, openCameraStream, pickPhotos, setHardwareZoom, stopStream, type Facing } from '../platform';
+
+/** undefined = 읽는 중, null = 기록 중이 아님 */
+function useDraft(): RecordDraft | null | undefined {
+  return useLiveQuery(async () => ({ d: (await db.drafts.get('current')) ?? null }), [])?.d;
+}
+
+/** 기록 화면 머리글: 뒤로 · 제목 · 도움말(기록 그만두기 포함) */
+function RecordTop({ title, sub, onBack, help, dark = false }: { title: string; sub?: string; onBack: () => void; help: ReactNode; dark?: boolean }) {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <header className={`record-top${dark ? ' is-dark' : ''}`}>
+        <button className="icon-btn" onClick={onBack} aria-label="이전 단계">
+          <Icon name="back" size={26} />
+        </button>
+        <div className="record-top__title">
+          <h1>{title}</h1>
+          {sub && <p>{sub}</p>}
+        </div>
+        <button className="icon-btn" onClick={() => setOpen(true)} aria-label="도움말">
+          <Icon name="question" size={28} />
+        </button>
+      </header>
+      {open && (
+        <div className="help-sheet" role="dialog" aria-modal="true" aria-label="도움말">
+          <button className="help-sheet__scrim" onClick={() => setOpen(false)} aria-label="닫기" />
+          <div className="help-sheet__body">
+            <span className="sheet-handle" aria-hidden="true" />
+            <div className="help-sheet__text">{help}</div>
+            <p className="notice notice--soft">
+              <Icon name="shield" size={18} /> 사람 얼굴이 나오지 않게 찍어 주세요.
+            </p>
+            <button className="btn btn--primary btn--block" onClick={() => setOpen(false)}>
+              계속하기
+            </button>
+            <button
+              className="btn btn--text btn--block"
+              onClick={async () => {
+                await discardDraft();
+                navigate('/', { replace: true });
+              }}
+            >
+              기록 그만두기
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** S4 촬영: 화면 안 카메라(1×·2×, 전환) 또는 휴대폰 카메라·앨범. 고른 사진은 바로 기기에 저장합니다. */
+export function RecordPhoto() {
+  const draft = useDraft();
+  const { content } = useContent();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  // then=pick: 확인 화면에서 ‘다시 찍기’·‘사진 추가’로 왔을 때(replace=1이면 찍은 사진을 바꿈)
+  const backToPick = params.get('then') === 'pick';
+  const replace = params.get('replace') === '1';
+  const video = useRef<HTMLVideoElement>(null);
+  const stream = useRef<MediaStream | null>(null);
+  const [facing, setFacing] = useState<Facing>('environment');
+  const [cam, setCam] = useState<'starting' | 'live' | 'off'>('starting');
+  const [zoom, setZoom] = useState<1 | 2>(1);
+  const [hwZoom, setHwZoom] = useState<{ min: number; max: number } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [tip, setTip] = useState(false);
+  const [flash, setFlash] = useState(false);
+  const askedPosition = useRef(false);
+
+  useEffect(() => {
+    if (draft === null) void startDraft(null);
+  }, [draft]);
+
+  // 촬영자 위치는 기록을 시작할 때 한 번 읽습니다.
+  useEffect(() => {
+    if (!draft || draft.observer || askedPosition.current) return;
+    askedPosition.current = true;
+    void getPosition().then((fix) => fix && setObserver(fix));
+  }, [draft]);
+
+  useEffect(() => {
+    void getMeta('cameraTipSeen').then((seen) => !seen && setTip(true));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setCam('starting');
+    void openCameraStream(facing).then((s) => {
+      if (cancelled) return stopStream(s);
+      if (!s) return setCam('off');
+      stream.current = s;
+      if (video.current) {
+        video.current.srcObject = s;
+        void video.current.play().catch(() => {});
+      }
+      setHwZoom(hardwareZoomRange(s));
+      setZoom(1);
+      setCam('live');
+    });
+    return () => {
+      cancelled = true;
+      stopStream(stream.current);
+      stream.current = null;
+    };
+  }, [facing]);
+
+  useEffect(() => {
+    if (stream.current && hwZoom) void setHardwareZoom(stream.current, Math.min(hwZoom.max, Math.max(hwZoom.min, zoom)));
+  }, [zoom, hwZoom]);
+
+  if (!draft) return null;
+  const room = replace ? MAX_PHOTOS : MAX_PHOTOS - draft.photos.length;
+  const target = taxonById(content, draft.sourceTaxonId);
+  const last = draft.photos[draft.photos.length - 1];
+
+  const goNext = () => navigate(backToPick || draft.subject ? '/record/pick' : '/record/where', { replace: backToPick });
+
+  const add = async (files: File[], source: MediaSource) => {
+    if (!files.length) return;
+    setBusy(true);
+    if (replace) await updateDraft({ photos: [] });
+    await addPhotos(files, source);
+    track('record_photo', { draftId: draft.draftId, photos: (replace ? 0 : draft.photos.length) + files.length, source });
+    setBusy(false);
+    goNext();
+  };
+
+  const shoot = async () => {
+    if (busy) return;
+    if (room <= 0) return goNext();
+    if (cam === 'live' && video.current) {
+      setFlash(true);
+      setTimeout(() => setFlash(false), 160);
+      const file = await captureFrame(video.current, hwZoom ? 1 : zoom);
+      if (file) return add([file], 'camera');
+    }
+    // 화면 안 카메라를 못 쓰면 휴대폰 카메라 앱(PRD F05 기본). 사용자 탭 안에서 바로 열어야 합니다.
+    void pickPhotos('camera', room).then((files) => add(files, 'camera'));
+  };
+
+  const back = async () => {
+    if (backToPick) return navigate('/record/pick', { replace: true });
+    if (!draft.photos.length) await discardDraft();
+    navigate('/', { replace: true });
+  };
+
+  return (
+    <main className="camera">
+      <RecordTop
+        dark
+        title="생물 촬영"
+        onBack={() => void back()}
+        help={
+          <>
+            <h2>이렇게 찍어요</h2>
+            <ul className="dot-list">
+              <li>생물이 화면 가운데 오게 맞춰요.</li>
+              <li>멀리 있으면 2×로 확대해서 찍어요.</li>
+              <li>사진은 1장 꼭, 3장까지 남길 수 있어요.</li>
+            </ul>
+          </>
+        }
+      />
+      <div className={`camera__view${cam === 'live' ? ' is-live' : ''}`}>
+        <video
+          ref={video}
+          className={`camera__video${facing === 'user' ? ' is-mirror' : ''}`}
+          style={!hwZoom && zoom === 2 ? { transform: `scale(2)${facing === 'user' ? ' scaleX(-1)' : ''}` } : undefined}
+          playsInline
+          muted
+          autoPlay
+          aria-hidden="true"
+        />
+        <div className="camera__overlay">
+          <p className="camera__face">
+            <Icon name="shield" size={16} /> 사람 얼굴이 나오지 않게 찍어요
+          </p>
+          <div className="camera__frame">
+            {cam === 'starting' && <p className="camera__status">카메라를 켜는 중…</p>}
+            {cam === 'off' && (
+              <div className="camera__fallback">
+                <Icon name="camera" size={44} />
+                <strong>촬영 버튼을 누르면 휴대폰 카메라가 열려요</strong>
+                <span>이 브라우저에서는 화면 안 미리보기를 쓸 수 없어요</span>
+              </div>
+            )}
+          </div>
+          {tip && (
+            <div className="camera-tip" role="note">
+              <span className="camera-tip__badge">처음 촬영하시나요?</span>
+              <strong>생물이 화면 가운데 오도록 맞춰주세요</strong>
+              <span>흐리지 않게 한 장 찍어주세요</span>
+              <button
+                className="btn btn--pill"
+                onClick={() => {
+                  setTip(false);
+                  void setMeta('cameraTipSeen', true);
+                }}
+              >
+                알겠어요
+              </button>
+            </div>
+          )}
+          {cam === 'live' && (
+            <div className="zoom">
+              <p>멀리 있다면 확대해서 찍어보세요</p>
+              <div className="zoom__seg" role="group" aria-label="확대">
+                {([1, 2] as const).map((z) => (
+                  <button key={z} className={zoom === z ? 'is-on' : ''} aria-pressed={zoom === z} onClick={() => setZoom(z)}>
+                    {z}×
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {draft.photos.length > 0 && !replace && (
+          <button className="camera__count" onClick={goNext}>
+            찍은 사진 {draft.photos.length}장 · 다음 <Icon name="chevron" size={16} />
+          </button>
+        )}
+        {flash && <span className="camera__flash" aria-hidden="true" />}
+      </div>
+      <div className="camera__controls">
+        <button
+          className="cam-side"
+          disabled={busy || room <= 0}
+          onClick={() => void pickPhotos('album', room).then((files) => add(files, 'album'))}
+        >
+          <span className="cam-side__thumb">{last && !replace ? <BlobImage blob={last.display ?? last.original} alt="" /> : <Icon name="image" size={26} />}</span>
+          <span>앨범</span>
+        </button>
+        <button className="shutter" onClick={() => void shoot()} disabled={busy} aria-label="촬영">
+          <span className="shutter__ring" aria-hidden="true" />
+          <span>촬영</span>
+        </button>
+        <button className="cam-side" disabled={cam !== 'live' || busy} onClick={() => setFacing(facing === 'environment' ? 'user' : 'environment')}>
+          <span className="cam-side__icon">
+            <Icon name="flip" size={30} />
+          </span>
+          <span>전환</span>
+        </button>
+      </div>
+      <p className="camera__foot" role="status">
+        {busy ? '사진을 저장하는 중…' : target ? `${withEul(target.koreanName)} 찍고 이름을 확인해요` : '촬영 후 생물 이름을 확인하고 등록해요'}
+      </p>
+    </main>
+  );
+}
+
+/** S6 있던 곳: 찍은 사람 위치 ≠ 생물 위치. 지도를 탭하고 반경을 고릅니다(PRD F07). */
+export function RecordWhere() {
+  const draft = useDraft();
+  const { content, mapUrl } = useContent();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const editing = params.get('then') === 'pick';
+  const [subject, setSubject] = useState<LatLng | null | undefined>(undefined);
+  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS);
+  const [nearMe, setNearMe] = useState(false);
+
+  // 이미 고른 위치가 있으면(확인 화면에서 ‘수정’) 그대로 띄웁니다.
+  useEffect(() => {
+    if (!draft || subject !== undefined) return;
+    setSubject(draft.subject ?? null);
+    if (draft.radiusM && draft.locationMethod === 'tap') setRadius(draft.radiusM);
+    setNearMe(draft.locationMethod === 'near_me');
+  }, [draft, subject]);
+
+  if (draft === undefined) return null;
+  if (draft === null) return <Navigate to="/" replace />;
+  if (!draft.photos.length) return <Navigate to="/record/photo" replace />;
+
+  const observer = draft.observer;
+  const observerInPark = !!observer && inBounds(observer, content.park.bounds);
+  const nearRadius = observer ? NEAR_ME_BASE_RADIUS + observer.accuracy : NEAR_ME_BASE_RADIUS;
+  const name = taxonById(content, draft.taxonId ?? draft.sourceTaxonId)?.koreanName ?? '찍은 생물';
+  const zone = subject ? findZone(subject, content.zones) : null;
+
+  const distanceText = nearMe
+    ? '찍은 곳 근처로 저장해요'
+    : !subject
+      ? '지도를 눌러 주세요'
+      : observer
+        ? `찍은 곳에서 ${formatDistance(distanceM(observer, subject))}`
+        : '찍은 곳 위치를 알 수 없어요';
+
+  const confirm = async () => {
+    if (!subject) return;
+    await updateDraft({ subject, radiusM: nearMe ? nearRadius : radius, locationMethod: nearMe ? 'near_me' : 'tap' });
+    navigate('/record/pick', { replace: editing });
+  };
+
+  return (
+    <main className="record record--map">
+      <RecordTop
+        title="있던 곳"
+        onBack={() => navigate(editing ? '/record/pick' : '/record/photo', { replace: true })}
+        help={
+          <>
+            <h2>생물이 있던 곳을 눌러요</h2>
+            <p>찍은 사람 자리가 아니라 생물이 있던 자리예요. 정확히 모르면 반경을 넓게 고르거나 ‘내 근처예요’를 눌러요.</p>
+          </>
+        }
+      />
+      <p className="record__hint">
+        <strong>{name}</strong>이(가) 있던 곳을 지도에서 눌러 주세요.
+      </p>
+      <div className="record__map">
+        <ParkMap
+          imageUrl={mapUrl}
+          bounds={content.park.bounds}
+          attribution={content.map.attribution}
+          scale
+          zones={content.zones}
+          facilities={content.facilities}
+          me={observerInPark ? observer : null}
+          meLabel="찍은 곳"
+          subject={subject ?? null}
+          radiusM={nearMe ? nearRadius : radius}
+          focus={subject ?? (observerInPark ? observer : null)}
+          focusScale={2.5}
+          onMapClick={(p) => {
+            setSubject(p);
+            setNearMe(false);
+          }}
+        />
+      </div>
+      <div className="where-panel">
+        <div className="row row--between">
+          <div className="where-panel__text">
+            <strong aria-live="polite">{distanceText}</strong>
+            {zone && <span className="muted">{zone.name}</span>}
+          </div>
+          <button
+            className={`chip${nearMe ? ' is-on' : ''}`}
+            aria-pressed={nearMe}
+            disabled={!observer}
+            onClick={() => {
+              if (!observer) return;
+              setNearMe(true);
+              setSubject({ lat: observer.lat, lng: observer.lng });
+            }}
+          >
+            내 근처예요
+          </button>
+        </div>
+        <div className="row row--tight" role="group" aria-label="반경">
+          <span className="muted">반경</span>
+          {RADIUS_CHOICES.map((r) => (
+            <button key={r} className={`chip${!nearMe && radius === r ? ' is-on' : ''}`} aria-pressed={!nearMe && radius === r} disabled={nearMe} onClick={() => setRadius(r)}>
+              {r}m
+            </button>
+          ))}
+        </div>
+        <button className="btn btn--primary btn--block btn--big" disabled={!subject} onClick={() => void confirm()}>
+          {editing ? '이 위치로 정하기' : '다음: 이름 확인'}
+        </button>
+      </div>
+    </main>
+  );
+}
+
+type Choice = { taxonId: string | null; source: PickSource; freeText: string | null };
+
+async function saveWith(content: Content, draft: RecordDraft, choice: Choice) {
+  await pickTaxon(choice.taxonId, choice.source, choice.freeText);
+  return saveObservation(
+    content,
+    { ...draft, taxonId: choice.taxonId, pickSource: choice.source, freeTextName: choice.freeText },
+    { subject: draft.subject!, radiusM: draft.radiusM ?? DEFAULT_RADIUS, method: draft.locationMethod ?? 'tap' },
+  );
+}
+
+/** 사진 카드: 찍은 사진, 다시 찍기, 사진 추가(최대 3장) */
+function ShotCard({ draft, canEdit = true }: { draft: RecordDraft; canEdit?: boolean }) {
+  const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+  const photo = draft.photos[Math.min(index, draft.photos.length - 1)];
+  return (
+    <div className="shot">
+      <div className="shot__photo">
+        <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" />
+        <span className="shot__badge">
+          <Icon name="camera" size={18} /> 촬영한 사진
+        </span>
+        {canEdit && (
+          <button className="shot__retake" onClick={() => navigate('/record/photo?then=pick&replace=1')}>
+            <Icon name="refresh" size={20} /> 다시 찍기
+          </button>
+        )}
+      </div>
+      {canEdit && (draft.photos.length > 1 || draft.photos.length < MAX_PHOTOS) && (
+        <ul className="shot__thumbs" aria-label="찍은 사진">
+          {draft.photos.length > 1 &&
+            draft.photos.map((p, i) => (
+              <li key={p.id}>
+                <button className={`shot__thumb${i === index ? ' is-on' : ''}`} onClick={() => setIndex(i)} aria-label={`사진 ${i + 1} 보기`}>
+                  <BlobImage blob={p.display ?? p.original} alt="" />
+                </button>
+                <button className="shot__remove" onClick={() => void removePhoto(p.id).then(() => setIndex(0))} aria-label={`사진 ${i + 1} 지우기`}>
+                  <Icon name="close" size={14} />
+                </button>
+              </li>
+            ))}
+          {draft.photos.length < MAX_PHOTOS && (
+            <li>
+              <button className="shot__add" onClick={() => navigate('/record/photo?then=pick')}>
+                <Icon name="plus" size={20} /> 사진 추가
+              </button>
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** 관찰 위치 줄(있던 곳 요약 + 수정) */
+function WhereRow({ draft, editable = true }: { draft: RecordDraft; editable?: boolean }) {
+  const { content } = useContent();
+  const subject = draft.subject;
+  const zone = subject ? findZone(subject, content.zones) : null;
+  const outside = !!subject && !inBounds(subject, content.park.bounds);
+  const detail =
+    draft.locationMethod === 'near_me'
+      ? '찍은 곳 근처'
+      : subject && draft.observer
+        ? `찍은 곳에서 ${formatDistance(distanceM(draft.observer, subject))}`
+        : `반경 ${draft.radiusM ?? DEFAULT_RADIUS}m`;
+  return (
+    <div className="where-row">
+      <Icon name="pin" size={22} />
+      <strong>관찰 위치</strong>
+      <span className="where-row__text">
+        {outside ? '공원 밖' : (zone?.name ?? '조사구역 밖')} · {detail}
+      </span>
+      {editable && <Link to="/record/where?then=pick">수정</Link>}
+    </div>
+  );
+}
+
+/** S5 생물 확인: 예상 결과 + 다른 후보 2개(PRD F06 후보 3개), 목록에 없어요, 아직 모르겠어요 */
+export function RecordPick() {
+  const draft = useDraft();
+  const { content } = useContent();
+  const season = useSeason();
+  const navigate = useNavigate();
+  const [choice, setChoice] = useState<Choice | null>(null);
+  const [others, setOthers] = useState(false);
+  const [query, setQuery] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!draft || draft.candidateIds.length) return;
+    const where = draft.subject ?? draft.observer;
+    const zone = where ? findZone(where, content.zones) : null;
+    const ids = draft.sourceTaxonId
+      ? candidatesFromTaxon(content, draft.sourceTaxonId, draft.draftId)
+      : candidatesFromZone(content, zone?.id ?? null, season, draft.draftId);
+    void updateDraft({ candidateIds: ids });
+  }, [draft, content, season]);
+
+  if (draft === undefined) return null;
+  if (draft === null) return <Navigate to="/" replace />;
+  if (!draft.photos.length) return <Navigate to="/record/photo" replace />;
+  if (!draft.subject) return <Navigate to="/record/where" replace />;
+  if (!draft.candidateIds.length) return null;
+
+  // 예상 결과: 카드에서 왔으면 찾던 종, 아니면 이 구역 후보 중 공개 기록이 가장 많은 종(AI 판별 아님, PRD F18)
+  const fromCard = !!draft.sourceTaxonId && draft.candidateIds.includes(draft.sourceTaxonId);
+  const predictedId = fromCard ? draft.sourceTaxonId! : [...draft.candidateIds].sort((a, b) => (season.recordCounts[b] ?? 0) - (season.recordCounts[a] ?? 0))[0];
+  const candidateSource: PickSource = draft.sourceTaxonId ? 'card' : 'zone';
+  const current: Choice = choice ?? { taxonId: predictedId, source: candidateSource, freeText: null };
+  const taxon = taxonById(content, current.taxonId);
+  const name = taxon?.koreanName ?? (current.freeText ? `‘${current.freeText}’` : '');
+  const basis =
+    current.source === 'search' ? '이름으로 찾은 생물이에요' : current.source === 'free_text' ? '직접 적은 이름이에요' : current.taxonId !== predictedId ? '직접 고른 후보예요' : fromCard ? '찾으러 온 생물이에요' : '이 구역에서 가장 많이 기록됐어요';
+  const alternatives = draft.candidateIds.filter((id) => id !== current.taxonId).slice(0, current.source === 'card' || current.source === 'zone' ? 2 : 3);
+  const results = query.trim() ? searchTaxa(content, query) : season.dex.map((id) => taxonById(content, id)).filter((t): t is Taxon => !!t);
+
+  const confirm = async () => {
+    if (saving) return;
+    setSaving(true);
+    const obs = await saveWith(content, draft, current);
+    navigate(obs.taxonId ? `/species/${obs.taxonId}?saved=${obs.id}` : `/records?saved=${obs.id}`, { replace: true });
+  };
+  const choose = (c: Choice) => {
+    setChoice(c);
+    setOthers(false);
+    setQuery('');
+    // 휴대폰은 문서가, 넓은 화면은 휴대폰 틀 안쪽 층이 스크롤합니다.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.device__scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <main className="record">
+      <RecordTop
+        title="생물 확인"
+        sub="등록 전에 이름을 확인해주세요"
+        onBack={() => navigate('/record/where?then=pick', { replace: true })}
+        help={
+          <>
+            <h2>이름이 맞는지 비교해요</h2>
+            <p>예상 결과는 찾으러 온 생물이나 이 구역에서 자주 기록된 생물이에요. 사진과 생김새를 비교하고, 다르면 ‘다른 생물이에요’를 눌러요. 몰라도 괜찮아요. 팀이 사진을 보고 확인해요.</p>
+          </>
+        }
+      />
+      <div className="record__body stack">
+        <ShotCard draft={draft} />
+
+        <section className="guess">
+          <p className="kicker">
+            {current.source === 'card' || current.source === 'zone' ? '예상 결과' : '고른 이름'}
+            {taxon ? ` · ${CATEGORY_LABEL[taxon.category]}` : ''}
+          </p>
+          <h2 className="guess__name">{withRo(name)} 보여요</h2>
+          {taxon && <p className="sci">{taxon.scientificName}</p>}
+          <p className="guess__basis">{basis}</p>
+        </section>
+
+        {taxon && taxon.clue.looks.length > 0 && (
+          <section className="sec">
+            <h2 className="sec__title">사진과 비교해 보세요</h2>
+            <ul className="ticks">
+              {taxon.clue.looks.slice(0, 2).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <p className="caption">자동 판별이 아니에요. 팀이 사진을 한 번 더 확인해요.</p>
+          </section>
+        )}
+
+        {alternatives.length > 0 && (
+          <section className="sec">
+            <h2 className="sec__title">혹시 이 생물인가요?</h2>
+            <ul className="alt-list">
+              {alternatives.map((id) => {
+                const t = taxonById(content, id);
+                if (!t) return null;
+                return (
+                  <li key={id}>
+                    <button className="alt" onClick={() => choose({ taxonId: id, source: candidateSource, freeText: null })}>
+                      <SpeciesArt taxon={t} size="sm" />
+                      <span>
+                        <strong>{t.koreanName}</strong>
+                        <span className="muted">{t.clue.looks[0]}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+
+        <WhereRow draft={draft} />
+
+        <div className="stack stack--tight">
+          <button className="btn btn--primary btn--block btn--big" disabled={saving} onClick={() => void confirm()}>
+            맞아요, 도감에 등록
+          </button>
+          <button className="btn btn--outline btn--block btn--big" onClick={() => setOthers(true)}>
+            다른 생물이에요
+          </button>
+          <Link to="/record/unknown" className="link-btn">
+            아직 모르겠어요 · 미확인으로 저장
+          </Link>
+        </div>
+      </div>
+
+      {others && (
+        <div className="help-sheet" role="dialog" aria-modal="true" aria-label="다른 생물 고르기">
+          <button className="help-sheet__scrim" onClick={() => setOthers(false)} aria-label="닫기" />
+          <div className="help-sheet__body help-sheet__body--tall">
+            <span className="sheet-handle" aria-hidden="true" />
+            <h2>어떤 생물이었나요?</h2>
+            <label className="search-field">
+              <Icon name="search" />
+              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="이름으로 찾기 (예: 쇠물닭)" enterKeyHint="search" aria-label="이름으로 찾기" />
+            </label>
+            {!query.trim() && <p className="caption">이번 계절 도감에 있는 생물이에요. 없으면 이름을 적어 찾아 주세요.</p>}
+            <ul className="search-results">
+              {results.map((t) => (
+                <li key={t.id}>
+                  <button className="species-row species-row--button" onClick={() => choose({ taxonId: t.id, source: draft.candidateIds.includes(t.id) ? candidateSource : 'search', freeText: null })}>
+                    <SpeciesArt taxon={t} size="xs" />
+                    <span className="species-row__text">
+                      <strong>{t.koreanName}</strong>
+                      <span className="muted">{t.scientificName}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {query.trim() && (
+              <button className="btn btn--outline btn--block" onClick={() => choose({ taxonId: null, source: 'free_text', freeText: query.trim().slice(0, 60) })}>
+                ‘{query.trim()}’(으)로 남길게요
+              </button>
+            )}
+            <Link to="/record/unknown" className="link-btn">
+              아직 모르겠어요 · 미확인으로 저장
+            </Link>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}
+
+/** 아직 모르겠어요: 사진은 남기고 이름은 나중에(미동정). 관찰 메모는 ‘가족이 적은 이름·메모’로 갑니다. */
+export function RecordUnknown() {
+  const draft = useDraft();
+  const { content } = useContent();
+  const navigate = useNavigate();
+  const [memo, setMemo] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  if (draft === undefined) return null;
+  if (draft === null) return <Navigate to="/" replace />;
+  if (!draft.photos.length) return <Navigate to="/record/photo" replace />;
+  if (!draft.subject) return <Navigate to="/record/where" replace />;
+  const photo = draft.photos[0];
+
+  const save = async () => {
+    if (saving) return;
+    setSaving(true);
+    const obs = await saveWith(content, draft, { taxonId: null, source: 'unknown', freeText: memo.trim().slice(0, 60) || null });
+    navigate(`/records?saved=${obs.id}`, { replace: true });
+  };
+
+  return (
+    <main className="record">
+      <RecordTop
+        title="생물 확인"
+        onBack={() => navigate('/record/pick', { replace: true })}
+        help={
+          <>
+            <h2>몰라도 괜찮아요</h2>
+            <p>미확인으로 저장하면 팀이 사진을 보고 이름을 확인해요. 확인되면 도감 칸이 열려요.</p>
+          </>
+        }
+      />
+      <div className="record__body stack">
+        <div className="unknown-photo">
+          <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" />
+        </div>
+        <div className="unknown-head">
+          <span className="unknown-head__icon" aria-hidden="true">
+            <Icon name="search" size={26} />
+          </span>
+          <h1>아직 이름을 찾지 못했어요</h1>
+          <p>사진은 남겨두고, 이름은 나중에 확인할 수 있어요.</p>
+        </div>
+        <section className="sec">
+          <h2 className="sec__title">이렇게 다시 찍어 보세요</h2>
+          <ul className="ticks">
+            <li>생물이 조금 더 크게 보이도록</li>
+            <li>흔들리지 않게, 밝은 곳에서</li>
+          </ul>
+        </section>
+        <label className="memo">
+          <span className="sec__title">관찰 메모</span>
+          <span className="memo__box">
+            <input value={memo} onChange={(e) => setMemo(e.target.value.slice(0, 60))} placeholder="어떤 모습이었나요?" maxLength={60} />
+            <Icon name="pencil" size={20} />
+          </span>
+          <span className="caption">예: 목이 긴 하얀 새 · 팀이 이름을 확인할 때 봐요</span>
+        </label>
+        <WhereRow draft={draft} />
+        <div className="stack stack--tight">
+          <button className="btn btn--primary btn--block btn--big" onClick={() => navigate('/record/photo?then=pick&replace=1')}>
+            <Icon name="camera" size={22} /> 다시 촬영하기
+          </button>
+          <button className="btn btn--secondary btn--block btn--big" disabled={saving} onClick={() => void save()}>
+            <Icon name="bookmark" size={20} /> 미확인 기록으로 저장
+          </button>
+          <button
+            className="link-btn"
+            onClick={() =>
+              void pickPhotos('album', MAX_PHOTOS).then(async (files) => {
+                if (!files.length) return;
+                await updateDraft({ photos: [] });
+                await addPhotos(files, 'album');
+                navigate('/record/pick', { replace: true });
+              })
+            }
+          >
+            다른 사진 선택
+          </button>
+        </div>
+        <p className="caption center">미확인 사진은 내 기록에 보관돼요. 팀이 이름을 확인하면 도감에 올라가요.</p>
+      </div>
+    </main>
+  );
+}
+
+/** 예전 완료 화면 주소: 저장 뒤 화면(생물 카드 또는 내 기록)으로 보냅니다. */
+export function RecordDone() {
+  const [params] = useSearchParams();
+  const id = params.get('id') ?? '';
+  const obs = useLiveQuery(async () => ({ o: (await db.observations.get(id)) ?? null }), [id]);
+  if (!obs) return null;
+  if (!obs.o) return <Navigate to="/records" replace />;
+  return <Navigate to={obs.o.taxonId ? `/species/${obs.o.taxonId}?saved=${id}` : `/records?saved=${id}`} replace />;
+}
+
+/** 다음 단서: 이름은 숨기고 장소와 생김새로 찾게 합니다. */
+export function NextClue({ taxonId }: { taxonId: string }) {
+  const { content } = useContent();
+  const t = taxonById(content, taxonId);
+  if (!t) return null;
+  return <ClueCard taxon={t} />;
+}
+
+/** 물가의 친구를 찾아보세요: 생김새 단서 + 지도에서 찾기 */
+export function ClueCard({ taxon }: { taxon: Taxon }) {
+  const { content } = useContent();
+  const zone = zoneById(content, taxon.clue.zoneIds[0]);
+  return (
+    <section className="clue">
+      <p className="kicker">
+        <Icon name="binoculars" size={16} /> 다음 단서
+      </p>
+      <h2>{withEul(friendOf(taxon))} 찾아보세요</h2>
+      <ul className="ticks">
+        {taxon.clue.looks.slice(0, 1).map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+        <li>
+          {zone ? `${zone.name} — ` : ''}
+          {taxon.clue.where}
+        </li>
+      </ul>
+      <div className="clue__foot">
+        <span className="caption">사진을 찍고 확인하면 칸이 열려요</span>
+        <Link to={`/?focus=${taxon.id}`} className="btn btn--secondary btn--small">
+          <Icon name="pin" size={18} /> 지도에서 찾기
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/** 못 찾은 칸 이름 대신 쓰는 말(‘물가의 친구’) */
+export function friendOf(taxon: Taxon): string {
+  return taxon.category === 'waterbird' ? '물가의 친구' : taxon.category === 'townbird' ? '나무 위 친구' : taxon.category === 'tree' ? '숲속 친구' : '풀밭의 친구';
+}
