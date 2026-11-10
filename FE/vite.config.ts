@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // 웹과 Edge Function이 함께 쓰는 순수 TS 코드(Darwin Core 매핑 등)
-      '@shared': fileURLToPath(new URL('./supabase/functions/_shared', import.meta.url)),
+      '@shared': fileURLToPath(new URL('../BE/supabase/functions/_shared', import.meta.url)),
     },
   },
   // 나중에 불러오는 모듈도 개발 서버 시작 때 미리 묶습니다(실행 중 발견되면 페이지가 새로고침됨).
@@ -64,6 +64,6 @@ export default defineConfig({
     chunkSizeWarningLimit: 700,
   },
   test: {
-    include: ['src/**/*.test.ts', 'supabase/functions/_shared/**/*.test.ts'],
+    include: ['src/**/*.test.ts', '../BE/supabase/functions/_shared/**/*.test.ts'],
   },
 });

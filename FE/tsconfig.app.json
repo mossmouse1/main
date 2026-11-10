@@ -18,8 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client", "vite-plugin-pwa/client"],
     "paths": {
-      "@shared/*": ["./supabase/functions/_shared/*"]
+      "@shared/*": ["../BE/supabase/functions/_shared/*"],
+      "vitest": ["./node_modules/vitest"]
     }
   },
-  "include": ["src", "supabase/functions/_shared"]
+  "include": ["src", "../BE/supabase/functions/_shared"]
 }

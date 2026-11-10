@@ -5,5 +5,3 @@ scripts/data
 .env
 .env.*
 *.local
-supabase/.temp
-supabase/.branches

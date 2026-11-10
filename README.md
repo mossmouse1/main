@@ -29,7 +29,7 @@ npm run build      # 타입 검사 + 배포용 빌드(dist/)
 | F10 가족 도감(칸, 진행률, NEW, 다음 단서, 검토 반영) | ✅ | `src/screens/Dex.tsx`, `src/lib/dex.ts` |
 | F11 탐험 시작·끝(30분 무활동·3시간 자동 종료, 조사 노력, 요약) | ✅ | `src/data/walks.ts`, `src/screens/WalkSummary.tsx` |
 | F12 팀 검토(동정 상태·이력, 중복 묶기, 숨기기, 사진 숨기기) | ✅ | `src/admin/Review.tsx` |
-| F13 CSV 내보내기(Darwin Core, BOM, 기간·상태 필터, 검토 이력 CSV) | ✅ | `supabase/functions/_shared/dwc.ts`, `supabase/functions/export-csv` |
+| F13 CSV 내보내기(Darwin Core, BOM, 기간·상태 필터, 검토 이력 CSV) | ✅ | `BE/supabase/functions/_shared/dwc.ts`, `BE/supabase/functions/export-csv` |
 | F14 기록 지키기(이메일 연결, 삭제 요청) | ◐ Supabase 모드에서만, 새 기기 로그인 화면은 아직 | `src/screens/Settings.tsx` |
 | F15 구역 상세 | ✅ | `src/screens/ZoneDetail.tsx` |
 | F16 콘텐츠 편집 화면 | ✗ 읽기만(편집은 JSON) | `src/admin/ContentAdmin.tsx` |
@@ -49,8 +49,8 @@ src/data/                  기기 DB(Dexie), 기록·탐험·전송 대기열·�
 src/backend/               서버 연결: local.ts(가짜 서버) / supabase.ts
 src/screens/               가족 화면 S0~S11
 src/admin/                 팀 화면 A1~A3 (/admin, 따로 받음)
-supabase/migrations/       테이블·RLS·DB 함수(PostGIS 구역·비오톱 판정, 멱등 저장, 검토)
-supabase/functions/        export-csv(Edge Function), _shared/dwc.ts(웹과 같이 쓰는 매핑)
+BE/supabase/migrations/       테이블·RLS·DB 함수(PostGIS 구역·비오톱 판정, 멱등 저장, 검토)
+BE/supabase/functions/        export-csv(Edge Function), _shared/dwc.ts(웹과 같이 쓰는 매핑)
 scripts/gen-seed.mjs       v1.json → supabase/seed.sql
 ```
 
@@ -58,7 +58,7 @@ scripts/gen-seed.mjs       v1.json → supabase/seed.sql
 
 1. 프로젝트를 만들고 **Authentication → Anonymous sign-ins**를 켭니다(봇 막기용 CAPTCHA 권장). Authentication → URL Configuration에 배포 주소를 넣습니다(이메일 연결 링크용).
 2. 스키마: `npx supabase link --project-ref <ref>` 후 `npx supabase db push`. 두 번째 마이그레이션은 pg_cron(30분 무활동 탐험 자동 종료)을 씁니다.
-3. 시드: `npm run seed:sql` 후 `supabase/seed.sql`을 SQL 편집기에서 실행합니다(콘텐츠를 고칠 때마다 다시).
+3. 시드: `npm run seed:sql` 후 `BE/supabase/seed.sql`을 SQL 편집기에서 실행합니다(콘텐츠를 고칠 때마다 다시).
 4. 내보내기 함수: `npx supabase functions deploy export-csv`
 5. 검토자 계정: Authentication에서 사용자를 만든 뒤 SQL로 역할을 줍니다.
    ```sql

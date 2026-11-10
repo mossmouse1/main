@@ -1,4 +1,4 @@
-// public/content/v1.json → supabase/seed.sql
+// FE/public/content/v1.json → BE/supabase/seed.sql
 // 콘텐츠는 JSON 한 곳에서 고치고, 서버의 구역·비오톱 판정과 내보내기용 종 이름은 이 시드로 맞춥니다.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +48,6 @@ for (const s of content.seasonSets) {
 }
 
 lines.push('', 'commit;', '');
-const out = fileURLToPath(new URL('supabase/seed.sql', root));
+const out = fileURLToPath(new URL('../BE/supabase/seed.sql', root));
 writeFileSync(out, lines.join('\n'));
 console.log(`seed.sql: 구역 ${content.zones.length}, 비오톱 ${content.biotopes.length}, 종 ${content.taxa.length}, 세트 ${content.seasonSets.length}`);

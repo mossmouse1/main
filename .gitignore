@@ -5,8 +5,8 @@ dev-dist
 .env
 .env.*
 !.env.example
-supabase/.temp
-supabase/.branches
+BE/supabase/.temp
+BE/supabase/.branches
 .DS_Store
 
 .vercel
