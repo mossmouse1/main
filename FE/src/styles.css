@@ -1818,6 +1818,9 @@ img {
   color: inherit;
 }
 .blob-missing {
+  gap: 6px;
+  text-align: center;
+  font-size: 13px;
   display: grid;
   place-items: center;
   background: var(--paper-2);
@@ -2264,6 +2267,7 @@ img {
   color: #fff;
 }
 .camera__view {
+  touch-action: none; /* 핀치 줌이 브라우저 기본 확대·스크롤과 부딪치지 않게 */
   position: relative;
   flex: 1;
   min-height: 300px;
@@ -3353,4 +3357,13 @@ img {
     width: 64px;
     height: 64px;
   }
+}
+
+.zoom__value {
+  align-self: center;
+  min-width: 44px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
 }

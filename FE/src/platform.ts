@@ -3,6 +3,7 @@
  * 나중에 앱(웹뷰)으로 감쌀 때 이 파일만 네이티브 브리지로 바꾸면 됩니다.
  */
 import type { MediaSource, ObserverFix } from './data/types';
+import { fitSize, MAX_CAPTURE_EDGE, visibleRect } from './lib/zoom';
 
 /**
  * 사진을 고릅니다. 사용자 탭 안에서 바로 불러야 합니다(브라우저가 사용자 동작으로 인정해야 열림).
@@ -70,18 +71,33 @@ export async function setHardwareZoom(stream: MediaStream, zoom: number): Promis
   }
 }
 
-/** 미리보기 한 장을 JPEG 파일로. cropZoom > 1이면 가운데를 잘라 확대합니다. */
+const toJpeg = (canvas: HTMLCanvasElement, quality: number) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+
+/**
+ * 미리보기에 보이는 영역 그대로 JPEG 파일로(디지털 확대면 cropZoom > 1).
+ * 캔버스는 긴 변 4096px로 제한하고, toBlob이 실패하면 더 작게 한 번 더 시도합니다. 끝내 실패하면 null.
+ */
 export async function captureFrame(video: HTMLVideoElement, cropZoom = 1): Promise<File | null> {
   const vw = video.videoWidth;
   const vh = video.videoHeight;
   if (!vw || !vh) return null;
-  const w = Math.round(vw / cropZoom);
-  const h = Math.round(vh / cropZoom);
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  canvas.getContext('2d')?.drawImage(video, (vw - w) / 2, (vh - h) / 2, w, h, 0, 0, w, h);
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+  const { sx, sy, sw, sh } = visibleRect(vw, vh, video.clientWidth, video.clientHeight, cropZoom);
+  let blob: Blob | null = null;
+  for (const [edge, quality] of [[MAX_CAPTURE_EDGE, 0.92], [2048, 0.85]] as const) {
+    const { w, h } = fitSize(sw, sh, edge);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    try {
+      canvas.getContext('2d')?.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+      blob = await toJpeg(canvas, quality);
+    } catch {
+      blob = null;
+    }
+    canvas.width = canvas.height = 0; // iOS는 쓰고 난 캔버스 메모리를 바로 돌려주지 않아서 비웁니다.
+    if (blob) break;
+    console.warn('captureFrame: toBlob failed', { edge });
+  }
   if (!blob) return null;
   const now = Date.now();
   return new File([blob], `camera-${now}.jpg`, { type: 'image/jpeg', lastModified: now });

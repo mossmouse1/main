@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useObjectUrl, useOnline, usePendingCount } from '../hooks';
 import { Icon } from './Icon';
@@ -111,14 +111,22 @@ export function Stepper({ label, value, onChange, max = 10 }: {
   );
 }
 
-export function BlobImage({ blob, alt, className }: { blob: Blob | null | undefined; alt: string; className?: string }) {
-  const url = useObjectUrl(blob);
-  if (!url) {
+/** 사진 표시. 불러오지 못하면 같은 사진으로 한 번 더 시도하고, 그래도 안 되면 안내(failText)를 보여 줍니다. */
+export function BlobImage({ blob, alt, className, failText }: { blob: Blob | null | undefined; alt: string; className?: string; failText?: string }) {
+  const [attempt, setAttempt] = useState(0);
+  const url = useObjectUrl(blob, attempt);
+  useEffect(() => setAttempt(0), [blob]);
+  if (!url || attempt > 1) {
     return (
       <div className={`blob-missing ${className ?? ''}`} role="img" aria-label={alt}>
         <Icon name="image" />
+        {attempt > 1 && failText && <span>{failText}</span>}
       </div>
     );
   }
-  return <img src={url} alt={alt} className={className} />;
+  const onError = () => {
+    console.warn('BlobImage: load failed', { attempt, type: blob?.type, size: blob?.size });
+    setAttempt((n) => n + 1);
+  };
+  return <img src={url} alt={alt} className={className} onError={onError} />;
 }

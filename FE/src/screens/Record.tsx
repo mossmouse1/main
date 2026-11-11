@@ -17,6 +17,8 @@ import type { MediaSource, PickSource, RecordDraft } from '../data/types';
 import { getFamilyBackend } from '../backend';
 import { IdentifyError, type IdentifyResult } from '../backend/types';
 import { useSeason } from '../hooks';
+import { usePinchZoom } from '../lib/usePinchZoom';
+import { clampZoom, zoomLimits } from '../lib/zoom';
 import { makeIdentifyCopy } from '../lib/photo';
 import { withEul, withRo } from '../lib/josa';
 import { distanceM, findZone, formatDistance, inBounds, type LatLng } from '../lib/geo';
@@ -86,7 +88,11 @@ export function RecordPhoto() {
   const stream = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<Facing>('environment');
   const [cam, setCam] = useState<'starting' | 'live' | 'off'>('starting');
-  const [zoom, setZoom] = useState<1 | 2>(1);
+  const [zoom, setZoom] = useState(1);
+  const view = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(1);
+  zoomRef.current = zoom;
+  const hwChain = useRef<Promise<unknown>>(Promise.resolve());
   const [hwZoom, setHwZoom] = useState<{ min: number; max: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [tip, setTip] = useState(false);
@@ -131,8 +137,13 @@ export function RecordPhoto() {
   }, [facing]);
 
   useEffect(() => {
-    if (stream.current && hwZoom) void setHardwareZoom(stream.current, Math.min(hwZoom.max, Math.max(hwZoom.min, zoom)));
+    const s = stream.current;
+    // 하드웨어 줌은 순서대로 하나씩 적용합니다(핀치 중 값이 겹쳐 되돌아가지 않게).
+    if (s && hwZoom) hwChain.current = hwChain.current.then(() => setHardwareZoom(s, clampZoom(zoom, hwZoom.min, hwZoom.max)));
   }, [zoom, hwZoom]);
+
+  const limits = zoomLimits(hwZoom);
+  usePinchZoom(view, () => zoomRef.current, setZoom, limits.min, limits.max);
 
   if (!draft) return null;
   const room = replace ? MAX_PHOTOS : MAX_PHOTOS - draft.photos.length;
@@ -157,7 +168,7 @@ export function RecordPhoto() {
     if (cam === 'live' && video.current) {
       setFlash(true);
       setTimeout(() => setFlash(false), 160);
-      const file = await captureFrame(video.current, hwZoom ? 1 : zoom);
+      const file = await captureFrame(video.current, hwZoom ? 1 : zoomRef.current);
       if (file) return add([file], 'camera');
     }
     // 화면 안 카메라를 못 쓰면 휴대폰 카메라 앱(PRD F05 기본). 사용자 탭 안에서 바로 열어야 합니다.
@@ -187,11 +198,11 @@ export function RecordPhoto() {
           </>
         }
       />
-      <div className={`camera__view${cam === 'live' ? ' is-live' : ''}`}>
+      <div ref={view} className={`camera__view${cam === 'live' ? ' is-live' : ''}`}>
         <video
           ref={video}
           className={`camera__video${facing === 'user' ? ' is-mirror' : ''}`}
-          style={!hwZoom && zoom === 2 ? { transform: `scale(2)${facing === 'user' ? ' scaleX(-1)' : ''}` } : undefined}
+          style={!hwZoom && zoom > 1 ? { transform: `scale(${zoom})${facing === 'user' ? ' scaleX(-1)' : ''}` } : undefined}
           playsInline
           muted
           autoPlay
@@ -232,10 +243,11 @@ export function RecordPhoto() {
               <p>멀리 있다면 확대해서 찍어보세요</p>
               <div className="zoom__seg" role="group" aria-label="확대">
                 {([1, 2] as const).map((z) => (
-                  <button key={z} className={zoom === z ? 'is-on' : ''} aria-pressed={zoom === z} onClick={() => setZoom(z)}>
+                  <button key={z} className={Math.abs(zoom - z) < 0.05 ? 'is-on' : ''} aria-pressed={Math.abs(zoom - z) < 0.05} onClick={() => setZoom(clampZoom(z, limits.min, limits.max))}>
                     {z}×
                   </button>
                 ))}
+                <output className="zoom__value" aria-live="off">{zoom.toFixed(1)}×</output>
               </div>
             </div>
           )}
@@ -406,7 +418,7 @@ function ShotCard({ draft, canEdit = true }: { draft: RecordDraft; canEdit?: boo
   return (
     <div className="shot">
       <div className="shot__photo">
-        <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" />
+        <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" failText="사진을 불러오지 못했어요. 다시 찍기" />
         <span className="shot__badge">
           <Icon name="camera" size={18} /> 촬영한 사진
         </span>
