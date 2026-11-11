@@ -47,6 +47,8 @@ export function DebugPanel() {
     ['createImageBitmap', data['photo.bitmap']],
     ['img 오류', data['photo.imgError']],
     ['재시도 단계(0~3)', data['photo.stage']],
+    ['핀치 대상 요소', data['zoom.target']],
+    ['핀치 리스너 부착', data['zoom.attached']],
     ['줌 모드', data['zoom.mode']],
     ['caps.zoom', data['zoom.capsZoom']],
     ['줌 범위', data['zoom.hwRange']],

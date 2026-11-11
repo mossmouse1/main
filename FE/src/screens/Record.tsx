@@ -91,7 +91,7 @@ export function RecordPhoto() {
   const [cam, setCam] = useState<'starting' | 'live' | 'off'>('starting');
   // 배율은 ref에 두고 requestAnimationFrame으로 영상에 바로 반영합니다(핀치 중 재렌더 없음). zoomLabel은 표시·버튼용으로 천천히 갱신합니다.
   const [zoomLabel, setZoomLabel] = useState(1);
-  const view = useRef<HTMLDivElement>(null);
+  const [view, setView] = useState<HTMLDivElement | null>(null); // 콜백 ref: 요소가 늦게 나타나도 핀치 리스너가 달리게
   const zoomRef = useRef(1);
   const hwRef = useRef<{ min: number; max: number } | null>(null);
   const facingRef = useRef<Facing>('environment');
@@ -262,7 +262,7 @@ export function RecordPhoto() {
           </>
         }
       />
-      <div ref={view} className={`camera__view${cam === 'live' ? ' is-live' : ''}`}>
+      <div ref={setView} className={`camera__view${cam === 'live' ? ' is-live' : ''}`}>
         <video
           ref={video}
           className={`camera__video${facing === 'user' ? ' is-mirror' : ''}`}
