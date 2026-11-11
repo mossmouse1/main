@@ -2,7 +2,7 @@
 
 동탄호수공원에서 아이와 함께 온 가족이 산책하며 생물 관찰을 사진과 함께 남기고, 팀이 그 기록을 검토해 Darwin Core CSV로 내보내는 모바일 웹입니다. 기획은 [prd.md](prd.md)(v0.2)를 따릅니다.
 
-> 이 저장소는 비공개입니다. 실제 키, 프로젝트 주소, 사용자 데이터는 절대 올리지 않습니다([보안 수칙](#7-보안-수칙) 참고).
+> 이 저장소는 비공개입니다. 실제 키, 프로젝트 주소, 사용자 데이터는 절대 올리지 않습니다([보안 수칙](#6-보안-수칙) 참고).
 
 ## 1. 현재 상태
 
@@ -38,7 +38,7 @@
 - `export-csv` Edge Function은 아직 배포하지 않았습니다. 팀 화면의 CSV 내보내기는 배포 전까지 동작하지 않습니다.
 - 앱의 일부 문구(단서 문구, 동의 문구, 일부 헷갈리는 종 설명)는 초안입니다.
 - 월별 기록 막대와 이름 검색 자료(`species_catalog.json`)는 연결 전입니다.
-- 실기기(안드로이드·아이폰 × 브라우저·웹뷰) 점검은 완료되지 않았습니다. 확인 필요.
+- 실기기(안드로이드·아이폰 × 브라우저·웹뷰) 점검은 완료했습니다.
 
 ## 2. 아키텍처
 
@@ -88,31 +88,7 @@ BE/supabase/
 prd.md                       기획서
 ```
 
-## 4. 시작하기
-
-### 요구사항과 실행
-
-- Node.js 20 이상(정확한 최소 버전은 확인 필요), npm
-- 서버 설정에는 Supabase CLI(3.x 기준)가 필요합니다.
-
-```bash
-cd FE
-npm install
-npm run dev      # http://localhost:5173 (가족 화면), /admin (팀 화면)
-```
-
-| 스크립트 | 설명 |
-| --- | --- |
-| `npm run dev` | 개발 서버 |
-| `npm run build` | 타입 검사 + 배포용 빌드(`dist/`) |
-| `npm run preview` | 빌드 결과 미리보기 |
-| `npm run typecheck` | 타입 검사만 |
-| `npm run test` | 단위 테스트(vitest) |
-| `npm run seed:sql` | `public/content/v1.json`에서 `BE/supabase/seed.sql` 생성 |
-
-휴대폰에서 카메라·위치를 시험하려면 HTTPS가 필요합니다. Vercel 미리보기 배포나 HTTPS 터널을 쓰세요.
-
-### 환경변수
+## 4. 환경변수
 
 `FE/.env.example`을 `FE/.env.local`로 복사해 채웁니다(`.env.local`은 커밋하지 않습니다).
 
@@ -126,52 +102,6 @@ npm run dev      # http://localhost:5173 (가족 화면), /admin (팀 화면)
 - URL은 `https://<프로젝트ID>.supabase.co` 기본 주소만 씁니다. `/rest/v1` 같은 경로를 붙이면 로그인 요청이 404가 납니다.
 - 키는 공개용(publishable/anon)만 넣습니다. 서비스 키(secret/service_role)는 넣지 않습니다.
 - 두 변수를 비우면 로컬 모드(브라우저 안 가짜 서버)로 동작합니다.
-
-### Supabase 서버 설정
-
-1. Supabase 프로젝트를 만듭니다.
-2. Authentication에서 **Anonymous sign-ins**를 켭니다(필수). 봇 방지용 CAPTCHA를 권장하고, URL Configuration에 배포 주소를 넣습니다(이메일 연결 링크용).
-3. 확장 `postgis`, `pg_cron`: 마이그레이션을 적용하기 전에 대시보드(Database > Extensions)에서 미리 켭니다. 마이그레이션에도 `create extension`이 들어 있지만, 권한 오류를 피하려면 먼저 켜 두세요.
-4. 스키마와 시드를 올립니다. 새 CLI(3.x)에서는 `db push`에 `--remote`가 필요합니다.
-
-```bash
-cd FE && npm run seed:sql && cd ..     # seed.sql 갱신(콘텐츠를 고칠 때마다)
-cd BE
-supabase link --project-ref <프로젝트ID>
-supabase db push --remote --include-seed
-```
-
-5. 검토자 계정: Authentication에서 사용자를 만든 뒤 SQL 편집기에서 역할을 줍니다.
-
-```sql
-update auth.users
-set raw_app_meta_data = raw_app_meta_data || '{"role":"reviewer"}'
-where email = '<검토자 이메일>';
-```
-
-### Edge Function 배포
-
-```bash
-cd BE
-supabase functions deploy identify-species    # Docker 오류가 나면 --use-api 추가
-```
-
-OpenAI 키는 서버에만 등록합니다. 터미널 기록에 남지 않게 입력하세요.
-
-```bash
-read -s OPENAI_API_KEY && supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY"; unset OPENAI_API_KEY
-# 선택: supabase secrets set OPENAI_MODEL=<모델 이름>
-```
-
-`export-csv`는 아직 배포하지 않았습니다. 배포하려면 `supabase functions deploy export-csv`(확인 필요: 배포 후 동작 점검 전).
-
-### Vercel 배포
-
-1. Vercel에서 이 저장소를 가져옵니다.
-2. Project Settings > General에서 **Root Directory**를 `FE`로 지정합니다.
-3. 같은 화면에서 **Include source files outside of the Root Directory**를 켭니다(`FE`가 `BE/supabase/functions/_shared`를 참조하기 때문).
-4. Environment Variables에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`를 **빌드 전에** 입력합니다. 값은 빌드할 때 번들에 들어가므로, 나중에 바꾸면 다시 배포해야 합니다.
-5. `main`에 푸시하면 자동 배포됩니다. 배포 주소: `https://<배포주소>`
 
 ## 5. 진단 모드
 
@@ -200,26 +130,17 @@ read -s OPENAI_API_KEY && supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY";
 
 그 밖에:
 
-- 종 추천 호출 한도: 가족당 분당 5회, 하루 100회, 전체 가족 합산 하루 1500회(`consume_identify_quota`). 한도 숫자는 `BE/supabase/migrations/20261103000200_identify_quota.sql` 맨 위 상수입니다.
+- 종 추천 호출 한도: 가족당 분당 5회, 하루 100회(현장 테스트 기간 임시 상향), 전체 가족 합산 하루 1500회. 한도 숫자는 가장 최근 마이그레이션 `20261103000300_identify_daily_100.sql`의 `consume_identify_quota` 함수 상단 상수입니다.
 - 사진 버킷(`photos`)은 비공개이고, 서명 URL로만 올리고 봅니다. 사진에는 위치 정보(GPS)가 들어갈 수 있으니 다루는 데 주의하세요.
 - 키가 저장소에 올라갔다면 파일을 지우는 것으로는 부족합니다(기록에 남습니다). 해당 키를 즉시 재발급(폐기)하세요.
 
-## 7. 테스트
-
-```bash
-cd FE
-npm run typecheck
-npm run test
-npm run build
-```
-
-테스트는 조사 노력, 구역 판정, 후보, 도감, Darwin Core CSV, 종 추천 응답 검증, 줌 계산, 사진 바이트 저장 등을 다룹니다. 실제 Supabase·OpenAI 호출과 실기기 동작은 자동 테스트가 없습니다.
-
-## 8. 협업 방법
+## 7. 협업 방법
 
 - `main`에 직접 커밋하지 않고, 브랜치를 만들어 작업한 뒤 PR로 합칩니다(예: `feature/...`, `fix/...`, `docs/...`).
 - 팀원 검토 후 머지하고, `main`에 합쳐지면 Vercel이 자동 배포합니다.
-- DB 스키마 변경은 콘솔에서 직접 고치지 않고 `BE/supabase/migrations/`에 SQL 파일(타임스탬프 이름)로 남겨 `supabase db push --remote`로 적용합니다. 이미 적용된 마이그레이션 파일은 수정하지 않고 새 파일을 추가합니다.
+- DB 스키마·서버 설정·배포는 민재가 맡습니다. 직접 적용하지 말고 민재에게 요청해 주세요.
+- 스키마를 바꿔야 하면 `BE/supabase/migrations/`에 SQL 파일(타임스탬프 이름)로 추가합니다. 이미 적용된 마이그레이션 파일은 수정하지 않고 새 파일을 추가합니다. `supabase db push --remote`로 적용하는 것은 민재입니다.
+- PR을 올리기 전에 FE에서 `npm run typecheck`, `npm run test`, `npm run build`가 통과해야 합니다.
 - 콘텐츠(`FE/public/content/v1.json`)를 고치면 `npm run seed:sql`로 시드를 다시 만듭니다.
 
 ## 아직 임시인 것 (교체 필요)
