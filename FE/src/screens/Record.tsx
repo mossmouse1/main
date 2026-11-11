@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { BlobImage } from '../components/Layout';
@@ -17,6 +17,7 @@ import type { MediaSource, PickSource, RecordDraft } from '../data/types';
 import { getFamilyBackend } from '../backend';
 import { IdentifyError, type IdentifyResult } from '../backend/types';
 import { useSeason } from '../hooks';
+import { DEBUG, debugInc, debugSet } from '../lib/debug';
 import { usePinchZoom } from '../lib/usePinchZoom';
 import { clampZoom, zoomLimits } from '../lib/zoom';
 import { makeIdentifyCopy } from '../lib/photo';
@@ -88,12 +89,71 @@ export function RecordPhoto() {
   const stream = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<Facing>('environment');
   const [cam, setCam] = useState<'starting' | 'live' | 'off'>('starting');
-  const [zoom, setZoom] = useState(1);
+  // 배율은 ref에 두고 requestAnimationFrame으로 영상에 바로 반영합니다(핀치 중 재렌더 없음). zoomLabel은 표시·버튼용으로 천천히 갱신합니다.
+  const [zoomLabel, setZoomLabel] = useState(1);
   const view = useRef<HTMLDivElement>(null);
   const zoomRef = useRef(1);
-  zoomRef.current = zoom;
-  const hwChain = useRef<Promise<unknown>>(Promise.resolve());
+  const hwRef = useRef<{ min: number; max: number } | null>(null);
+  const facingRef = useRef<Facing>('environment');
+  const raf = useRef(0);
+  const labelAt = useRef(0);
+  const trail = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hwBusy = useRef(false);
+  const hwTarget = useRef<number | null>(null);
   const [hwZoom, setHwZoom] = useState<{ min: number; max: number } | null>(null);
+
+  const paint = useCallback(() => {
+    raf.current = 0;
+    const z = zoomRef.current;
+    const mirror = facingRef.current === 'user' ? ' scaleX(-1)' : '';
+    // 하드웨어 줌이 없으면 CSS로 가운데를 확대(디지털 줌). 있으면 영상 자체가 확대돼서 옵니다.
+    if (video.current) video.current.style.transform = !hwRef.current && z > 1 ? `scale(${z})${mirror}` : '';
+    debugInc('zoom.updates');
+    const publish = () => {
+      setZoomLabel(zoomRef.current);
+      debugSet('zoom.value', Number(zoomRef.current.toFixed(2)));
+    };
+    if (performance.now() - labelAt.current > 100) {
+      labelAt.current = performance.now();
+      publish();
+    }
+    clearTimeout(trail.current);
+    trail.current = setTimeout(publish, 120); // 손가락을 뗀 뒤 마지막 값을 반드시 표시
+  }, []);
+
+  // 하드웨어 줌: 진행 중인 호출이 있으면 최신 목표값만 기억했다가 끝나면 그 값만 적용합니다(큐에 쌓아 밀리지 않게).
+  const pushHw = useCallback(() => {
+    const s = stream.current;
+    const target = hwTarget.current;
+    if (hwBusy.current || !s || target === null) return;
+    hwTarget.current = null;
+    hwBusy.current = true;
+    void setHardwareZoom(s, target).finally(() => {
+      hwBusy.current = false;
+      if (hwTarget.current !== null) pushHw();
+    });
+  }, []);
+
+  const setZoom = useCallback(
+    (z: number) => {
+      zoomRef.current = z;
+      if (!raf.current) raf.current = requestAnimationFrame(paint);
+      const hw = hwRef.current;
+      if (hw) {
+        hwTarget.current = clampZoom(z, hw.min, hw.max);
+        pushHw();
+      }
+    },
+    [paint, pushHw],
+  );
+
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(raf.current);
+      clearTimeout(trail.current);
+    },
+    [],
+  );
   const [busy, setBusy] = useState(false);
   const [tip, setTip] = useState(false);
   const [flash, setFlash] = useState(false);
@@ -117,6 +177,7 @@ export function RecordPhoto() {
   useEffect(() => {
     let cancelled = false;
     setCam('starting');
+    facingRef.current = facing;
     void openCameraStream(facing).then((s) => {
       if (cancelled) return stopStream(s);
       if (!s) return setCam('off');
@@ -125,7 +186,11 @@ export function RecordPhoto() {
         video.current.srcObject = s;
         void video.current.play().catch(() => {});
       }
-      setHwZoom(hardwareZoomRange(s));
+      const hw = hardwareZoomRange(s);
+      hwRef.current = hw;
+      setHwZoom(hw);
+      debugSet('zoom.mode', hw ? 'hardware' : 'digital');
+      debugSet('zoom.hwRange', hw ? `${hw.min}-${hw.max}` : 'none');
       setZoom(1);
       setCam('live');
     });
@@ -136,14 +201,13 @@ export function RecordPhoto() {
     };
   }, [facing]);
 
-  useEffect(() => {
-    const s = stream.current;
-    // 하드웨어 줌은 순서대로 하나씩 적용합니다(핀치 중 값이 겹쳐 되돌아가지 않게).
-    if (s && hwZoom) hwChain.current = hwChain.current.then(() => setHardwareZoom(s, clampZoom(zoom, hwZoom.min, hwZoom.max)));
-  }, [zoom, hwZoom]);
-
   const limits = zoomLimits(hwZoom);
   usePinchZoom(view, () => zoomRef.current, setZoom, limits.min, limits.max);
+  useEffect(() => {
+    if (!DEBUG) return;
+    const caps = (s: MediaStream | null) => (s?.getVideoTracks()[0]?.getCapabilities?.() as { zoom?: unknown } | undefined)?.zoom;
+    debugSet('zoom.capsZoom', caps(stream.current) ? 'yes' : 'no');
+  }, [cam]);
 
   if (!draft) return null;
   const room = replace ? MAX_PHOTOS : MAX_PHOTOS - draft.photos.length;
@@ -202,7 +266,6 @@ export function RecordPhoto() {
         <video
           ref={video}
           className={`camera__video${facing === 'user' ? ' is-mirror' : ''}`}
-          style={!hwZoom && zoom > 1 ? { transform: `scale(${zoom})${facing === 'user' ? ' scaleX(-1)' : ''}` } : undefined}
           playsInline
           muted
           autoPlay
@@ -243,11 +306,15 @@ export function RecordPhoto() {
               <p>멀리 있다면 확대해서 찍어보세요</p>
               <div className="zoom__seg" role="group" aria-label="확대">
                 {([1, 2] as const).map((z) => (
-                  <button key={z} className={Math.abs(zoom - z) < 0.05 ? 'is-on' : ''} aria-pressed={Math.abs(zoom - z) < 0.05} onClick={() => setZoom(clampZoom(z, limits.min, limits.max))}>
+                  <button key={z} className={Math.abs(zoomLabel - z) < 0.05 ? 'is-on' : ''} aria-pressed={Math.abs(zoomLabel - z) < 0.05} onClick={() => {
+                      const c = clampZoom(z, limits.min, limits.max);
+                      setZoom(c);
+                      setZoomLabel(c);
+                    }}>
                     {z}×
                   </button>
                 ))}
-                <output className="zoom__value" aria-live="off">{zoom.toFixed(1)}×</output>
+                <output className="zoom__value" aria-live="off">{zoomLabel.toFixed(1)}×</output>
               </div>
             </div>
           )}
@@ -418,7 +485,7 @@ function ShotCard({ draft, canEdit = true }: { draft: RecordDraft; canEdit?: boo
   return (
     <div className="shot">
       <div className="shot__photo">
-        <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" failText="사진을 불러오지 못했어요. 다시 찍기" />
+        <BlobImage blob={photo.display ?? photo.original} alt="찍은 사진" failText="사진을 불러오지 못했어요. 다시 찍기" diag />
         <span className="shot__badge">
           <Icon name="camera" size={18} /> 촬영한 사진
         </span>

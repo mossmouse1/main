@@ -74,10 +74,15 @@ export const supabaseFamily: FamilyBackend = {
     const uid = await familyUid();
     const ext = p.mime.split('/')[1]?.replace('jpeg', 'jpg') || 'bin';
     const originalPath = `${uid}/${p.observationId}/${p.photoId}-original.${ext}`;
-    const displayPath = p.display ? `${uid}/${p.observationId}/${p.photoId}-display.jpg` : null;
+    // 비어 있는 사진은 올리지도 등록하지도 않습니다(던지면 대기열에 남아 다시 시도하고, 사진 데이터도 지워지지 않습니다).
+    if (p.original && p.original.size === 0) throw new Error('photo_empty');
+    const display = p.display && p.display.size > 0 ? p.display : null;
+    if (!p.original && !display) throw new Error('photo_missing');
+    const displayPath = display ? `${uid}/${p.observationId}/${p.photoId}-display.jpg` : null;
     // 원본이 이미 지워졌다면(앞서 올리고 등록만 실패한 경우) 올리기는 건너뜁니다.
     if (p.original) await uploadOnce(originalPath, p.original, p.mime);
-    if (p.display && displayPath) await uploadOnce(displayPath, p.display, 'image/jpeg');
+    if (display && displayPath) await uploadOnce(displayPath, display, 'image/jpeg');
+    // 위 올리기가 모두 성공한 뒤에만 등록합니다.
     check(
       await family.rpc('register_photo', {
         p_id: p.photoId,

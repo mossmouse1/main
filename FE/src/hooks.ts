@@ -16,6 +16,11 @@ export function usePendingCount(): number {
   return useLiveQuery(() => db.observations.where('sync').equals('pending').count(), [], 0);
 }
 
+/** 아직 서버에 올라가지 않은 사진 수 */
+export function usePendingPhotos(): number {
+  return useLiveQuery(() => db.photos.filter((p) => !p.uploaded).count(), [], 0);
+}
+
 export function useActiveWalk(): LocalWalk | null | undefined {
   const row = useLiveQuery(async () => {
     const walks = await db.walks.orderBy('startedAt').reverse().limit(5).toArray();

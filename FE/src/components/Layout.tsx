@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
-import { useObjectUrl, useOnline, usePendingCount } from '../hooks';
+import { isByteBacked } from '../data/blobBytes';
+import { DEBUG, debugSet } from '../lib/debug';
+import { useObjectUrl, useOnline, usePendingCount, usePendingPhotos } from '../hooks';
 import { Icon } from './Icon';
 
 /** 하단 탭 4개(PRD 4장): 탐험 · 도감 · 촬영 · 내 기록. 촬영은 떠 있는 큰 버튼, 설정은 내 기록 머리글에서 엽니다. */
@@ -46,13 +48,18 @@ export function TabLayout() {
 /** 대기 중인 기록 수를 화면 위에 보여 줍니다. 오프라인이어도 기록은 막지 않습니다. */
 export function SyncBar() {
   const pending = usePendingCount();
+  const photos = usePendingPhotos();
   const online = useOnline();
-  if (online && pending === 0) return null;
+  if (online && pending === 0 && photos === 0) return null;
   return (
     <div className={`syncbar${online ? '' : ' is-offline'}`} role="status">
       <Icon name={online ? 'clock' : 'cloud'} size={16} />
       {online ? (
-        <span>보내는 중인 기록 {pending}건</span>
+        <span>
+          {pending > 0 ? `보내는 중인 기록 ${pending}건` : ''}
+          {pending > 0 && photos > 0 ? ' · ' : ''}
+          {photos > 0 ? `사진 업로드 대기 중 ${photos}장` : ''}
+        </span>
       ) : (
         <span>
           오프라인{pending > 0 ? ` · 대기 중 ${pending}건` : ''} · 기록은 휴대폰에 먼저 저장돼요
@@ -111,22 +118,61 @@ export function Stepper({ label, value, onChange, max = 10 }: {
   );
 }
 
-/** 사진 표시. 불러오지 못하면 같은 사진으로 한 번 더 시도하고, 그래도 안 되면 안내(failText)를 보여 줍니다. */
-export function BlobImage({ blob, alt, className, failText }: { blob: Blob | null | undefined; alt: string; className?: string; failText?: string }) {
-  const [attempt, setAttempt] = useState(0);
-  const url = useObjectUrl(blob, attempt);
-  useEffect(() => setAttempt(0), [blob]);
-  if (!url || attempt > 1) {
+const toDataUrl = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result));
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+
+/**
+ * 사진 표시. 불러오지 못하면 ① 같은 Blob으로 주소를 새로 만들고 ② data URL(revoke되지 않음)로 한 번씩 더 시도하고,
+ * 그래도 안 되면 안내(failText)를 보여 줍니다. diag는 ?debug=1 진단에 상태를 남깁니다(주 사진 한 곳만).
+ */
+export function BlobImage({ blob, alt, className, failText, diag = false }: { blob: Blob | null | undefined; alt: string; className?: string; failText?: string; diag?: boolean }) {
+  const [stage, setStage] = useState(0); // 0 처음 · 1 주소 재생성 · 2 data URL · 3 실패
+  const objectUrl = useObjectUrl(blob, Math.min(stage, 1));
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  useEffect(() => {
+    setStage(0);
+    setDataUrl(null);
+    if (!diag || !DEBUG || !blob) return;
+    debugSet('photo.size', blob.size);
+    debugSet('photo.type', blob.type || '(none)');
+    debugSet('photo.storage', isByteBacked(blob) ? 'ArrayBuffer' : 'Blob(legacy)');
+    debugSet('photo.imgError', false);
+    createImageBitmap(blob).then(
+      (b) => (b.close(), debugSet('photo.bitmap', 'ok')),
+      () => debugSet('photo.bitmap', 'fail'),
+    );
+  }, [blob, diag]);
+  useEffect(() => {
+    if (diag) debugSet('photo.stage', stage);
+    if (stage !== 2 || !blob) return;
+    let alive = true;
+    toDataUrl(blob).then(
+      (u) => alive && setDataUrl(u),
+      () => alive && setStage(3),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [stage, blob, diag]);
+
+  const src = stage === 2 ? dataUrl : objectUrl;
+  if (!src || stage > 2) {
     return (
       <div className={`blob-missing ${className ?? ''}`} role="img" aria-label={alt}>
         <Icon name="image" />
-        {attempt > 1 && failText && <span>{failText}</span>}
+        {stage > 2 && failText && <span>{failText}</span>}
       </div>
     );
   }
   const onError = () => {
-    console.warn('BlobImage: load failed', { attempt, type: blob?.type, size: blob?.size });
-    setAttempt((n) => n + 1);
+    console.warn('BlobImage: load failed', { stage, type: blob?.type, size: blob?.size });
+    if (diag) debugSet('photo.imgError', true);
+    setStage((n) => n + 1);
   };
-  return <img src={url} alt={alt} className={className} onError={onError} />;
+  return <img src={src} alt={alt} className={className} onError={onError} />;
 }

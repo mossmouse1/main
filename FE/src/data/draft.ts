@@ -1,5 +1,6 @@
 import { MAX_PHOTOS } from '../config';
 import { makeDisplayCopy, readExifTime } from '../lib/photo';
+import { packBlobs, withBytes } from './blobBytes';
 import { nowIso } from '../lib/time';
 import { uuid } from '../lib/uuid';
 import { db } from './db';
@@ -44,24 +45,30 @@ export async function addPhotos(files: File[], mediaSource: MediaSource): Promis
   const room = MAX_PHOTOS - draft.photos.length;
   const added: DraftPhoto[] = [];
   for (const file of files.slice(0, room)) {
-    const [exifTime, display] = await Promise.all([readExifTime(file), makeDisplayCopy(file)]);
-    added.push({
+    try {
+      const [exifTime, display] = await Promise.all([readExifTime(file), makeDisplayCopy(file)]);
+      // 원본·화면용 모두 바이트로 읽어 둡니다(iOS에서 IndexedDB의 Blob이 깨지는 문제 대응).
+      const [original, displayBytes] = await Promise.all([withBytes(file), display ? withBytes(display).catch(() => null) : null]);
+      added.push({
       id: uuid(),
-      original: file,
-      display,
+      original,
+      display: displayBytes,
       mime: file.type || 'application/octet-stream',
       exifTime,
       mediaSource,
       capturedAt: nowIso(),
-    });
+      });
+    } catch (err) {
+      console.warn('addPhotos: skipped a photo', { type: file.type, size: file.size, reason: err instanceof Error ? err.message : 'unknown' });
+    }
   }
   const latest = await db.drafts.get('current');
-  if (latest) await db.drafts.update('current', { photos: [...latest.photos, ...added].slice(0, MAX_PHOTOS) });
+  if (latest) await db.drafts.update('current', { photos: packBlobs([...latest.photos, ...added].slice(0, MAX_PHOTOS)) });
 }
 
 export async function removePhoto(photoId: string): Promise<void> {
   const draft = await db.drafts.get('current');
-  if (draft) await db.drafts.update('current', { photos: draft.photos.filter((p) => p.id !== photoId) });
+  if (draft) await db.drafts.update('current', { photos: packBlobs(draft.photos.filter((p) => p.id !== photoId)) });
 }
 
 export async function setObserver(observer: ObserverFix | null): Promise<void> {

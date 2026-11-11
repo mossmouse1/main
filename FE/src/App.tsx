@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
+import { DebugPanel } from './components/DebugPanel';
 import { TabLayout } from './components/Layout';
+import { DEBUG } from './lib/debug';
 import { getMeta } from './data/db';
 import { getHousehold, hasConsent } from './data/household';
 import { startSync } from './data/sync';
@@ -22,7 +24,9 @@ const AdminApp = lazy(() => import('./admin/AdminApp'));
 
 export function App() {
   return (
-    <Routes>
+    <>
+      {DEBUG && <DebugPanel />}
+      <Routes>
       <Route
         path="/admin/*"
         element={
@@ -53,7 +57,8 @@ export function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

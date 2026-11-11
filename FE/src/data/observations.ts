@@ -2,6 +2,7 @@ import type { Content } from '../content/types';
 import { distanceM, findBiotope, findZone, inBounds, type LatLng } from '../lib/geo';
 import { nowIso } from '../lib/time';
 import { uuid } from '../lib/uuid';
+import { packBlobs } from './blobBytes';
 import { db } from './db';
 import { enqueue, kickSync } from './sync';
 import { track } from './track';
@@ -65,7 +66,7 @@ export async function saveObservation(
 
   await db.transaction('rw', [db.observations, db.photos, db.drafts, db.outbox], async () => {
     await db.observations.add(obs);
-    await db.photos.bulkAdd(photos);
+    await db.photos.bulkAdd(packBlobs(photos));
     await db.drafts.delete('current');
     await enqueue({ kind: 'observation', refId: id, obsId: id }, { kick: false });
     for (const p of photos) await enqueue({ kind: 'photo', refId: p.id, obsId: id }, { kick: false });

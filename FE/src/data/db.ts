@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
+import { reviveBlobs } from './blobBytes';
 import type {
   Household,
   LocalObservation,
@@ -40,6 +41,10 @@ db.version(1).stores({
   events: '++id',
   assets: 'key',
 });
+
+// 사진은 바이트로 저장하고(blobBytes.ts) 읽을 때 Blob으로 되살립니다. 옛 Blob 데이터도 그대로 읽힙니다.
+db.drafts.hook('reading', (row) => reviveBlobs(row));
+db.photos.hook('reading', (row) => reviveBlobs(row));
 
 export interface MetaValues {
   household: Household;
