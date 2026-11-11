@@ -4,6 +4,7 @@
  */
 import { createClient, FunctionsHttpError } from '@supabase/supabase-js';
 import type { HistoryRow } from '@shared/dwc';
+import { isAlreadyUploaded } from '../lib/storageErrors';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../config';
 import type { MyStatus } from '../data/types';
 import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
@@ -29,18 +30,15 @@ async function familyUid(): Promise<string> {
   return data.session.user.id;
 }
 
-const isAlreadyThere = (err: { message?: string; statusCode?: string; status?: number } | null) =>
-  !!err && (err.statusCode === '409' || err.status === 409 || /exist|duplicate/i.test(err.message ?? ''));
-
 /** 같은 사진을 두 번 올려도 한 번만 저장되게(이미 있으면 성공으로 봄) */
 async function uploadOnce(path: string, blob: Blob, contentType: string): Promise<void> {
   const signed = await family.storage.from(BUCKET).createSignedUploadUrl(path);
   if (signed.error) {
-    if (isAlreadyThere(signed.error as never)) return;
+    if (isAlreadyUploaded(signed.error as never)) return;
     throw new Error(signed.error.message);
   }
   const up = await family.storage.from(BUCKET).uploadToSignedUrl(path, signed.data.token, blob, { contentType });
-  if (up.error && !isAlreadyThere(up.error as never)) throw new Error(up.error.message);
+  if (up.error && !isAlreadyUploaded(up.error as never)) throw new Error(up.error.message);
 }
 
 export const supabaseFamily: FamilyBackend = {
