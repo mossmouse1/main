@@ -140,7 +140,8 @@ prd.md                       기획서
 - `main`에 직접 커밋하지 않고, 브랜치를 만들어 작업한 뒤 PR로 합칩니다(예: `feature/...`, `fix/...`, `docs/...`).
 - 팀원 검토 후 머지하고, `main`에 합쳐지면 Vercel이 자동 배포합니다.
 - DB 스키마·서버 설정·배포는 직접 적용하지 말고 요청해 주세요.
-- 스키마를 바꿔야 하면 `BE/supabase/migrations/`에 SQL 파일(타임스탬프 이름)로 추가합니다. 이미 적용된 마이그레이션 파일은 수정하지 않고 새 파일을 추가합니다. `supabase db push --remote`로 적용하는 것은 요청해주세요.
+- 스키마 변경은 `BE/supabase/migrations/`에 SQL 파일(타임스탬프 이름)로 남깁니다. 이미 적용된 마이그레이션 파일은 수정하지 않고 새 파일을 추가합니다.
+- 마이그레이션 SQL 파일은 직접 추가해도 되지만, `supabase db push --remote`로 서버에 적용하는 것은 서버 담당자에게 요청해 주세요.
 - PR을 올리기 전에 FE에서 `npm run typecheck`, `npm run test`, `npm run build`가 통과해야 합니다.
 - 콘텐츠(`FE/public/content/v1.json`)를 고치면 `npm run seed:sql`로 시드를 다시 만듭니다.
 
