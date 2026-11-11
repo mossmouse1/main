@@ -15,7 +15,7 @@
 | F03 오늘 찾을 종 · F04 생물 카드 | 구현(월별 자료는 연결 전) | `FE/src/screens/SpeciesCard.tsx` |
 | F05 사진(카메라/앨범, 1~3장, 원본 + 1280px 사본, HEIC, EXIF 시각) | 구현 | `FE/src/platform.ts`, `FE/src/lib/photo.ts` |
 | F06 후보 3개 / 목록에 없어요 / 잘 모르겠어요 | 구현 | `FE/src/screens/Record.tsx` |
-| 사진으로 종 후보 3개 추천(서버에서 OpenAI 호출, 버튼을 눌렀을 때만) | 구현, Supabase 모드에서만 | `BE/supabase/functions/identify-species`, `FE/src/screens/Record.tsx` |
+| 사진으로 종 후보 3개 추천(서버에서 OpenAI 호출, 버튼을 눌렀을 때만). PRD 범위 밖에서 추가한 실험 기능 | 구현, Supabase 모드에서만 | `BE/supabase/functions/identify-species`, `FE/src/screens/Record.tsx` |
 | F07 생물 위치(지도 탭, 반경, 내 근처) | 구현 | `FE/src/screens/Record.tsx` |
 | 위치로 구역·비오톱 자동 판정 | 구현(비오톱 데이터는 샘플) | `BE/supabase/migrations`, `FE/src/lib/geo.ts` |
 | F08 자동 기록 · F09 오프라인 저장(IndexedDB 대기열, 재시도, 서버 확인 뒤 원본 삭제) | 구현 | `FE/src/data/observations.ts`, `FE/src/data/sync.ts` |
@@ -28,11 +28,11 @@
 | F16 콘텐츠 편집 화면 | 미구현(읽기만, 편집은 JSON) | `FE/src/admin/ContentAdmin.tsx` |
 | F17 품질 지표 | 일부 | `FE/src/admin/ContentAdmin.tsx` |
 
-PRD는 "AI 종 판별 모델"을 이번 범위 밖으로 적고 있지만, 종 추천 기능은 그 뒤에 추가된 것입니다. 추천은 후보를 보여 줄 뿐이고 최종 이름은 가족이 고르며, 선택한 경우 `pick_source`가 `photo_ai`로 기록됩니다.
+종 추천은 후보를 보여 줄 뿐이고 최종 이름은 가족이 고르며, 선택한 경우 `pick_source`가 `photo_ai`로 기록됩니다.
 
 ### 알려진 한계
 
-- 카메라 두 손가락 핀치 줌이 폰에서 아직 해결되지 않았습니다(1x/2x 버튼은 동작). 확인 필요: 마지막 수정이 아이폰에서 통과했는지.
+- 카메라 핀치 줌 미해결: 아이폰(크롬/사파리)에서 두 손가락 핀치가 반응하지 않습니다. 카메라의 1x/2x 버튼은 동작합니다. 리스너 부착 문제를 고쳤지만 실기기에서 여전히 재현되며, `?debug=1` 진단 패널로 원인을 확인 중입니다.
 - 지도는 임시 SVG입니다. 구역 경계(Z1~Z6)와 시설 위치도 임시 도형입니다.
 - 비오톱 데이터는 샘플 1개(호수)뿐입니다.
 - `export-csv` Edge Function은 아직 배포하지 않았습니다. 팀 화면의 CSV 내보내기는 배포 전까지 동작하지 않습니다.
@@ -131,7 +131,7 @@ npm run dev      # http://localhost:5173 (가족 화면), /admin (팀 화면)
 
 1. Supabase 프로젝트를 만듭니다.
 2. Authentication에서 **Anonymous sign-ins**를 켭니다(필수). 봇 방지용 CAPTCHA를 권장하고, URL Configuration에 배포 주소를 넣습니다(이메일 연결 링크용).
-3. 확장 `postgis`, `pg_cron`: 첫·두 번째 마이그레이션이 `create extension`을 실행합니다. 권한 오류가 나면 대시보드 Database > Extensions에서 직접 켭니다. 확인 필요: 새 프로젝트에서 자동으로 켜지는지.
+3. 확장 `postgis`, `pg_cron`: 마이그레이션을 적용하기 전에 대시보드(Database > Extensions)에서 미리 켭니다. 마이그레이션에도 `create extension`이 들어 있지만, 권한 오류를 피하려면 먼저 켜 두세요.
 4. 스키마와 시드를 올립니다. 새 CLI(3.x)에서는 `db push`에 `--remote`가 필요합니다.
 
 ```bash
