@@ -5,7 +5,7 @@ import { Icon } from '../components/Icon';
 import { BlobImage } from '../components/Layout';
 import { ParkMap } from '../components/ParkMap';
 import { SpeciesArt } from '../components/SpeciesArt';
-import { DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
+import { BACKEND_MODE, DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
 import { useContent } from '../content/ContentProvider';
 import { candidatesFromTaxon, candidatesFromZone, searchTaxa, taxonById, zoneById } from '../content/helpers';
 import { CATEGORY_LABEL, type Content, type Taxon } from '../content/types';
@@ -14,7 +14,10 @@ import { addPhotos, discardDraft, pickTaxon, removePhoto, setObserver, startDraf
 import { saveObservation } from '../data/observations';
 import { track } from '../data/track';
 import type { MediaSource, PickSource, RecordDraft } from '../data/types';
+import { getFamilyBackend } from '../backend';
+import { IdentifyError, type IdentifyResult } from '../backend/types';
 import { useSeason } from '../hooks';
+import { makeIdentifyCopy } from '../lib/photo';
 import { withEul, withRo } from '../lib/josa';
 import { distanceM, findZone, formatDistance, inBounds, type LatLng } from '../lib/geo';
 import { captureFrame, getPosition, hardwareZoomRange, openCameraStream, pickPhotos, setHardwareZoom, stopStream, type Facing } from '../platform';
@@ -463,6 +466,82 @@ function WhereRow({ draft, editable = true }: { draft: RecordDraft; editable?: b
   );
 }
 
+
+const IDENTIFY_ERROR_TEXT: Record<string, string> = {
+  rate_limited: '잠깐 쉬었다가 다시 눌러 주세요. 1분에 5번까지 추천받을 수 있어요.',
+  daily_limit: '오늘 추천받을 수 있는 횟수를 다 썼어요. 이름은 직접 찾아 주세요.',
+  global_limit: '오늘은 추천 기능이 많이 쓰여서 잠시 쉬어요. 이름은 직접 찾아 주세요.',
+  consent_required: '동의를 먼저 마쳐야 추천받을 수 있어요.',
+  network: '인터넷 연결을 확인하고 다시 눌러 주세요.',
+};
+/** 같은 사진은 결과를 기억해 다시 부르지 않습니다(호출 횟수 절약). */
+const identifyCache = new Map<string, IdentifyResult>();
+const TRUST_MIN = 0.3;
+
+/** 사진으로 종 추천받기: 버튼을 눌렀을 때만 부릅니다. */
+function PhotoSuggest({ draft, onPick, onManual }: { draft: RecordDraft; onPick: (taxonId: string, candidateIds: string[]) => void; onManual: () => void }) {
+  const { content } = useContent();
+  const photo = draft.photos[0];
+  const [, bump] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const result = identifyCache.get(photo.id);
+
+  const run = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      const blob = await makeIdentifyCopy(photo.display ?? photo.original);
+      if (!blob) throw new IdentifyError('failed');
+      identifyCache.set(photo.id, await (await getFamilyBackend()).identifySpecies(blob));
+      bump((n) => n + 1);
+    } catch (e) {
+      setError(IDENTIFY_ERROR_TEXT[e instanceof IdentifyError ? e.code : ''] ?? '추천을 받지 못했어요. 이름은 직접 찾아 주세요.');
+    }
+    setBusy(false);
+  };
+
+  const cards = result?.candidates.map((c) => ({ c, t: taxonById(content, c.taxonId) })).filter((x): x is { c: IdentifyResult['candidates'][number]; t: Taxon } => !!x.t) ?? [];
+  const trusted = !!result && !result.noMatch && cards.length > 0 && cards[0].c.confidence >= TRUST_MIN;
+
+  return (
+    <section className="sec">
+      {!result && (
+        <button className="btn btn--outline btn--block" disabled={busy} onClick={() => void run()}>
+          {busy ? '사진을 살펴보는 중…' : '사진으로 종 추천받기'}
+        </button>
+      )}
+      {error && <p className="caption" role="alert">{error}</p>}
+      {result && trusted && (
+        <>
+          <h2 className="sec__title">사진과 닮은 생물이에요</h2>
+          <ul className="alt-list">
+            {cards.map(({ c, t }) => (
+              <li key={t.id}>
+                <button className="alt" onClick={() => onPick(t.id, cards.map((x) => x.t.id))}>
+                  <SpeciesArt taxon={t} size="sm" />
+                  <span>
+                    <strong>{t.koreanName}</strong>
+                    <span className="muted">{t.scientificName} · 확신도 {Math.round(c.confidence * 100)}%</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p className="caption">AI 추천이라 틀릴 수 있어요. 사진과 비교해 보고 골라 주세요.</p>
+        </>
+      )}
+      {result && !trusted && (
+        <>
+          <p className="caption">목록에 없는 것 같아요. 직접 찾아볼래요.</p>
+          <button className="btn btn--outline btn--block" onClick={onManual}>이름으로 직접 찾기</button>
+        </>
+      )}
+    </section>
+  );
+}
+
 /** S5 생물 확인: 예상 결과 + 다른 후보 2개(PRD F06 후보 3개), 목록에 없어요, 아직 모르겠어요 */
 export function RecordPick() {
   const draft = useDraft();
@@ -498,7 +577,7 @@ export function RecordPick() {
   const taxon = taxonById(content, current.taxonId);
   const name = taxon?.koreanName ?? (current.freeText ? `‘${current.freeText}’` : '');
   const basis =
-    current.source === 'search' ? '이름으로 찾은 생물이에요' : current.source === 'free_text' ? '직접 적은 이름이에요' : current.taxonId !== predictedId ? '직접 고른 후보예요' : fromCard ? '찾으러 온 생물이에요' : '이 구역에서 가장 많이 기록됐어요';
+    current.source === 'photo_ai' ? '사진 추천(AI)에서 고른 생물이에요' : current.source === 'search' ? '이름으로 찾은 생물이에요' : current.source === 'free_text' ? '직접 적은 이름이에요' : current.taxonId !== predictedId ? '직접 고른 후보예요' : fromCard ? '찾으러 온 생물이에요' : '이 구역에서 가장 많이 기록됐어요';
   const alternatives = draft.candidateIds.filter((id) => id !== current.taxonId).slice(0, current.source === 'card' || current.source === 'zone' ? 2 : 3);
   const results = query.trim() ? searchTaxa(content, query) : season.dex.map((id) => taxonById(content, id)).filter((t): t is Taxon => !!t);
 
@@ -553,6 +632,17 @@ export function RecordPick() {
             </ul>
             <p className="caption">자동 판별이 아니에요. 팀이 사진을 한 번 더 확인해요.</p>
           </section>
+        )}
+
+        {BACKEND_MODE === 'supabase' && (
+          <PhotoSuggest
+            draft={draft}
+            onManual={() => setOthers(true)}
+            onPick={(taxonId, ids) => {
+              void updateDraft({ candidateIds: ids });
+              choose({ taxonId, source: 'photo_ai', freeText: null });
+            }}
+          />
         )}
 
         {alternatives.length > 0 && (

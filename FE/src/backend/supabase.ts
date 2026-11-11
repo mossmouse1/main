@@ -2,11 +2,11 @@
  * Supabase 모드. 테이블·함수·권한은 supabase/migrations에 있습니다.
  * 가족과 팀 검토자는 세션을 따로 둡니다(같은 브라우저에서 /admin을 열어도 가족 익명 계정이 바뀌지 않게).
  */
-import { createClient } from '@supabase/supabase-js';
+import { createClient, FunctionsHttpError } from '@supabase/supabase-js';
 import type { HistoryRow } from '@shared/dwc';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../config';
 import type { MyStatus } from '../data/types';
-import type { AdminBackend, AdminFilters, AdminRow, FamilyBackend, ReviewChanges } from './types';
+import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
 
 const BUCKET = 'photos';
 const SIGNED_URL_SECONDS = 600; // 10분
@@ -134,6 +134,23 @@ export const supabaseFamily: FamilyBackend = {
   async linkedEmail() {
     const { data } = await family.auth.getUser();
     return data.user?.email ?? null;
+  },
+
+  async identifySpecies(image) {
+    const imageBase64 = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(',')[1] ?? '');
+      r.onerror = () => reject(new IdentifyError('failed'));
+      r.readAsDataURL(image);
+    });
+    const { data, error } = await family.functions.invoke('identify-species', { body: { imageBase64, mime: 'image/jpeg' } });
+    if (!error) return data as IdentifyResult;
+    if (error instanceof FunctionsHttpError) {
+      const body = (await error.context.json().catch(() => null)) as { error?: string } | null;
+      const known: IdentifyErrorCode[] = ['rate_limited', 'daily_limit', 'global_limit', 'consent_required', 'too_large'];
+      throw new IdentifyError(known.find((c) => c === body?.error) ?? 'failed');
+    }
+    throw new IdentifyError('network');
   },
 };
 

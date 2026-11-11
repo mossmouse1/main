@@ -1,0 +1,67 @@
+import { describe, expect, it } from 'vitest';
+import { buildRequest, checkInput, mapQuotaError, MAX_BASE64_CHARS, parseResult, type TaxonLite } from './identify';
+
+const taxa: TaxonLite[] = [
+  { id: 'a', korean_name: '청둥오리', scientific_name: 'Anas platyrhynchos', category: 'bird' },
+  { id: 'b', korean_name: '쇠물닭', scientific_name: 'Gallinula chloropus', category: 'bird' },
+  { id: 'c', korean_name: '왕버들', scientific_name: 'Salix chaenomeloides', category: 'plant' },
+  { id: 'd', korean_name: '참새', scientific_name: 'Passer montanus', category: 'bird' },
+];
+const wrap = (obj: unknown) => ({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify(obj) }] }] });
+
+describe('buildRequest', () => {
+  it('taxonId를 목록 id로 제한하고 high 이미지로 보낸다', () => {
+    const r = buildRequest('m', taxa, 'AAAA', 'image/jpeg');
+    const props = (r.text.format.schema.properties.candidates.items.properties as any).taxonId;
+    expect(props.enum).toEqual(['a', 'b', 'c', 'd']);
+    const content = r.input[0].content as any[];
+    expect(content[1]).toMatchObject({ detail: 'high', image_url: 'data:image/jpeg;base64,AAAA' });
+    expect(content[0].text).toContain('b: 쇠물닭 / Gallinula chloropus');
+  });
+});
+
+describe('parseResult', () => {
+  it('목록에 없는 종과 중복을 버리고 확신도를 0~1로 맞추며 3개까지만 남긴다', () => {
+    const r = parseResult(
+      wrap({ noMatch: false, candidates: [{ taxonId: 'zzz', confidence: 0.9 }, { taxonId: 'a', confidence: 1.7 }, { taxonId: 'a', confidence: 0.5 }, { taxonId: 'b', confidence: 0.3 }, { taxonId: 'c', confidence: 0.2 }, { taxonId: 'd', confidence: 0.1 }] }),
+      taxa,
+    );
+    expect(r).toEqual({
+      noMatch: false,
+      candidates: [
+        { taxonId: 'a', koreanName: '청둥오리', confidence: 1 },
+        { taxonId: 'b', koreanName: '쇠물닭', confidence: 0.3 },
+        { taxonId: 'c', koreanName: '왕버들', confidence: 0.2 },
+      ],
+    });
+  });
+  it('후보가 모두 걸러지면 noMatch', () => {
+    expect(parseResult(wrap({ noMatch: false, candidates: [{ taxonId: 'x', confidence: 1 }] }), taxa)).toEqual({ candidates: [], noMatch: true });
+  });
+  it('형식 오류·미완료·거절은 null', () => {
+    expect(parseResult({ status: 'incomplete', output: [] }, taxa)).toBeNull();
+    expect(parseResult({ status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal', refusal: 'no' }] }] }, taxa)).toBeNull();
+    expect(parseResult({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: 'not json' }] }] }, taxa)).toBeNull();
+    expect(parseResult(null, taxa)).toBeNull();
+  });
+});
+
+describe('mapQuotaError', () => {
+  it('한도는 429, 동의 없음은 403', () => {
+    expect(mapQuotaError('rate_limited')).toEqual({ status: 429, error: 'rate_limited' });
+    expect(mapQuotaError('daily_limit')).toEqual({ status: 429, error: 'daily_limit' });
+    expect(mapQuotaError('global_limit')).toEqual({ status: 429, error: 'global_limit' });
+    expect(mapQuotaError('consent_required')).toEqual({ status: 403, error: 'consent_required' });
+    expect(mapQuotaError('boom').status).toBe(500);
+  });
+});
+
+describe('checkInput', () => {
+  it('정상, 형식 오류, 너무 큼', () => {
+    expect(checkInput({ imageBase64: 'AAAA', mime: 'image/jpeg' })).toBeNull();
+    expect(checkInput({ imageBase64: 'AAAA', mime: 'image/png' })?.status).toBe(400);
+    expect(checkInput({ imageBase64: 'data:image/jpeg;base64,AAAA', mime: 'image/jpeg' })?.status).toBe(400);
+    expect(checkInput({ imageBase64: 'A'.repeat(MAX_BASE64_CHARS + 1), mime: 'image/jpeg' })?.status).toBe(413);
+    expect(checkInput(null)?.status).toBe(400);
+  });
+});

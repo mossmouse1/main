@@ -5,7 +5,7 @@ export { ID_STATUS_LABEL, type IdStatus } from '@shared/dwc';
 
 export type MediaSource = 'camera' | 'album';
 /** 후보를 어디서 골랐는지: 생물 카드 / 현재 구역 / 이름 검색 / 직접 입력 / 잘 모르겠어요 */
-export type PickSource = 'card' | 'zone' | 'search' | 'free_text' | 'unknown';
+export type PickSource = 'card' | 'zone' | 'search' | 'free_text' | 'unknown' | 'photo_ai';
 export type LocationMethod = 'tap' | 'near_me';
 
 export interface ObserverFix extends LatLng {

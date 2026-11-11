@@ -26,6 +26,21 @@ export interface FamilyBackend {
   /** 기록 지키기(F14): 이메일 매직 링크로 익명 계정 연결 */
   linkEmail(email: string): Promise<void>;
   linkedEmail(): Promise<string | null>;
+  /** 사진으로 종 후보 추천(서버 AI). 로컬 모드에서는 쓸 수 없습니다. */
+  identifySpecies(image: Blob): Promise<IdentifyResult>;
+}
+
+export interface IdentifyResult {
+  candidates: { taxonId: string; koreanName: string; confidence: number }[];
+  noMatch: boolean;
+}
+
+/** identifySpecies 실패 이유(화면에서 한국어로 바꿉니다) */
+export type IdentifyErrorCode = 'rate_limited' | 'daily_limit' | 'global_limit' | 'consent_required' | 'too_large' | 'network' | 'failed';
+export class IdentifyError extends Error {
+  constructor(public code: IdentifyErrorCode) {
+    super(code);
+  }
 }
 
 /** 검토 화면에서 쓰는 행: 내보내기 행 + 검토에 필요한 값 */

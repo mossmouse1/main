@@ -1,4 +1,4 @@
-import { DISPLAY_LONG_EDGE } from '../config';
+import { DISPLAY_LONG_EDGE, IDENTIFY_LONG_EDGE } from '../config';
 
 export function isHeic(file: Blob & { name?: string }): boolean {
   return /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name ?? '');
@@ -26,7 +26,16 @@ async function decode(blob: Blob): Promise<Decoded> {
  * 화면용 사본(긴 변 1280px JPEG). 원본은 손대지 않습니다.
  * 브라우저가 HEIC를 못 읽으면 그때만 heic2any를 받아 변환합니다.
  */
-export async function makeDisplayCopy(file: File): Promise<Blob | null> {
+export function makeDisplayCopy(file: File): Promise<Blob | null> {
+  return resizeJpeg(file, DISPLAY_LONG_EDGE, 0.85);
+}
+
+/** 종 추천용 사본(긴 변 768px 이하 JPEG, 품질 0.7). 전송량과 비용을 줄이려고 작게 보냅니다. */
+export function makeIdentifyCopy(file: Blob): Promise<Blob | null> {
+  return resizeJpeg(file as File, IDENTIFY_LONG_EDGE, 0.7);
+}
+
+async function resizeJpeg(file: File, longEdge: number, quality: number): Promise<Blob | null> {
   let source: Decoded;
   try {
     source = await decode(file);
@@ -42,13 +51,13 @@ export async function makeDisplayCopy(file: File): Promise<Blob | null> {
   }
   const w = source instanceof HTMLImageElement ? source.naturalWidth : source.width;
   const h = source instanceof HTMLImageElement ? source.naturalHeight : source.height;
-  const scale = Math.min(1, DISPLAY_LONG_EDGE / Math.max(w, h));
+  const scale = Math.min(1, longEdge / Math.max(w, h));
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(w * scale);
   canvas.height = Math.round(h * scale);
   canvas.getContext('2d')!.drawImage(source, 0, 0, canvas.width, canvas.height);
   if ('close' in source) source.close();
-  return new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.85));
+  return new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/jpeg', quality));
 }
 
 /**

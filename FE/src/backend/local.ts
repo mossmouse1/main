@@ -22,7 +22,7 @@ import { effortText } from '../lib/effort';
 import { distanceM, findBiotope, findZone, inBounds } from '../lib/geo';
 import { kstDate, minutesBetween } from '../lib/time';
 import { uuid } from '../lib/uuid';
-import type { AdminBackend, AdminFilters, AdminRow, FamilyBackend } from './types';
+import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type FamilyBackend } from './types';
 
 interface SrvHousehold {
   id: string;
@@ -391,6 +391,10 @@ export const localFamily: FamilyBackend = {
 
   async linkedEmail() {
     return null;
+  },
+
+  async identifySpecies() {
+    throw new IdentifyError('failed'); // 로컬 모드에서는 화면이 버튼을 숨깁니다.
   },
 };
 
