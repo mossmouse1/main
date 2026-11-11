@@ -10,3 +10,4 @@ BE/supabase/.branches
 .DS_Store
 
 .vercel
+.vscode/
