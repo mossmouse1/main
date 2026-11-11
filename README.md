@@ -200,7 +200,7 @@ read -s OPENAI_API_KEY && supabase secrets set OPENAI_API_KEY="$OPENAI_API_KEY";
 
 그 밖에:
 
-- 종 추천 호출 한도: 가족당 분당 5회, 하루 40회, 전체 가족 합산 하루 1500회(`consume_identify_quota`). 한도 숫자는 `BE/supabase/migrations/20261103000200_identify_quota.sql` 맨 위 상수입니다.
+- 종 추천 호출 한도: 가족당 분당 5회, 하루 100회, 전체 가족 합산 하루 1500회(`consume_identify_quota`). 한도 숫자는 `BE/supabase/migrations/20261103000200_identify_quota.sql` 맨 위 상수입니다.
 - 사진 버킷(`photos`)은 비공개이고, 서명 URL로만 올리고 봅니다. 사진에는 위치 정보(GPS)가 들어갈 수 있으니 다루는 데 주의하세요.
 - 키가 저장소에 올라갔다면 파일을 지우는 것으로는 부족합니다(기록에 남습니다). 해당 키를 즉시 재발급(폐기)하세요.
 
