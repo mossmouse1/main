@@ -356,7 +356,8 @@ export function RecordPhoto() {
 /** S6 있던 곳: 찍은 사람 위치 ≠ 생물 위치. 지도를 탭하고 반경을 고릅니다(PRD F07). */
 export function RecordWhere() {
   const draft = useDraft();
-  const { content, mapUrl } = useContent();
+  const { content, mapUrl, isoUrl } = useContent();
+  const iso = isoUrl ? content.map.iso ?? null : null;
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const editing = params.get('then') === 'pick';
@@ -412,8 +413,10 @@ export function RecordWhere() {
         <strong>{name}</strong>이(가) 있던 곳을 지도에서 눌러 주세요.
       </p>
       <div className="record__map">
+        {/* 지도 홈과 같은 블록 지도. 누른 곳은 그 뒤 땅의 자리로 정합니다(나무·건물 위를 눌러도). */}
         <ParkMap
-          imageUrl={mapUrl}
+          imageUrl={iso ? isoUrl! : mapUrl}
+          iso={iso}
           bounds={content.park.bounds}
           attribution={content.map.attribution}
           scale
@@ -424,7 +427,7 @@ export function RecordWhere() {
           subject={subject ?? null}
           radiusM={nearMe ? nearRadius : radius}
           focus={subject ?? (observerInPark ? observer : null)}
-          focusScale={2.5}
+          focusScale={iso ? 2.6 : 2.5}
           onMapClick={(p) => {
             setSubject(p);
             setNearMe(false);

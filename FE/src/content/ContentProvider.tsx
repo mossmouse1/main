@@ -1,10 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import { loadContent, loadMapImageUrl } from './load';
+import { buildTrailGraph, type TrailGraph } from '../lib/trail';
+import { loadContent, loadIsoImageUrl, loadMapImageUrl, loadTrails } from './load';
 import type { Content } from './types';
 
 interface ContentState {
   content: Content;
   mapUrl: string;
+  /** 지도 홈의 쿼터뷰 블록 지도(없으면 null) */
+  isoUrl: string | null;
+  /** 산책로 그래프(못 받았으면 점 0개) */
+  trails: TrailGraph;
 }
 
 const ContentContext = createContext<ContentState | null>(null);
@@ -16,7 +21,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const load = useCallback(() => {
     setFailed(false);
     loadContent()
-      .then(async (content) => setState({ content, mapUrl: await loadMapImageUrl(content) }))
+      .then(async (content) => {
+        const [mapUrl, isoUrl, lines] = await Promise.all([loadMapImageUrl(content), loadIsoImageUrl(content), loadTrails()]);
+        setState({ content, mapUrl, isoUrl, trails: buildTrailGraph(lines) });
+      })
       .catch(() => setFailed(true));
   }, []);
 

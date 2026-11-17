@@ -57,6 +57,8 @@ export interface MetaValues {
   /** 지도 탐험 가이드·촬영 첫 안내를 봤는지 */
   tourSeen: boolean;
   cameraTipSeen: boolean;
+  /** 지도에 그리는 내가 걸어온 길(최근 3시간, 기기에만 둠). data/trackLog.ts */
+  trackLog: [number, number, number][];
 }
 
 // meta에는 이 밖에 'content'(콘텐츠 사본)도 들어갑니다(content/load.ts).

@@ -50,6 +50,12 @@ export default defineConfig({
             options: { cacheName: 'photos', expiration: { maxEntries: 300 } },
           },
           {
+            // 블록 글꼴(Do Hyeon): 한 번 받으면 공원에서 연결이 끊겨도 씁니다.
+            urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
+            handler: 'CacheFirst',
+            options: { cacheName: 'google-fonts', expiration: { maxEntries: 60 }, cacheableResponse: { statuses: [0, 200] } },
+          },
+          {
             urlPattern: ({ url }) => url.hostname === 'cdn.jsdelivr.net' && url.pathname.includes('pretendard'),
             handler: 'CacheFirst',
             options: { cacheName: 'fonts', expiration: { maxEntries: 200 }, cacheableResponse: { statuses: [0, 200] } },

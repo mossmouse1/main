@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useSearchParams } from 'react-router';
 import { IdStatusBadge, SyncBadge } from '../components/Badges';
 import { Icon } from '../components/Icon';
-import { BlobImage, Toast } from '../components/Layout';
+import { BlobImage, PageHeader, Toast } from '../components/Layout';
 import { useContent } from '../content/ContentProvider';
 import { taxonById, zoneById } from '../content/helpers';
 import { db } from '../data/db';
@@ -33,12 +33,15 @@ export function Records() {
 
   return (
     <main className="page">
-      <header className="page-header page-header--plain">
-        <h1>내 기록</h1>
-        <Link to="/settings" className="icon-btn" aria-label="설정">
-          <Icon name="gear" size={26} />
-        </Link>
-      </header>
+      <PageHeader
+        title="내 기록"
+        backTo="/dex"
+        right={
+          <Link to="/settings" className="icon-btn" aria-label="설정">
+            <Icon name="gear" size={26} />
+          </Link>
+        }
+      />
       <div className="page__body stack">
         {observations.length > 0 && (
           <dl className="tally">

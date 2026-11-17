@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { Icon } from '../components/Icon';
-import { Silhouette } from '../components/Illustrations';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { SearchOverlay } from '../components/SearchOverlay';
 import { SpeciesArt } from '../components/SpeciesArt';
 import { db, getMeta, setMeta } from '../data/db';
@@ -35,7 +35,6 @@ export function Dex() {
   );
 
   if (!dex) return null;
-  const percent = dex.total ? Math.round((dex.filled / dex.total) * 100) : 0;
   const newCount = dex.cells.filter((c) => c.isNew).length;
   const cells = dex.cells
     .map((cell, i) => ({ ...cell, no: i + 1 }))
@@ -47,9 +46,14 @@ export function Dex() {
       <header className="dex-head">
         <div className="dex-head__row">
           <h1>나의 도감</h1>
-          <button className="icon-btn" onClick={() => setSearching(true)} aria-label="생물 이름 찾기">
-            <Icon name="search" size={24} />
-          </button>
+          <div className="dex-head__tools">
+            <Link to="/records" className="icon-btn" aria-label="내 기록">
+              <Icon name="clipboard" size={24} />
+            </Link>
+            <button className="icon-btn" onClick={() => setSearching(true)} aria-label="생물 이름 찾기">
+              <Icon name="search" size={24} />
+            </button>
+          </div>
         </div>
         <div className="dex-score" role="progressbar" aria-valuemin={0} aria-valuemax={dex.total} aria-valuenow={dex.filled} aria-label="발견한 생물">
           <p className="dex-score__num">
@@ -57,13 +61,15 @@ export function Dex() {
             <span>/ {dex.total}</span>
           </p>
           <div className="dex-score__text">
-            <span>
-              {season.season} 도감 · {dex.filled === dex.total ? '모두 찾았어요' : `${dex.total - dex.filled}종 남음`}
-            </span>
-            {newCount > 0 && <b className="dex-score__new">새로 찾음 +{newCount}</b>}
+            <span className="dex-score__season">{season.season} 도감</span>
+            <span>{dex.filled === dex.total ? '모두 찾았어요!' : `${dex.total - dex.filled}종 더 찾으면 완성`}</span>
           </div>
-          <span className="dex-score__track" aria-hidden="true">
-            <span style={{ width: `${percent}%` }} />
+          {newCount > 0 && <b className="dex-score__new">새로 찾음 +{newCount}</b>}
+          {/* 칸 수만큼 작은 블록, 찾은 만큼 초록 */}
+          <span className="dex-score__blocks" aria-hidden="true">
+            {dex.cells.map((c) => (
+              <i key={c.taxon.id} className={c.filled ? 'is-on' : undefined} />
+            ))}
           </span>
         </div>
       </header>
@@ -99,19 +105,19 @@ export function Dex() {
               <li key={cell.taxon.id}>
                 <Link
                   to={`/species/${cell.taxon.id}`}
-                  className={`dex-tile${cell.filled ? ' is-filled' : ''}${dex.nextClue?.id === cell.taxon.id ? ' is-next' : ''}`}
+                  className={`dex-tile dex-tile--${cell.taxon.category}${cell.filled ? ' is-filled' : ''}${dex.nextClue?.id === cell.taxon.id ? ' is-next' : ''}`}
                   aria-label={cell.filled ? `${cell.no}번 ${cell.taxon.koreanName}, 찾음` : `${cell.no}번 아직 못 찾은 ${friendOf(cell.taxon)}`}
                 >
-                  <span className="dex-tile__img">
-                    {cell.filled ? <SpeciesArt taxon={cell.taxon} size="fill" /> : <Silhouette category={cell.taxon.category} />}
-                    {cell.isNew && <span className="new-tag">NEW</span>}
+                  <span className="dex-tile__no">No.{String(cell.no).padStart(3, '0')}</span>
+                  {cell.isNew && <span className="new-tag">NEW</span>}
+                  <span className="dex-tile__coin">
+                    {cell.filled ? <SpeciesArt taxon={cell.taxon} size="fill" /> : <CategoryIcon category={cell.taxon.category} size={28} />}
                     {cell.filled && (
                       <span className="dex-tile__check">
-                        <Icon name="check" size={13} />
+                        <Icon name="check" size={12} />
                       </span>
                     )}
                   </span>
-                  <span className="dex-tile__no">No.{String(cell.no).padStart(3, '0')}</span>
                   <span className="dex-tile__name">{cell.filled ? cell.taxon.koreanName : friendOf(cell.taxon)}</span>
                   {cell.changedByReview && <span className="changed-tag">확인 후 바뀜</span>}
                 </Link>

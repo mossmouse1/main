@@ -122,14 +122,22 @@ export function getPosition(timeoutMs = 10000): Promise<ObserverFix | null> {
   });
 }
 
+/** 지도에서 따라가는 위치: 걷는 방향(움직일 때만, 북 0°)도 같이 */
+export interface LiveFix extends ObserverFix {
+  heading: number | null;
+}
+
 /** 지도 화면이 열려 있는 동안만 위치를 따라갑니다. 돌려주는 함수로 멈춥니다. */
-export function watchPosition(onFix: (fix: ObserverFix) => void, onDenied: () => void): () => void {
+export function watchPosition(onFix: (fix: LiveFix) => void, onDenied: () => void): () => void {
   if (!('geolocation' in navigator)) {
     onDenied();
     return () => {};
   }
   const id = navigator.geolocation.watchPosition(
-    (p) => onFix(toFix(p)),
+    (p) => {
+      const h = p.coords.heading;
+      onFix({ ...toFix(p), heading: h != null && Number.isFinite(h) && (p.coords.speed ?? 0) > 0.3 ? h : null });
+    },
     (err) => {
       if (err.code === err.PERMISSION_DENIED) onDenied();
     },

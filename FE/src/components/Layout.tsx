@@ -2,42 +2,42 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { isByteBacked } from '../data/blobBytes';
 import { DEBUG, debugSet } from '../lib/debug';
-import { useObjectUrl, useOnline, usePendingCount, usePendingPhotos } from '../hooks';
+import { useDex, useObjectUrl, useOnline, usePendingCount, usePendingPhotos } from '../hooks';
 import { Icon } from './Icon';
 
-/** 하단 탭 4개(PRD 4장): 탐험 · 도감 · 촬영 · 내 기록. 촬영은 떠 있는 큰 버튼, 설정은 내 기록 머리글에서 엽니다. */
+/**
+ * 화면 틀과 아래쪽 버튼 3개: 지도 · 촬영(가장 큰 버튼) · 도감(채운 칸 수).
+ * 내 기록·설정은 도감 화면 머리글에서 엽니다(자주 쓰지 않는 것은 한 단계 안으로).
+ * 버튼은 지도의 블록처럼 생겼고, 지도 홈에서는 지도 위에 떠 있습니다(지도가 화면 전체).
+ */
 export function TabLayout() {
   const { pathname } = useLocation();
-  const inRecords = pathname.startsWith('/records') || pathname.startsWith('/settings') || pathname.startsWith('/walk');
+  const dex = useDex();
+  const onMap = pathname === '/' || pathname.startsWith('/zone');
   return (
-    <div className="app-shell">
+    <div className={`app-shell${pathname === '/' ? ' is-map' : ''}`}>
       <SyncBar />
       <div className="tab-page">
         <Outlet />
       </div>
-      <nav className="tabbar" aria-label="주요 화면">
-        <NavLink to="/" end>
-          <span className="tabbar__item">
-            <Icon name="explore" />
-            <span>탐험</span>
+      <nav className="dock" aria-label="주요 화면">
+        <NavLink to="/" end className={onMap ? 'active' : undefined}>
+          <span className="dock__btn">
+            <Icon name="explore" size={22} />
+            <span>지도</span>
           </span>
         </NavLink>
-        <NavLink to="/dex">
-          <span className="tabbar__item">
-            <Icon name="book" />
-            <span>도감</span>
-          </span>
-        </NavLink>
-        <NavLink to="/record" className="tabbar__fab" aria-label="촬영">
-          <span className="tabbar__fab-circle">
-            <Icon name="camera" size={28} />
+        <NavLink to="/record" className="dock__shoot" aria-label="촬영">
+          <span className="dock__shoot-btn">
+            <Icon name="camera" size={24} />
             <span>촬영</span>
           </span>
         </NavLink>
-        <NavLink to="/records" className={inRecords ? 'active' : undefined}>
-          <span className="tabbar__item">
-            <Icon name="clipboard" />
-            <span>내 기록</span>
+        <NavLink to="/dex" className={onMap ? undefined : 'active'} aria-label={`도감, ${dex?.filled ?? 0}칸 채움, 모두 ${dex?.total ?? 0}칸`}>
+          <span className="dock__btn">
+            <Icon name="book" size={22} />
+            <span>도감</span>
+            <span className="dock__count">{dex?.filled ?? 0}</span>
           </span>
         </NavLink>
       </nav>
