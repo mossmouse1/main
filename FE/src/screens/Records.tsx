@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router';
 import { IdStatusBadge, SyncBadge } from '../components/Badges';
 import { Icon } from '../components/Icon';
 import { BlobImage, PageHeader, Toast } from '../components/Layout';
+import { RecordReward, useRecordReward } from '../components/RecordReward';
 import { useContent } from '../content/ContentProvider';
 import { taxonById, zoneById } from '../content/helpers';
 import { db } from '../data/db';
@@ -23,6 +24,16 @@ export function Records() {
 
   const [params] = useSearchParams();
   const saved = observations.find((o) => o.id === params.get('saved'));
+  const reward = useRecordReward(saved?.id);
+  const savedToast = saved && (
+    <Toast tone="soft">
+      <Icon name="bookmark" size={20} />
+      <span>
+        {saved.taxonId ? '기록했어요!' : '미확인 기록으로 저장했어요.'}
+        <small>{saved.taxonId ? '도감에서 확인해 보세요.' : '팀이 사진을 보고 이름을 확인해 줄 거예요.'}</small>
+      </span>
+    </Toast>
+  );
   const walkById = new Map(walks.map((w) => [w.id, w]));
   const groups: { walkId: string; items: LocalObservation[] }[] = [];
   for (const o of observations) {
@@ -59,15 +70,7 @@ export function Records() {
             </div>
           </dl>
         )}
-        {saved && (
-          <Toast tone="soft">
-            <Icon name="bookmark" size={20} />
-            <span>
-              {saved.taxonId ? '기록했어요!' : '미확인 기록으로 저장했어요.'}
-              <small>{saved.taxonId ? '도감에서 확인해 보세요.' : '팀이 사진을 보고 이름을 확인해 줄 거예요.'}</small>
-            </span>
-          </Toast>
-        )}
+        {savedToast && <RecordReward active={reward} stamp="기록" compact>{savedToast}</RecordReward>}
         {pending > 0 && (
           <div className="card row row--between">
             <span>

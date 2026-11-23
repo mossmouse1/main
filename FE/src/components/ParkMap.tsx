@@ -7,6 +7,7 @@ import { clusterByPixels } from '../lib/cluster';
 import { geometryToLatLngs, inBounds, type LatLng } from '../lib/geo';
 import { isoBearing, isoProject, isoUnproject, type IsoSpec } from '../lib/iso';
 import { categoryIconSvg } from './CategoryIcon';
+import { parkScan, waterField } from './MapField';
 
 /**
  * 지도 위에 떠 있는 생물 칸(지도 홈). 못 찾은 생물(found: false)은 빈 칸, 찾은 생물은 사진 딱지로 보입니다.
@@ -46,6 +47,10 @@ interface Props {
   onZoneClick?: (id: string) => void;
   /** 떠 있는 생물 사진(묶음). 고른 종(selectedId)의 지점은 묶지 않고 모두 따로 보입니다. */
   photoPins?: PhotoPin[];
+  /** 대표 퀘스트 지점 한 곳은 묶음에서 빼고 강조합니다. */
+  questPinKey?: string;
+  waterZone?: Zone;
+  scanZones?: Zone[] | null;
   /** 더 확대할 수 없는데 여러 종이 한 묶음일 때 */
   onClusterPick?: (taxonIds: string[]) => void;
   selectedId?: string | null;
@@ -165,6 +170,7 @@ const hashDelay = (s: string) => {
 export function ParkMap(props: Props) {
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const imageOverlay = useRef<L.ImageOverlay | null>(null);
   const fitZoom = useRef(0);
   const groups = useRef<Record<'zones' | 'facilities' | 'photos' | 'track' | 'me' | 'subject' | 'route', L.LayerGroup> | null>(null);
   const drawPhotos = useRef<() => void>(() => {});
@@ -191,7 +197,7 @@ export function ParkMap(props: Props) {
       zoomDelta: 0.5,
       bounceAtZoomLimits: false,
     });
-    L.imageOverlay(imageUrl, img, { alt: '동탄호수공원 지도' }).addTo(map);
+    imageOverlay.current = L.imageOverlay(latest.current.imageUrl, img, { alt: '동탄호수공원 지도' }).addTo(map);
     if (attribution) L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution(attribution).addTo(map);
     if (scale && !bridge.iso) L.control.scale({ imperial: false, position: 'bottomleft', maxWidth: 90 }).addTo(map);
 
@@ -266,9 +272,30 @@ export function ParkMap(props: Props) {
       map.stop();
       map.remove();
       mapRef.current = null;
+      imageOverlay.current = null;
       groups.current = null;
     };
-  }, [imageUrl, bounds, bridge, attribution, scale]);
+  }, [bounds, bridge, attribution, scale]);
+
+  useEffect(() => {
+    const overlay = imageOverlay.current;
+    if (overlay?.getElement()?.getAttribute('src') !== imageUrl) overlay?.setUrl(imageUrl);
+  }, [imageUrl]);
+
+  const { waterZone, scanZones } = props;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !waterZone) return;
+    const layer = waterField(map, bridge.image, bridge.to, waterZone.geometry);
+    return () => { layer.remove(); };
+  }, [waterZone, bridge]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !scanZones?.length) return;
+    const layer = parkScan(map, bridge.image, bridge.to, scanZones);
+    return () => { layer?.remove(); };
+  }, [scanZones, bridge]);
 
   const { zones, onZoneClick, showZones = true, zoneMode = 'outline' } = props;
   useEffect(() => {
@@ -285,8 +312,15 @@ export function ParkMap(props: Props) {
       } else {
         const label = zone.mapLabel ?? zone.name;
         if (!label) continue;
+        const shore = zone.id === 'Z2';
+        const icon = L.divIcon({
+          className: `map-icon map-icon--zone${shore ? ' map-icon--shore' : ''}`,
+          html: `<span class="map-zone${shore ? ' map-zone--shore' : ''}">${esc(label)}</span>`,
+          iconSize: [44, 44],
+          iconAnchor: [22, shore ? -20 : 22],
+        });
         L.marker(bridge.to(zone.center[0], zone.center[1]), {
-          icon: htmlIcon(`<span class="map-zone">${esc(label)}</span>`),
+          icon,
           title: `${zone.id} ${zone.name}`,
           interactive: !!onZoneClick,
           keyboard: !!onZoneClick,
@@ -310,7 +344,7 @@ export function ParkMap(props: Props) {
     }
   }, [facilities, bridge]);
 
-  const { photoPins, selectedId } = props;
+  const { photoPins, selectedId, questPinKey } = props;
   useEffect(() => {
     drawPhotos.current = () => {
       const g = groups.current?.photos;
@@ -319,22 +353,24 @@ export function ParkMap(props: Props) {
       g.clearLayers();
       const pins = latest.current.photoPins ?? [];
       const sel = latest.current.selectedId ?? null;
+      const questKey = latest.current.questPinKey;
       const zoom = map.getZoom();
       const atMax = zoom >= map.getMaxZoom() - 0.05;
-      // 못 찾은 생물은 ‘빈 칸’(분류 그림자), 찾은 생물은 사진으로 채운 ‘딱지’
-      const face = (p: PhotoPin) =>
-        p.found && p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async"/>` : `<span class="ph__sil">${categoryIconSvg(p.category, p.kind === 'hint' ? 20 : 26)}</span>`;
-      /** 떠 있는 사진 방울: 바닥 그림자 + 둥실거리는 사진(+ 뒤에 겹친 한 장, 종 수, 찾음 표시) + 이름 */
+      const face = (p: PhotoPin, quest = false) =>
+        (p.found || quest) && p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async"/>` : `<span class="ph__sil">${categoryIconSvg(p.category, p.kind === 'hint' ? 20 : 23)}</span>`;
       const bubble = (p: PhotoPin, cls: string, extra: string, label: string) =>
-        `<span class="ph ph--${p.kind} ph--${p.category}${p.found ? ' is-found' : ' is-empty'}${cls}" style="--d:-${hashDelay(p.key)}s"><span class="ph__shadow"></span><span class="ph__float">${extra}<span class="ph__card">${face(p)}</span>${
+        `<span class="ph ph--${p.kind} ph--${p.category}${p.found ? ' is-found' : ' is-empty'}${cls}${p.key === questKey ? ' is-quest' : ''}" style="--d:-${hashDelay(p.key)}s"><span class="ph__shadow"></span><span class="ph__float">${extra}<span class="ph__card">${face(p, p.key === questKey)}</span>${
           p.found ? `<span class="ph__check">${CHECK_SVG}</span>` : ''
         }</span>${label}</span>`;
-      const marker = (at: L.LatLng, html: string, title: string, z: number, onClick: () => void) =>
-        L.marker(at, { icon: htmlIcon(html), title, keyboard: true, zIndexOffset: z, riseOnHover: true }).on('click', onClick).addTo(g);
+      const marker = (at: L.LatLng, html: string, title: string, z: number, onClick: () => void) => {
+        const icon = L.divIcon({ className: 'map-icon map-icon--photo', html, iconSize: [44, 44], iconAnchor: [22, 60] });
+        const pin = L.marker(at, { icon, title, keyboard: true, zIndexOffset: z, riseOnHover: true }).on('click', onClick).addTo(g);
+        pin.getElement()?.setAttribute('aria-label', title);
+      };
 
-      // 고른 종의 지점: 묶지 않고 모두 따로, 맨 위에
-      const chosen = sel ? pins.filter((p) => p.taxonId === sel) : [];
-      const rest = sel ? pins.filter((p) => p.taxonId !== sel) : pins;
+      // 선택한 종과 퀘스트 대표 지점은 개별 핀으로 표시합니다.
+      const chosen = pins.filter((p) => p.taxonId === sel || p.key === questKey);
+      const rest = pins.filter((p) => p.taxonId !== sel && p.key !== questKey);
       const clusters = clusterByPixels(
         rest.map((p) => {
           const q = map.project(bridge.to(p.lat, p.lng), zoom);
@@ -363,11 +399,16 @@ export function ParkMap(props: Props) {
         });
       }
       for (const p of chosen) {
-        marker(bridge.to(p.lat, p.lng), bubble(p, ' is-selected', '', ''), p.kind === 'hint' ? `${p.label} 찾아볼 곳` : p.label, 2000, () => latest.current.onSpeciesClick?.(p.taxonId));
+        const quest = p.key === questKey;
+        const selected = p.taxonId === sel;
+        const cls = selected ? ' is-selected' : sel ? ' is-dim' : '';
+        const title = quest ? `퀘스트 · ${p.label}` : p.kind === 'hint' ? `${p.label} 찾아볼 곳` : p.label;
+        const z = quest && (!sel || selected) ? 2500 : selected ? 2000 : 0;
+        marker(bridge.to(p.lat, p.lng), bubble(p, cls, '', ''), title, z, () => latest.current.onSpeciesClick?.(p.taxonId));
       }
     };
     drawPhotos.current();
-  }, [photoPins, selectedId, bridge]);
+  }, [photoPins, selectedId, questPinKey, bridge]);
 
   const { track } = props;
   useEffect(() => {
@@ -455,7 +496,7 @@ export function ParkMap(props: Props) {
     const zoom = flyTo.exact ? wanted : Math.max(map.getZoom(), wanted);
     // 머리글과 시트 사이(보이는 영역) 한가운데로 옮깁니다.
     const target = map.project(bridge.to(flyTo.to.lat, flyTo.to.lng), zoom).add([0, (bottomInset - topInset) / 2]);
-    map.flyTo(map.unproject(target, zoom), zoom, { duration: 0.5 });
+    map.flyTo(map.unproject(target, zoom), zoom, { duration: 0.5, animate: !matchMedia('(prefers-reduced-motion: reduce)').matches });
   }, [flyTo?.key]);
 
   return <div ref={el} className={`park-map${bridge.iso ? ' park-map--iso' : ''} ${props.className ?? ''}`} role="application" aria-label="동탄호수공원 지도" />;

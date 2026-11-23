@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { BlobImage } from '../components/Layout';
 import { ParkMap } from '../components/ParkMap';
+import { markRecordReward } from '../components/RecordReward';
 import { SpeciesArt } from '../components/SpeciesArt';
 import { BACKEND_MODE, DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
 import { useContent } from '../content/ContentProvider';
@@ -21,6 +22,7 @@ import { DEBUG, debugInc, debugSet } from '../lib/debug';
 import { usePinchZoom } from '../lib/usePinchZoom';
 import { clampZoom, zoomLimits } from '../lib/zoom';
 import { makeIdentifyCopy } from '../lib/photo';
+import { playRewardAudio, prepareRewardAudio } from '../lib/rewardAudio';
 import { withEul, withRo } from '../lib/josa';
 import { distanceM, findZone, formatDistance, inBounds, type LatLng } from '../lib/geo';
 import { captureFrame, getPosition, hardwareZoomRange, openCameraStream, pickPhotos, setHardwareZoom, stopStream, type Facing } from '../platform';
@@ -666,7 +668,10 @@ export function RecordPick() {
   const confirm = async () => {
     if (saving) return;
     setSaving(true);
+    const audio = prepareRewardAudio();
     const obs = await saveWith(content, draft, current);
+    markRecordReward(obs.id);
+    void playRewardAudio(audio);
     navigate(obs.taxonId ? `/species/${obs.taxonId}?saved=${obs.id}` : `/records?saved=${obs.id}`, { replace: true });
   };
   const choose = (c: Choice) => {
@@ -821,7 +826,10 @@ export function RecordUnknown() {
   const save = async () => {
     if (saving) return;
     setSaving(true);
+    const audio = prepareRewardAudio();
     const obs = await saveWith(content, draft, { taxonId: null, source: 'unknown', freeText: memo.trim().slice(0, 60) || null });
+    markRecordReward(obs.id);
+    void playRewardAudio(audio);
     navigate(`/records?saved=${obs.id}`, { replace: true });
   };
 

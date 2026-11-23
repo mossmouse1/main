@@ -6,9 +6,10 @@ import { Icon } from '../components/Icon';
 import { FoundStamp } from '../components/Illustrations';
 import { BlobImage, PageHeader, Toast } from '../components/Layout';
 import { MonthBars } from '../components/MonthBars';
+import { RecordReward, useRecordReward } from '../components/RecordReward';
 import { PhotoCredit, SpeciesArt } from '../components/SpeciesArt';
 import { useContent } from '../content/ContentProvider';
-import { taxonById, zoneById } from '../content/helpers';
+import { seasonContains, taxonById, zoneById } from '../content/helpers';
 import { CATEGORY_LABEL } from '../content/types';
 import { db } from '../data/db';
 import { startDraft } from '../data/draft';
@@ -39,6 +40,8 @@ export function SpeciesCard() {
     [],
   );
 
+  const saved = savedId ? mine.find((m) => m.obs.id === savedId) : undefined;
+  const reward = useRecordReward(saved?.obs.id);
   if (!taxon) return <Navigate to="/" replace />;
   const found = !!dex?.foundIds.has(taxon.id);
   const refs = taxon.photos?.length ? taxon.photos : taxon.photo ? [taxon.photo] : [];
@@ -48,7 +51,7 @@ export function SpeciesCard() {
   const zone = zoneById(content, taxon.clue.zoneIds[0]);
   const dexIndex = season.dex.indexOf(taxon.id);
   const cell = dex?.cells.find((c) => c.taxon.id === taxon.id);
-  const saved = savedId ? mine.find((m) => m.obs.id === savedId) : undefined;
+  const newDiscovery = !!saved && !!cell && seasonContains(season, saved.obs.observedAt) && mine.filter(({ obs }) => seasonContains(season, obs.observedAt)).length === 1;
   const firstSeen = mine.length ? mine[mine.length - 1].obs.observedAt : null;
   const photoCount = mine.reduce((n, m) => n + m.obs.photoIds.length, 0);
 
@@ -57,33 +60,34 @@ export function SpeciesCard() {
     navigate('/record/photo');
   };
 
+  const heroCard = (
+    <div className="species-hero">
+      {showMine ? (
+        <BlobImage blob={myPhoto.display ?? myPhoto.original} alt={`우리가 찍은 ${taxon.koreanName}`} className="species-hero__img" />
+      ) : (
+        <SpeciesArt taxon={taxon} photo={refPhoto} size="fill" />
+      )}
+      <span className="species-hero__badge">{showMine ? '내가 찍은 사진' : '참고 사진'}</span>
+      {saved && (
+        <Toast>
+          <Icon name="check" size={20} />
+          {newDiscovery ? (
+            <>
+              새로운 발견! 도감 {dex?.filled} / {dex?.total} <b className="toast__plus">+1</b>
+            </>
+          ) : cell ? (
+            <>기록했어요 · 도감 {dex?.filled} / {dex?.total}</>
+          ) : (
+            <>기록했어요 · 소중한 기록이에요</>
+          )}
+        </Toast>
+      )}
+    </div>
+  );
   return (
     <main className="page species-page">
       <PageHeader title="생물 도감" />
-      <div className="species-hero">
-        {showMine ? (
-          <BlobImage blob={myPhoto.display ?? myPhoto.original} alt={`우리가 찍은 ${taxon.koreanName}`} className="species-hero__img" />
-        ) : (
-          <SpeciesArt taxon={taxon} photo={refPhoto} size="fill" />
-        )}
-        <span className="species-hero__badge">{showMine ? '내가 찍은 사진' : '참고 사진'}</span>
-        {saved && (
-          <Toast>
-            <Icon name="check" size={20} />
-            {cell?.isNew ? (
-              <>
-                새로운 발견! 도감 {dex?.filled} / {dex?.total} <b className="toast__plus">+1</b>
-              </>
-            ) : cell ? (
-              <>
-                기록했어요 · 도감 {dex?.filled} / {dex?.total}
-              </>
-            ) : (
-              <>기록했어요 · 소중한 기록이에요</>
-            )}
-          </Toast>
-        )}
-      </div>
+      <RecordReward active={reward} stamp={newDiscovery ? '발견' : '기록'}>{heroCard}</RecordReward>
       {!showMine && refPhoto && <PhotoCredit photo={refPhoto} />}
 
       <div className="page__body">

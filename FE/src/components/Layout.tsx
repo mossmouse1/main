@@ -29,7 +29,7 @@ export function TabLayout() {
         </NavLink>
         <NavLink to="/record" className="dock__shoot" aria-label="촬영">
           <span className="dock__shoot-btn">
-            <Icon name="camera" size={24} />
+            <Icon name="viewfinder" size={25} />
             <span>촬영</span>
           </span>
         </NavLink>
