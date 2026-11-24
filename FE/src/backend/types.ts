@@ -87,6 +87,14 @@ export interface DeletionRequest {
   status: string;
 }
 
+/** 보고서의 산책(조사) 횟수·시간을 세기 위한 최소 값 */
+export interface AdminWalk {
+  id: string;
+  startedAt: string;
+  endedAt: string | null;
+  lastActivityAt: string;
+}
+
 export interface AdminBackend {
   mode: 'local' | 'supabase';
   currentUser(): Promise<{ email: string } | null>;
@@ -103,4 +111,5 @@ export interface AdminBackend {
   ungroup(observationId: string): Promise<void>;
   exportCsv(kind: 'observations' | 'history', filters: AdminFilters): Promise<Blob>;
   listDeletionRequests(): Promise<DeletionRequest[]>;
+  listWalks(): Promise<AdminWalk[]>;
 }

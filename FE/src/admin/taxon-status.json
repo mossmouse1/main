@@ -1,0 +1,23 @@
+{
+  "_안내": "종 상태 초안. 값이 있는 종만 적습니다(공란 = 확인 안 됨, '해당 없음'이 아님). 전부 verified:false. 공식 목록과 대조한 뒤 verified를 true로 바꾸세요. 대조용 CSV: docs/종_상태_대조표.csv(npm run status:csv)",
+  "survey-bluegill": {
+    "alien": true,
+    "source": "작성자 기억 기반 초안. 환경부 생태계교란 생물 지정 목록과 대조 필요",
+    "verified": false
+  },
+  "common-kestrel": {
+    "protection": "멸종위기 야생생물 II급 · 천연기념물",
+    "source": "작성자 기억 기반 초안. 환경부 멸종위기 야생생물 목록·문화재청 천연기념물 목록과 대조 필요",
+    "verified": false
+  },
+  "eurasian-sparrowhawk": {
+    "protection": "멸종위기 야생생물 II급 · 천연기념물",
+    "source": "작성자 기억 기반 초안. 환경부 멸종위기 야생생물 목록·문화재청 천연기념물 목록과 대조 필요",
+    "verified": false
+  },
+  "gbif-2481047": {
+    "protection": "멸종위기 야생생물 I급 · 천연기념물",
+    "source": "작성자 기억 기반 초안. 환경부 멸종위기 야생생물 목록·문화재청 천연기념물 목록과 대조 필요",
+    "verified": false
+  }
+}
