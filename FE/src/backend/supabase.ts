@@ -7,7 +7,7 @@ import type { HistoryRow } from '@shared/dwc';
 import { isAlreadyUploaded } from '../lib/storageErrors';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../config';
 import type { MyStatus } from '../data/types';
-import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
+import { IdentifyError, type AdminBackend, type AdminFilters, type AdminWalk, type AdminRow, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
 
 const BUCKET = 'photos';
 const SIGNED_URL_SECONDS = 600; // 10분
@@ -262,6 +262,15 @@ export const supabaseAdmin: AdminBackend = {
     });
     if (!res.ok) throw new Error(`내보내기 실패 (${res.status}) ${await res.text()}`);
     return res.blob();
+  },
+
+  async listWalks() {
+    const walks: AdminWalk[] = [];
+    for (let from = 0; ; from += 1000) {
+      const page = check(await team.from('walks').select('id, started_at, ended_at, last_activity_at').order('started_at').range(from, from + 999)) ?? [];
+      walks.push(...page.map((w) => ({ id: w.id, startedAt: w.started_at, endedAt: w.ended_at, lastActivityAt: w.last_activity_at })));
+      if (page.length < 1000) return walks;
+    }
   },
 
   async listDeletionRequests() {

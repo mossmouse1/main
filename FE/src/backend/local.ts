@@ -572,6 +572,10 @@ export const localAdmin: AdminBackend = {
     return new Blob([csv], { type: 'text/csv;charset=utf-8' });
   },
 
+  async listWalks() {
+    return (await srv.walks.toArray()).map((w) => ({ id: w.id, startedAt: w.startedAt, endedAt: w.endedAt, lastActivityAt: w.lastActivityAt }));
+  },
+
   async listDeletionRequests() {
     const [rows, households] = await Promise.all([srv.deletions.toArray(), srv.households.toArray()]);
     const no = new Map(households.map((h) => [h.id, h.no]));

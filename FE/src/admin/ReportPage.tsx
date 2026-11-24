@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { AdminRow } from '../backend/types';
+import type { AdminRow, AdminWalk } from '../backend/types';
 import { useContent } from '../content/ContentProvider';
 import { taxonById } from '../content/helpers';
 import { useAdmin } from './AdminApp';
-import { appearances, isAlien, isOutOfDex, isProtected, isUnverified, kstDateTime, participantNumbers, recordRow, summarize, type Appearance } from './report';
+import { appearances, isAlien, isOutOfDex, isProtected, inPeriod, isUnverified, kstDateTime, participantNumbers, recordRow, summarize, type Appearance } from './report';
 
 const Unverified = () => <span className="badge badge--wait">검증 전</span>;
 
@@ -45,28 +45,34 @@ export function ReportPage() {
   const { content } = useContent();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const [rows, setRows] = useState<AdminRow[] | null>(null);
+  const [all, setAll] = useState<AdminRow[] | null>(null);
+  const [walks, setWalks] = useState<AdminWalk[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 전체를 한 번만 받고 기간은 화면에서 거릅니다. 그래야 참여자·산책 번호가 기간과 상관없이 같습니다.
   useEffect(() => {
-    setRows(null);
-    void admin
-      .listObservations({ from: from || undefined, to: to || undefined })
-      .then(setRows)
+    void Promise.all([admin.listObservations({ includeHidden: true }), admin.listWalks()])
+      .then(([a, w]) => {
+        setAll(a);
+        setWalks(w);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
-  }, [admin, from, to]);
+  }, [admin]);
+
+  const inRange = all?.filter((r) => inPeriod(r, from, to)) ?? null;
+  const rows = inRange?.filter((r) => !r.hidden) ?? null;
 
   const period = from || to ? `${from || '처음'} ~ ${to || '현재'}` : '전체';
   const taxonOf = (id: string | null) => (id ? taxonById(content, id) : undefined);
 
   const download = async () => {
-    if (!rows) return;
+    if (!all || !rows || !inRange) return;
     setBusy(true);
     setError(null);
     try {
       const { buildReportXlsx } = await import('./reportXlsx');
-      const blob = await buildReportXlsx(rows, period, taxonOf);
+      const blob = await buildReportXlsx({ all, rows, hiddenCount: inRange.length - rows.length, walks, period, taxonOf });
       const stamp = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10).replace(/-/g, '');
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -80,7 +86,7 @@ export function ReportPage() {
     }
   };
 
-  const people = rows ? participantNumbers(rows) : new Map<number, number>();
+  const people = all ? participantNumbers(all) : new Map<number, number>();
   const sum = rows && summarize(rows);
   const outOfDex = rows?.filter(isOutOfDex) ?? [];
   const table = rows?.map((r) => ({ r, x: recordRow(r, people.get(r.household_no)!, taxonOf(r.taxon_id)) })) ?? [];
