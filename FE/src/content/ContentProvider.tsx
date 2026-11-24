@@ -3,7 +3,7 @@ import { db, getMeta, setMeta } from '../data/db';
 import { getHousehold } from '../data/household';
 import { kstDate } from '../lib/time';
 import { buildTrailGraph, type TrailGraph } from '../lib/trail';
-import { activeSeason, questSpecies, taxonById } from './helpers';
+import { activeSeason, questSpecies } from './helpers';
 import { loadContent, loadIsoImageUrl, loadMapImageUrl, loadTrails } from './load';
 import type { Content, SeasonSet } from './types';
 
@@ -24,9 +24,7 @@ async function assignSeason(content: Content, familyId: string): Promise<SeasonS
   const season = activeSeason(content);
   const ids = await db.transaction('rw', db.meta, async () => {
     const stored = await getMeta('questSpecies') ?? {};
-    const list = stored[season.id];
-    const prior = list?.length === 10 ? list.filter((id) => !!taxonById(content, id)) : [];
-    const picked = [...new Set([...prior, ...questSpecies(content, season, familyId)])].slice(0, 10);
+    const picked = questSpecies(content, season, familyId, stored[season.id]);
     if (picked.join() !== stored[season.id]?.join()) await setMeta('questSpecies', { ...stored, [season.id]: picked });
     return picked;
   });

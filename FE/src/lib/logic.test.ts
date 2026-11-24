@@ -68,12 +68,36 @@ describe('가족 도감', () => {
     expect(activeSeason(content, new Date('2026-11-30T14:59:59Z')).id).toBe('autumn-2026');
     expect(activeSeason(content, new Date('2026-11-30T15:00:00Z')).id).toBe('winter-2026');
   });
-  it('가족별 계절 후보에서 중복 없이 10종을 선택한다', () => {
+  it.each(content.seasonSets)('$season 퀘스트는 필수 물새 2종과 계절 후보 식물 8종을 고른다', (set) => {
+    const ids = questSpecies(content, set, 'family-a');
+    expect(new Set(ids).size).toBe(10);
+    expect(ids.filter((id) => {
+      const taxon = content.taxa.find((t) => t.id === id);
+      return taxon?.category !== 'tree' && !taxon?.isPlant;
+    })).toEqual(['spot-billed-duck', 'eurasian-coot']);
+    expect(ids.every((id) => set.dex.includes(id))).toBe(true);
+    expect(questSpecies(content, set, 'family-a', ids)).toEqual(ids);
+  });
+  it('가을 식물 후보에서 가족별로 같은 목록을 배정한다', () => {
     const first = questSpecies(content, pool, 'family-a');
-    expect(new Set(first).size).toBe(10);
-    expect(first.every((id) => pool.dex.includes(id))).toBe(true);
     expect(questSpecies(content, pool, 'family-a')).toEqual(first);
     expect(questSpecies(content, pool, 'family-b')).not.toEqual(first);
+  });
+  it('이전 퀘스트에서 같은 계절에 해당하는 식물 칸은 유지한다', () => {
+    const old = ['oriental-magpie', 'field-common-reed', 'gbif-5358748', 'field-common-reed', 'mallard'];
+    const winter = content.seasonSets.find((s) => s.season === '겨울')!;
+    const autumnIds = questSpecies(content, pool, 'family-a', old);
+    expect(autumnIds.slice(0, 2)).toEqual(['field-common-reed', 'gbif-5358748']);
+    expect(autumnIds).not.toContain('oriental-magpie');
+    expect(questSpecies(content, winter, 'family-a', old)).not.toContain('gbif-5358748');
+    expect(questSpecies({ ...content, version: 4 }, { ...winter, dex: ['mallard'] }, 'family-a')).toEqual(
+      questSpecies(content, winter, 'family-a'),
+    );
+    const dex = computeDex(content, { ...pool, dex: autumnIds, todaySix: autumnIds }, [
+      obs('field-common-reed'), obs('oriental-magpie'), obs('eurasian-coot'),
+    ], []);
+    expect(dex.filled).toBe(2);
+    expect(dex.collectionFoundIds.has('oriental-magpie')).toBe(true);
   });
   it('다른 계절의 사진과 미확인 사진이 개인 도감에 남는다', () => {
     const dex = computeDex(content, autumn, [

@@ -43,9 +43,26 @@ function seededShuffle<T>(items: T[], seed: string): T[] {
   return out;
 }
 
-export function questSpecies(content: Content, season: SeasonSet, familyId: string): string[] {
-  const pool = [...new Set(season.dex)].filter((id) => taxonById(content, id)?.photo).sort();
-  return seededShuffle(pool, `${season.id}:${familyId}`).slice(0, 10);
+const QUEST_BIRDS = ['spot-billed-duck', 'eurasian-coot'];
+const PLANT_SLOTS = 8;
+// 기존 설치에서 오프라인으로 v4 콘텐츠를 열어도, 이미 들어 있는 종 카드로 새 구성을 채웁니다.
+const V4_QUEST_PLANTS = [
+  'field-common-reed', 'gbif-5371712', 'japanese-maple', 'korean-red-pine', 'winged-spindle',
+  'survey-fountain-grass', 'survey-miscanthus-sinensis', 'survey-miscanthus-sacchariflorus',
+];
+
+export function questSpecies(content: Content, season: SeasonSet, familyId: string, previous: readonly string[] = []): string[] {
+  const seasonalCandidates = content.version > 4 ? season.dex : [
+    ...V4_QUEST_PLANTS,
+    ...(season.season === '가을' ? ['gbif-5358748'] : []),
+  ];
+  const pool = [...new Set(seasonalCandidates)].filter((id) => {
+    const taxon = taxonById(content, id);
+    return !!taxon?.photo && (taxon.isPlant || taxon.category === 'tree');
+  }).sort();
+  const kept = previous.filter((id) => pool.includes(id));
+  const plants = [...new Set([...kept, ...seededShuffle(pool, `${season.id}:${familyId}`)])].slice(0, PLANT_SLOTS);
+  return [...plants, ...QUEST_BIRDS.filter((id) => taxonById(content, id)?.photo)];
 }
 
 /** 생물 카드에서 시작: 그 종 + 헷갈리는 종 2개 */

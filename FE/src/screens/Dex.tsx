@@ -110,7 +110,9 @@ export function Dex() {
         ) : (
           <p className="caption">공원에서 이번 계절의 생물을 찍어 도감을 채워요. 완료 사진은 현장에서 리워드를 받을 때 보여 주세요.</p>
         )}
-        {!collection && <p className="caption">{season.recordCountsBasis}를 바탕으로 가족마다 10종을 뽑았어요.</p>}
+        {!collection && <p className="caption">
+          흰뺨검둥오리와 물닭은 필수예요. {season.recordCountsBasis}를 바탕으로 식물 8종을 골랐어요.
+        </p>}
         <div className="dex-filters">
           <div className="seg" role="group" aria-label="분류">
             {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (

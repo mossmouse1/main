@@ -21,14 +21,15 @@ const PAD = 6;
 const CARD_MAX_W = 340;
 
 /**
- * 코치마크: 처음 한 번, 실제 화면 위에서 하나씩 짚어 줍니다(대상 둘레만 밝고 나머지는 어둡게).
- * 처음 안내 슬라이드 대신 씁니다. onDone(true)은 끝까지 본 경우, onDone(false)은 건너뛴 경우입니다.
+ * 실제 화면 위에서 할 일을 하나씩 짚어 줍니다.
+ * onDone(true)은 끝까지 본 경우, onDone(false)은 건너뛴 경우입니다.
  */
-export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
+export function Tour({ steps, label, finishLabel = '시작하기', skipLabel = '건너뛰기', onDone }: {
   steps: TourStep[];
   label: string;
   /** 마지막 단계 버튼 글자(예: 위치 켜고 시작) */
   finishLabel?: string;
+  skipLabel?: string;
   onDone: (finished: boolean) => void;
 }) {
   const [index, setIndex] = useState(0);
@@ -100,7 +101,7 @@ export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
             ))}
           </ol>
           <button className="tour__skip" onClick={() => onDone(false)}>
-            건너뛰기
+            {skipLabel}
           </button>
         </div>
         <h2>{step.title}</h2>

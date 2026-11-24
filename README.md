@@ -34,13 +34,14 @@
 
 - 아래쪽 버튼은 3개입니다: 지도 · 촬영(가장 큼) · 도감(채운 칸 수). 내 기록·설정은 도감 화면 머리글에서 엽니다(PRD 4장의 탭 4개와 다름).
 - 계절 퀘스트 지도 위쪽에는 ‘다음에 찾을 생물’이 나옵니다. 못 찾은 생물의 관찰 지점에 가까워지면 같은 자리에 알림이 뜹니다.
-- 첫 화면에서 전체 지도를 살펴보고 **퀘스트 시작해 보기**를 누르면 첫 생물의 사진과 관찰 지점을 엽니다. **관찰 종 목록**에서 국명·학명으로 검색하고, 생물 카드에서 사진과 출처를 확인할 수 있습니다.
+- 첫 화면에서 전체 지도를 살펴보고 **퀘스트 시작해 보기**를 누르면 지도에서 찾기, 촬영과 등록, 도감 확인, 완료 사진의 네 단계를 안내합니다. **첫 생물 찾기**를 누르면 참고 사진과 관찰 지점 또는 구역을 엽니다.
 - 전체 도감 177종에 참고 사진을 제공합니다. 공개 참고 사진은 재사용 가능한 iNaturalist와 위키미디어 커먼즈 사진을 WebP로 크기 조정한 것이며, 촬영자와 사진 원문 및 이용 조건은 생물 카드에서 확인할 수 있습니다. 핀의 위치는 공개 관찰 기록에서 가져옵니다.
-- 지도 하단의 **가을 퀘스트** 또는 **겨울 퀘스트**에서 계절 후보 중 이 기기의 가족에게 무작위로 뽑힌 10종을 보여 줍니다. 뽑힌 목록은 시즌 중에 유지됩니다. 공원 조사구역에서 해당 기간에 남긴 사진으로 10종을 채우면 완료 PNG를 저장하거나 현장 운영진에게 보여줄 수 있습니다.
+- 계절 퀘스트는 흰뺨검둥오리와 물닭을 고정하고, 계절 식물 후보에서 8종을 골라 시즌 동안 유지합니다. 예전 목록에서 현재 후보에 해당하는 식물은 유지되고, 이전 사진은 전체 도감에서 볼 수 있습니다.
 - **전체 도감**에는 계절과 관계없이 내가 찍어 저장한 기록이 남습니다. 이름을 모르는 사진이나 직접 적은 이름도 볼 수 있고, 검토로 종이 확인되면 해당 칸에 반영됩니다.
 - 퀘스트의 새 종을 채울 때 저장 화면에 도장과 모션을 표시하고 효과음을 재생합니다. 저장 후 다음 생물을 지도에서 바로 열 수 있습니다. 10종을 모두 모으면 직접 찍은 사진으로 만든 완료 이미지를 저장하거나 현장 운영진에게 보여 줄 수 있습니다. 코치마크는 설정의 **탐험 가이드 다시 보기**에서 열 수 있습니다.
 - **조사팀 현장 사진**에는 2026년 11월 12일 촬영본을 담았습니다. 이름을 확인한 사진은 종 카드와 지도에 연결했고, 지도 좌표는 EXIF의 촬영자 위치입니다.
-- 11월 말 가을 퀘스트는 11월 공원 일대 조류 관찰과 화성특례시의 가을 식생 자료를 반영했습니다. 2026년 12월 1일 한국 시간부터는 공원 공개 관찰 자료에 12~2월 기록이 있는 겨울 후보로 전환합니다. [화성특례시 가을 식생 자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202)
+- 가을 후보 식물 9종 중 갈대·남천·단풍나무·토끼풀·수크령은 2026년 11월 12일 현장 사진에서 확인했습니다. 억새와 물억새는 시의 식생 자료, 소나무와 화살나무는 공원 내 11월 식재 관찰에 근거합니다. [화성특례시 가을 식생 자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202) · [소나무 관찰](https://www.inaturalist.org/observations/100897535) · [화살나무 관찰](https://www.inaturalist.org/observations/101591674)
+- 2026년 12월 1일 한국 시간부터 토끼풀이 빠지고, 남은 식물은 마른 이삭과 가지, 남은 열매나 바늘잎으로 찾습니다. 겨울 식물 후보는 공원 내 기록과 겨울에 남는 특징을 함께 고려했습니다. 두 물새는 11월 12일 현장 사진과 1~2월 공원 일대 기록에서 확인했습니다. [물닭 겨울 관찰](https://www.gbif.org/occurrence/6771555088) · [흰뺨검둥오리 겨울 관찰](https://www.gbif.org/occurrence/6785317871) · [서울시 억새·물억새 자료](https://parks.seoul.go.kr/program/detailView.do?bIdx=2718)
 - 홈에서 뺀 것: 거르기 칩, 가까운 생물 목록, 나침반, 구역 팻말(확대하면 보임), ‘탐험 시작’ 버튼(탐험은 첫 기록을 저장할 때 자동으로 시작), 처음 안내 슬라이드(코치마크로 바꿈).
 
 ### 디자인(블록 디오라마)
@@ -151,7 +152,7 @@ prd.md                       기획서
 공원 지도 범위와 [OpenStreetMap 공원 경계](https://www.openstreetmap.org/relation/17419957)가 겹치는 범위를 조회합니다. iNaturalist는 공개 좌표와 재사용 라이선스가 붙은 연구 등급 자료를 사용합니다. GBIF에 올라온 같은 iNaturalist 관찰은 원본 ID로 중복을 제거합니다. 알려진 위치 오차가 100m를 초과하는 좌표는 제외합니다. 원자료에 오차 정보가 없으면 생물 카드에 표시합니다. eBird 체크리스트는 구역 단위로 표시합니다.
 
 - GBIF에서 [네이처링](https://www.gbif.org/publisher/7de30ffe-19bb-489f-a1fb-5e291ad006d5), [국립중앙과학관](https://www.gbif.org/publisher/eb07eeb0-3db9-11d9-8439-b8a03c50a862), [국립생태원](https://www.gbif.org/publisher/6f2da4d9-8bd9-4f4f-852b-22cde4a43a01), [eBird](https://www.gbif.org/dataset/4fa7b334-ce0d-4e88-aaae-2e0c138d049e) 등에서 제공한 관찰을 찾고 [iNaturalist API](https://www.inaturalist.org/api)도 함께 조회합니다. 자료별 라이선스는 기록에 표시합니다.
-- 화성시 어류조사의 기사 인용과 화성시 보도자료에 나온 종은 `FE/scripts/data/dongtan-survey.json`에서 구역 단위로 추가합니다. [화성시민신문의 어류조사 인용](https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499) · [화성특례시 보도자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202)
+- 화성시 자료와 별도로 사진을 검토한 공원 내 식재 관찰은 `FE/scripts/data/dongtan-survey.json`에서 추가합니다. 위치 오차가 큰 화살나무 관찰은 구역으로 표시합니다. [화성시민신문의 어류조사 인용](https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499) · [화성특례시 보도자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202)
 - [제5차 전국자연환경조사 GDB](https://www.data.go.kr/data/15138804/fileData.do)의 공개 파일을 지도 범위로 잘라 확인한 결과 좌표 기록은 0건이었습니다. [국립생태원 공원 평가](https://www.nie.re.kr/nie/cmmn/file/fileDown.do?atchFileId=ef309f94394140d7b28f1de56fcaee86&fileSn=2)는 서식처 자료이며, 확인한 [학술논문](https://www.kci.go.kr/kciportal/mobile/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART003134970)은 이용 행태 연구입니다.
 - [루카 운영기관의 공개 기록 게시판](https://admin.luca.or.kr/bbs/board.php?bo_table=B12)에서 동탄호수공원·산척·송방천으로 검색한 결과는 0건이었습니다. [경기생물다양성탐사 공개 CSV](https://www.data.go.kr/data/15117062/fileData.do)는 지역별 관찰 종 수를 집계한 자료입니다. 루카 앱에서 이 공원 개별 기록을 내려받는 공개 경로는 확인되지 않았습니다.
 

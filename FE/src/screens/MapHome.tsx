@@ -34,24 +34,24 @@ const BOTTOM_INSET_CARD = 232;
 
 const EXPLORATION_GUIDE: TourStep[] = [
   {
-    target: () => document.querySelector('.hud-overview .next'),
-    title: '사진으로 먼저 살펴봐요',
-    body: '지도 핀을 누르면 공원에서 관찰된 생물의 사진과 관찰 위치를 볼 수 있어요. 숫자가 붙은 핀은 여러 종이 모인 곳이에요.',
-  },
-  {
-    target: () => document.querySelector('.quest-invitation') ?? document.querySelector('.tray'),
-    title: '이번 계절의 10종에 도전해요',
-    body: '계절 퀘스트를 열면 이번 계절에 찾아볼 10종이 정해져요. 사진이나 이름을 누르면 지도에서 관찰 지점을 볼 수 있어요.',
+    target: () => document.querySelector('.quest-invitation') ?? document.querySelector('.next'),
+    title: '지도에서 찾아볼 생물을 골라요',
+    body: '이번 계절의 식물 8종과 흰뺨검둥오리·물닭을 찾아요. 지도 핀을 누르면 참고 사진과 관찰 지점을 볼 수 있어요.',
   },
   {
     target: () => document.querySelector('.dock__shoot-btn'),
-    title: '찍고 저장하면 다음 생물을 찾아요',
-    body: '사진을 찍고 이름을 확인해 저장하세요. 저장 화면에서 다음 생물을 누르면 지도로 돌아가 바로 이어서 찾을 수 있어요.',
+    title: '공원에서 찍고 이름을 확인해요',
+    body: '촬영 버튼을 눌러 사진을 찍고, 생물이 있던 곳과 이름을 확인하세요. ‘맞아요, 도감에 등록’을 누르면 사진이 저장돼요.',
   },
   {
     target: () => document.querySelector('.dock__dex'),
-    title: '도감을 채우고 완료 사진을 받아요',
-    body: '전체 도감에서 생물 사진과 내 기록을 찾아볼 수 있어요. 계절 퀘스트 10종을 모으면 내가 찍은 사진으로 만든 완료 이미지를 보여 줄 수 있어요.',
+    title: '아래 도감에서 모은 종을 확인해요',
+    body: '하단 ‘도감’의 ‘계절 퀘스트’에서 체크 표시가 붙은 칸을 확인하세요. 저장 화면에서는 다음 생물로 바로 이어갈 수 있어요.',
+  },
+  {
+    target: () => document.querySelector('.dock__dex'),
+    title: '10칸을 모두 채우면 완료예요',
+    body: '도감에서 ‘퀘스트 완료 사진 보기’를 눌러 내가 찍은 사진으로 만든 이미지를 열어요. 리워드를 받을 때 현장 운영진에게 보여 주세요.',
   },
 ];
 /** 처음 배율(가장 작은 배율 = 그림이 화면을 꽉 채우는 배율의 몇 배) */
@@ -96,7 +96,9 @@ export function MapHome() {
   const dex = useDex();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const replayGuide = params.get('guide') === '1';
+  const guide = params.get('guide');
+  const startingGuide = guide === 'quest';
+  const showGuide = startingGuide || guide === '1';
   const fieldTaxa = useMemo(() => new Set((content.fieldPhotos ?? []).flatMap((photo) => photo.taxonId ? [photo.taxonId] : [])), [content]);
   const publicTaxa = useMemo(() => content.taxa.filter((taxon) => taxon.publicObservations?.length || fieldTaxa.has(taxon.id)), [content, fieldTaxa]);
   const showPublic = publicTaxa.length > 0 && params.get('public') !== '0';
@@ -128,7 +130,7 @@ export function MapHome() {
 
   // 위치 권한을 받은 경우에만 지도가 열린 동안 걸어온 길을 기록합니다.
   useEffect(() => {
-    if (!locationEnabled || replayGuide) return;
+    if (!locationEnabled || showGuide) return;
     return watchPosition(
       (fix) => {
         setMe(fix);
@@ -137,7 +139,7 @@ export function MapHome() {
       },
       () => setDenied(true),
     );
-  }, [locationEnabled, replayGuide, content.park.bounds]);
+  }, [locationEnabled, showGuide, content.park.bounds]);
   useEffect(() => {
     void loadTrack().then(setTrackPts);
     return onTrack(setTrackPts);
@@ -341,7 +343,7 @@ export function MapHome() {
 
   const finishCoach = useCallback(
     (finished: boolean) => {
-      if (finished) {
+      if (finished || startingGuide) {
         navigate(questEntry, { replace: true });
         return;
       }
@@ -349,7 +351,7 @@ export function MapHome() {
       remaining.delete('guide');
       setParams(remaining, { replace: true });
     },
-    [navigate, params, questEntry, setParams],
+    [navigate, params, questEntry, setParams, startingGuide],
   );
 
   return (
@@ -473,9 +475,9 @@ export function MapHome() {
               <h2>{season.season} 생물 도감{dex?.completion ? ' 완성!' : ''}</h2>
               <p>{dex?.completion ? '완료 사진을 현장에서 보여 주세요.' : dex?.filled
                 ? `${dex.filled}/${dex.total}종을 찾았어요. 다음 생물을 만나러 가요.`
-                : `공원에서 생물 ${season.dex.length}종을 찍고 도감을 채워요.`}</p>
+                : '공원에서 식물 8종과 물새 2종을 찍고 도감을 채워요.'}</p>
             </div>
-            <Link to={questEntry} className="btn btn--primary btn--block">
+            <Link to={dex?.filled ? questEntry : '/?guide=quest'} className="btn btn--primary btn--block">
               <Icon name={dex?.completion ? 'check' : 'binoculars'} size={20} />
               {dex?.completion ? '완료 사진 보기' : dex?.filled ? '퀘스트 이어 하기' : '퀘스트 시작해 보기'}
             </Link>
@@ -485,7 +487,13 @@ export function MapHome() {
         )}
       </section>
 
-      {replayGuide && <Tour steps={EXPLORATION_GUIDE} label="탐험 가이드" finishLabel={dex?.completion ? '완료 사진 보기' : '퀘스트 시작'} onDone={finishCoach} />}
+      {showGuide && <Tour
+        steps={EXPLORATION_GUIDE}
+        label={startingGuide ? '퀘스트 안내' : '탐험 가이드'}
+        finishLabel={dex?.completion ? '완료 사진 보기' : '첫 생물 찾기'}
+        skipLabel={startingGuide ? '건너뛰고 시작' : undefined}
+        onDone={finishCoach}
+      />}
     </main>
   );
 }

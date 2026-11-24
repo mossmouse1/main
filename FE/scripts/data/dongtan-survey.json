@@ -41,5 +41,38 @@
     "scientific": "Pennisetum alopecuroides",
     "korean": "수크령",
     "record": {"id":"city:2026:fountain-grass","date":"2026-10-12","source":"화성특례시 보도자료","url":"https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202","area":"동탄호수공원"}
+  },
+  {
+    "id": "korean-red-pine",
+    "scientific": "Pinus densiflora",
+    "korean": "소나무",
+    "cultivated": true,
+    "record": {
+      "id": "inat:100897535",
+      "date": "2021-11-12",
+      "source": "iNaturalist · 식재 관찰",
+      "url": "https://www.inaturalist.org/observations/100897535",
+      "credit": "jh_10932",
+      "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "lat": 37.168269,
+      "lng": 127.095864,
+      "uncertaintyM": 8
+    }
+  },
+  {
+    "id": "winged-spindle",
+    "scientific": "Euonymus alatus",
+    "korean": "화살나무",
+    "cultivated": true,
+    "record": {
+      "id": "inat:101591674",
+      "date": "2021-11-18",
+      "source": "iNaturalist · 식재 관찰",
+      "url": "https://www.inaturalist.org/observations/101591674",
+      "credit": "jh_10527",
+      "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "area": "동탄호수공원 동쪽 물가 일대",
+      "zoneId": "Z2"
+    }
   }
 ]

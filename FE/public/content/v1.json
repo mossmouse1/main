@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "updatedAt": "2026-11-24",
   "park": {
     "name": "동탄호수공원",
@@ -5603,12 +5603,13 @@
       "confusableStatus": "draft",
       "clue": {
         "zoneIds": [
+          "Z2",
           "Z4"
         ],
-        "where": "정원 울타리처럼 심겨 있어요.",
+        "where": "공원 동쪽 물가 산책로 주변에서 울타리처럼 심긴 관목을 살펴봐요.",
         "looks": [
-          "가지에 날개 같은 코르크가 붙어 있어요.",
-          "가을에 잎이 새빨개요."
+          "가는 가지에 납작한 날개처럼 달린 갈색 코르크가 보여요.",
+          "잎이 떨어진 뒤에는 가지의 날개를 가까이 찍어 보세요."
         ]
       },
       "monthCounts": [
@@ -5662,6 +5663,18 @@
       },
       "sightings": [
         [37.168408, 127.105275, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "inat:101591674",
+          "date": "2021-11-18",
+          "source": "iNaturalist · 식재 관찰",
+          "url": "https://www.inaturalist.org/observations/101591674",
+          "credit": "jh_10527",
+          "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+          "area": "동탄호수공원 동쪽 물가 일대",
+          "zoneId": "Z2"
+        }
       ]
     },
     {
@@ -5682,7 +5695,8 @@
         "where": "정원과 숲 가장자리에 있어요.",
         "looks": [
           "잎이 손바닥처럼 갈라져요.",
-          "열매에 날개가 두 개 있어요."
+          "열매에 날개가 두 개 있어요.",
+          "잎이 떨어진 뒤에는 지도 속 촬영 지점에서 나무 전체와 마주 난 가지나 남은 날개열매를 함께 찍어요."
         ]
       },
       "monthCounts": [
@@ -5827,12 +5841,13 @@
       "confusableStatus": "draft",
       "clue": {
         "zoneIds": [
+          "Z5",
           "Z3"
         ],
-        "where": "북쪽 숲에 많아요.",
+        "where": "지도에 표시된 서쪽 산책로 주변에서 바늘잎이 달린 나무를 찾아요.",
         "looks": [
-          "바늘잎이 두 개씩 붙어 나요.",
-          "줄기 위쪽 껍질이 붉어요."
+          "길고 가느다란 바늘잎이 두 개씩 붙어요.",
+          "위쪽 줄기의 붉은 껍질과 잎을 함께 찍어 보세요."
         ]
       },
       "monthCounts": [
@@ -5888,6 +5903,19 @@
         [37.170567, 127.098552, 0],
         [37.171927, 127.103151, 0],
         [37.169873, 127.101536, 0]
+      ],
+      "publicObservations": [
+        {
+          "id": "inat:100897535",
+          "date": "2021-11-12",
+          "source": "iNaturalist · 식재 관찰",
+          "url": "https://www.inaturalist.org/observations/100897535",
+          "credit": "jh_10932",
+          "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+          "lat": 37.168269,
+          "lng": 127.095864,
+          "uncertaintyM": 8
+        }
       ]
     },
     {
@@ -7238,9 +7266,14 @@
       "confusableIds": [],
       "confusableStatus": "draft",
       "clue": {
-        "zoneIds": [],
-        "where": "",
-        "looks": []
+        "zoneIds": [
+          "Z5"
+        ],
+        "where": "지도에 표시된 산책로 옆 풀밭에서 발밑을 살펴봐요.",
+        "looks": [
+          "둥근 작은잎 세 장이 모여 달려요.",
+          "꽃이 없을 때는 잎의 하얀 V자 무늬가 보이게 찍어요."
+        ]
       },
       "monthCounts": null,
       "recordCount": 3,
@@ -10374,9 +10407,14 @@
       "confusableIds": [],
       "confusableStatus": "draft",
       "clue": {
-        "zoneIds": [],
-        "where": "",
-        "looks": []
+        "zoneIds": [
+          "Z4"
+        ],
+        "where": "지도에 표시된 정원 화단의 낮은 관목을 살펴봐요.",
+        "looks": [
+          "가을과 겨울에 작은 붉은 열매가 여러 개 모여 달려요.",
+          "가늘고 뾰족한 작은잎 여러 개가 한 잎에 달려요."
+        ]
       },
       "monthCounts": null,
       "recordCount": 1,
@@ -11512,12 +11550,20 @@
       "koreanName": "억새",
       "scientificName": "Miscanthus sinensis",
       "category": "other",
-      "confusableIds": [],
+      "confusableIds": [
+        "survey-miscanthus-sacchariflorus",
+        "field-common-reed"
+      ],
       "confusableStatus": "draft",
       "clue": {
-        "zoneIds": [],
-        "where": "",
-        "looks": []
+        "zoneIds": [
+          "Z2"
+        ],
+        "where": "루나 구조물이 보이는 호숫가 산책로 주변의 억새밭을 살펴봐요.",
+        "looks": [
+          "은빛이나 회갈색 이삭이 긴 줄기 끝에 부채처럼 퍼져요.",
+          "한곳에서 여러 줄기가 포기를 이뤄 자라는 모습을 이삭과 함께 찍어요."
+        ]
       },
       "monthCounts": null,
       "photo": {
@@ -11562,12 +11608,20 @@
       "koreanName": "물억새",
       "scientificName": "Miscanthus sacchariflorus",
       "category": "other",
-      "confusableIds": [],
+      "confusableIds": [
+        "survey-miscanthus-sinensis",
+        "field-common-reed"
+      ],
       "confusableStatus": "draft",
       "clue": {
-        "zoneIds": [],
-        "where": "",
-        "looks": []
+        "zoneIds": [
+          "Z2"
+        ],
+        "where": "호숫가의 습한 가장자리에서 은빛 이삭이 줄지어 솟은 곳을 찾아요.",
+        "looks": [
+          "한 포기에 뭉치기보다 여러 줄기가 넓게 퍼져 자라요.",
+          "마른 때에는 이삭과 군락 전체를 함께 찍어 억새와 비교해 보세요."
+        ]
       },
       "monthCounts": null,
       "photo": {
@@ -11612,12 +11666,20 @@
       "koreanName": "수크령",
       "scientificName": "Pennisetum alopecuroides",
       "category": "other",
-      "confusableIds": [],
+      "confusableIds": [
+        "survey-miscanthus-sinensis",
+        "field-common-reed"
+      ],
       "confusableStatus": "draft",
       "clue": {
-        "zoneIds": [],
-        "where": "",
-        "looks": []
+        "zoneIds": [
+          "Z2"
+        ],
+        "where": "서쪽 산책로 주변 풀밭의 긴 이삭을 보세요.",
+        "looks": [
+          "줄기 끝에 솔처럼 생긴 길쭉한 이삭이 하나씩 달려요.",
+          "이삭이 갈색으로 말라도 솔 모양으로 찾아볼 수 있어요."
+        ]
       },
       "monthCounts": null,
       "photo": {
@@ -11676,8 +11738,8 @@
       "category": "other",
       "isPlant": true,
       "confusableIds": [
-        "survey-miscanthus-sinensis",
-        "survey-miscanthus-sacchariflorus"
+        "survey-miscanthus-sacchariflorus",
+        "survey-miscanthus-sinensis"
       ],
       "confusableStatus": "draft",
       "clue": {
@@ -11720,48 +11782,42 @@
       "todaySix": [
         "spot-billed-duck",
         "eurasian-coot",
-        "oriental-magpie",
-        "brown-eared-bulbul",
-        "survey-miscanthus-sinensis",
-        "survey-fountain-grass"
-      ],
-      "dex": [
-        "oriental-magpie",
-        "spot-billed-duck",
-        "eurasian-coot",
-        "gbif-9797180",
-        "survey-fountain-grass",
-        "japanese-maple",
-        "gbif-5371712",
-        "gbif-5358748",
         "field-common-reed",
-        "brown-eared-bulbul",
-        "daurian-redstart",
-        "japanese-tit",
-        "tree-sparrow",
-        "marsh-tit",
+        "gbif-5371712",
+        "japanese-maple",
+        "korean-red-pine",
+        "winged-spindle",
+        "survey-fountain-grass",
         "survey-miscanthus-sinensis",
         "survey-miscanthus-sacchariflorus"
       ],
+      "dex": [
+        "spot-billed-duck",
+        "eurasian-coot",
+        "field-common-reed",
+        "gbif-5371712",
+        "japanese-maple",
+        "korean-red-pine",
+        "winged-spindle",
+        "survey-fountain-grass",
+        "survey-miscanthus-sinensis",
+        "survey-miscanthus-sacchariflorus",
+        "gbif-5358748"
+      ],
       "recordCounts": {
-        "oriental-magpie": 2,
         "spot-billed-duck": 2,
         "eurasian-coot": 4,
-        "gbif-9797180": 2,
-        "survey-fountain-grass": 2,
-        "japanese-maple": 1,
-        "gbif-5371712": 1,
-        "gbif-5358748": 1,
         "field-common-reed": 1,
-        "brown-eared-bulbul": 1,
-        "daurian-redstart": 1,
-        "japanese-tit": 1,
-        "tree-sparrow": 1,
-        "marsh-tit": 1,
+        "gbif-5371712": 1,
+        "japanese-maple": 1,
+        "korean-red-pine": 0,
+        "winged-spindle": 0,
+        "survey-fountain-grass": 2,
         "survey-miscanthus-sinensis": 1,
-        "survey-miscanthus-sacchariflorus": 1
+        "survey-miscanthus-sacchariflorus": 1,
+        "gbif-5358748": 1
       },
-      "recordCountsBasis": "11월 12일 조사팀 현장 사진과 동탄호수공원 가을 관찰 자료"
+      "recordCountsBasis": "11월 동탄호수공원 현장 사진과 가을 관찰·식재 자료"
     },
     {
       "id": "winter-2026",
@@ -11773,44 +11829,40 @@
       "todaySix": [
         "spot-billed-duck",
         "eurasian-coot",
-        "common-merganser",
-        "great-crested-grebe",
-        "oriental-magpie",
-        "japanese-tit"
+        "field-common-reed",
+        "gbif-5371712",
+        "japanese-maple",
+        "korean-red-pine",
+        "winged-spindle",
+        "survey-fountain-grass",
+        "survey-miscanthus-sinensis",
+        "survey-miscanthus-sacchariflorus"
       ],
       "dex": [
         "spot-billed-duck",
         "eurasian-coot",
-        "common-merganser",
-        "great-crested-grebe",
-        "mallard",
-        "oriental-magpie",
-        "daurian-redstart",
-        "brown-eared-bulbul",
-        "japanese-tit",
-        "marsh-tit",
-        "varied-tit",
-        "gbif-9797180",
-        "gbif-2481890",
-        "gbif-5231438"
+        "field-common-reed",
+        "gbif-5371712",
+        "japanese-maple",
+        "korean-red-pine",
+        "winged-spindle",
+        "survey-fountain-grass",
+        "survey-miscanthus-sinensis",
+        "survey-miscanthus-sacchariflorus"
       ],
       "recordCounts": {
         "spot-billed-duck": 2,
         "eurasian-coot": 2,
-        "common-merganser": 2,
-        "great-crested-grebe": 1,
-        "mallard": 1,
-        "oriental-magpie": 1,
-        "daurian-redstart": 1,
-        "brown-eared-bulbul": 1,
-        "japanese-tit": 2,
-        "marsh-tit": 1,
-        "varied-tit": 1,
-        "gbif-9797180": 1,
-        "gbif-2481890": 2,
-        "gbif-5231438": 1
+        "field-common-reed": 0,
+        "gbif-5371712": 0,
+        "japanese-maple": 0,
+        "korean-red-pine": 0,
+        "winged-spindle": 0,
+        "survey-fountain-grass": 0,
+        "survey-miscanthus-sinensis": 0,
+        "survey-miscanthus-sacchariflorus": 0
       },
-      "recordCountsBasis": "동탄호수공원 공개 관찰 자료의 12~2월 기록"
+      "recordCountsBasis": "동탄호수공원 현장·식재 기록과 겨울에 남는 잎·줄기·열매 자료"
     }
   ],
   "publicObservationsUpdatedOn": "2026-11-24",
