@@ -12,3 +12,6 @@ BE/supabase/.branches
 .vercel
 .vscode/
 /docs/현장사진-보관/
+
+# 엑셀 보고서(개인정보 가능성)
+*.xlsx

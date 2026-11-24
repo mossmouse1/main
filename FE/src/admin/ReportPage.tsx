@@ -3,7 +3,7 @@ import type { AdminRow } from '../backend/types';
 import { useContent } from '../content/ContentProvider';
 import { taxonById } from '../content/helpers';
 import { useAdmin } from './AdminApp';
-import { appearances, isAlien, isOutOfDex, isProtected, isUnverified, participantNumbers, recordRow, summarize, type Appearance } from './report';
+import { appearances, isAlien, isOutOfDex, isProtected, isUnverified, kstDateTime, participantNumbers, recordRow, summarize, type Appearance } from './report';
 
 const Unverified = () => <span className="badge badge--wait">검증 전</span>;
 
@@ -14,7 +14,7 @@ function AppearanceTable({ list, withProtection }: { list: Appearance[]; withPro
       <thead>
         <tr>
           <th>종명</th>
-          <th>기록 수</th>
+          <th className="num">기록 수</th>
           <th>처음 관찰일</th>
           <th>마지막 관찰일</th>
           <th>구역 / 비오톱</th>
@@ -27,9 +27,9 @@ function AppearanceTable({ list, withProtection }: { list: Appearance[]; withPro
             <td>
               {a.name} {!a.verified && <Unverified />}
             </td>
-            <td>{a.count}</td>
-            <td>{a.first}</td>
-            <td>{a.last}</td>
+            <td className="num">{a.count}</td>
+            <td className="nowrap">{a.first}</td>
+            <td className="nowrap">{a.last}</td>
             <td>{a.places}</td>
             {withProtection && <td>{a.protection}</td>}
           </tr>
@@ -88,6 +88,11 @@ export function ReportPage() {
   return (
     <div className="admin__page stack report">
       <h1>보고서</h1>
+      <div className="report__print-head">
+        <strong>우리 공원 생명 도감 · 보고서</strong>
+        <span>기간: {period}</span>
+        <span>출력일: {kstDateTime(new Date().toISOString()).slice(0, 10)}</span>
+      </div>
       <div className="card row row--wrap report__controls">
         <label className="field">
           <span>시작일(관찰일, 한국 시간)</span>
@@ -137,7 +142,7 @@ export function ReportPage() {
               <div className="table-scroll"><table className="table">
                 <thead>
                   <tr>
-                    <th>관찰일시(KST)</th>
+                    <th className="nowrap">관찰일시(KST)</th>
                     <th>참여자</th>
                     <th>적은 이름</th>
                     <th>종 선택 방식</th>
@@ -150,11 +155,11 @@ export function ReportPage() {
                     .filter(({ r }) => isOutOfDex(r))
                     .map(({ r, x }) => (
                       <tr key={r.id}>
-                        <td>{x.observedAt}</td>
-                        <td>{x.participant}</td>
+                        <td className="nowrap">{x.observedAt}</td>
+                        <td className="nowrap">{x.participant}</td>
                         <td>{r.free_text_name ?? ''}</td>
                         <td>{x.pickSource}</td>
-                        <td>{x.zone}</td>
+                        <td className="nowrap">{x.zone}</td>
                         <td>전문가 확인 필요</td>
                       </tr>
                     ))}
@@ -168,12 +173,12 @@ export function ReportPage() {
             <div className="table-scroll"><table className="table">
               <thead>
                 <tr>
-                  <th>관찰일시(KST)</th>
+                  <th className="nowrap">관찰일시(KST)</th>
                   <th>참여자</th>
                   <th>종명</th>
                   <th>종 선택 방식</th>
                   <th>구역</th>
-                  <th>사진 수</th>
+                  <th className="num">사진 수</th>
                   <th>외래종</th>
                   <th>보호 구분</th>
                   <th>검수 상태</th>
@@ -182,14 +187,14 @@ export function ReportPage() {
               <tbody>
                 {table.map(({ r, x }) => (
                   <tr key={r.id}>
-                    <td>{x.observedAt}</td>
-                    <td>{x.participant}</td>
+                    <td className="nowrap">{x.observedAt}</td>
+                    <td className="nowrap">{x.participant}</td>
                     <td>
                       {x.name} {isUnverified(r) && <Unverified />}
                     </td>
                     <td>{x.pickSource}</td>
-                    <td>{x.zone}</td>
-                    <td>{x.photos}</td>
+                    <td className="nowrap">{x.zone}</td>
+                    <td className="num">{x.photos}</td>
                     <td>{x.alien}</td>
                     <td>{x.protection}</td>
                     <td>{x.review}</td>
