@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { activeSeason, candidatesFromTaxon, candidatesFromZone } from '../content/helpers';
+import { activeSeason, candidatesFromTaxon, candidatesFromZone, questSpecies } from '../content/helpers';
 import type { Content } from '../content/types';
 import { computeDex } from './dex';
 import { effortText } from './effort';
@@ -47,20 +47,42 @@ describe('후보 3개', () => {
 });
 
 describe('가족 도감', () => {
-  const autumn = activeSeason(content, new Date('2026-11-22T05:00:00Z'));
+  const pool = activeSeason(content, new Date('2026-11-22T05:00:00Z'));
+  const autumn = { ...pool, dex: pool.dex.slice(0, 10) };
   const obs = (taxonId: string | null, extra = {}) => ({
     id: Math.random().toString(),
     taxonId,
     observedAt: '2026-11-22T05:00:00Z',
     hidden: false,
+    outsidePark: false,
+    zoneId: 'Z2',
+    photoIds: ['photo'],
     reviewChanged: false,
     reviewSeen: true,
     ...extra,
   });
 
-  it('11월 22일은 가을 세트, 12칸', () => {
+  it('11월은 가을 퀘스트, 한국 시간 12월 1일부터 겨울 퀘스트', () => {
     expect(autumn.id).toBe('autumn-2026');
-    expect(computeDex(content, autumn, [], []).total).toBe(12);
+    expect(computeDex(content, autumn, [], []).total).toBe(10);
+    expect(activeSeason(content, new Date('2026-11-30T14:59:59Z')).id).toBe('autumn-2026');
+    expect(activeSeason(content, new Date('2026-11-30T15:00:00Z')).id).toBe('winter-2026');
+  });
+  it('가족별 계절 후보에서 중복 없이 10종을 선택한다', () => {
+    const first = questSpecies(content, pool, 'family-a');
+    expect(new Set(first).size).toBe(10);
+    expect(first.every((id) => pool.dex.includes(id))).toBe(true);
+    expect(questSpecies(content, pool, 'family-a')).toEqual(first);
+    expect(questSpecies(content, pool, 'family-b')).not.toEqual(first);
+  });
+  it('다른 계절의 사진과 미확인 사진이 개인 도감에 남는다', () => {
+    const dex = computeDex(content, autumn, [
+      obs('eurasian-coot', { observedAt: '2026-02-20T01:00:00Z' }),
+      obs(null, { id: 'my-unidentified', freeTextName: '내가 본 새' }),
+    ], []);
+    expect(dex.filled).toBe(0);
+    expect(dex.collectionFoundIds.has('eurasian-coot')).toBe(true);
+    expect(dex.unnamed[0]).toMatchObject({ id: 'my-unidentified', name: '내가 본 새' });
   });
   it('고른 기록이 있으면 칸이 차고 NEW가 붙는다. 숨긴 기록과 계절 밖 기록은 세지 않는다', () => {
     const dex = computeDex(
@@ -83,5 +105,14 @@ describe('가족 도감', () => {
     const dex = computeDex(content, autumn, [obs('common-moorhen', { reviewChanged: true, reviewSeen: false })], []);
     expect(dex.filled).toBe(0);
     expect(dex.changedUnseen).toBe(1);
+  });
+  it('공원에서 찍은 각 종 사진이 있어야 완료 날짜와 사진 목록을 만든다', () => {
+    const partial = autumn.dex.slice(0, -1).map((id) => obs(id, { photoIds: [id] }));
+    const last = autumn.dex.at(-1)!;
+    expect(computeDex(content, autumn, [...partial, obs(last, { outsidePark: true }), obs(last, { zoneId: 'Z6' }), obs(last, { photoIds: [] })], []).completion).toBeNull();
+    const completedAt = '2026-11-24T06:00:00Z';
+    const dex = computeDex(content, autumn, [...partial, obs(last, { observedAt: completedAt, photoIds: [last] })], []);
+    expect(dex.completion?.completedAt).toBe(completedAt);
+    expect(dex.completion?.entries.map((entry) => entry.photoIds[0])).toEqual(autumn.dex);
   });
 });

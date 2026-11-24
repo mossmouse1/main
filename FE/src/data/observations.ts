@@ -1,4 +1,5 @@
-import type { Content } from '../content/types';
+import type { Content, SeasonSet } from '../content/types';
+import { computeDex, isQuestObservation, type QuestReward } from '../lib/dex';
 import { distanceM, findBiotope, findZone, inBounds, type LatLng } from '../lib/geo';
 import { nowIso } from '../lib/time';
 import { uuid } from '../lib/uuid';
@@ -17,7 +18,8 @@ export async function saveObservation(
   content: Content,
   draft: RecordDraft,
   where: { subject: LatLng; radiusM: number; method: LocationMethod },
-): Promise<LocalObservation> {
+  season: SeasonSet,
+): Promise<{ observation: LocalObservation; reward: QuestReward | null }> {
   const walk = await ensureWalk(draft.foundAt);
   const id = uuid();
   const createdAt = nowIso();
@@ -64,15 +66,23 @@ export async function saveObservation(
     uploaded: false,
   }));
 
-  await db.transaction('rw', [db.observations, db.photos, db.drafts, db.outbox], async () => {
+  const reward = await db.transaction('rw', [db.observations, db.photos, db.drafts, db.outbox], async () => {
+    let progress: QuestReward | null = null;
+    if (obs.taxonId && season.dex.includes(obs.taxonId) && isQuestObservation(content, season, obs)) {
+      const previous = await db.observations.where('taxonId').anyOf(season.dex).toArray();
+      if (!previous.some((record) => record.taxonId === obs.taxonId && isQuestObservation(content, season, record))) {
+        progress = computeDex(content, season, [...previous, obs], []).completion ? 'completion' : 'discovery';
+      }
+    }
     await db.observations.add(obs);
     await db.photos.bulkAdd(packBlobs(photos));
     await db.drafts.delete('current');
     await enqueue({ kind: 'observation', refId: id, obsId: id }, { kick: false });
     for (const p of photos) await enqueue({ kind: 'photo', refId: p.id, obsId: id }, { kick: false });
+    return progress;
   });
-  await touchWalk(true);
+  void touchWalk(true).catch(() => {});
   track('record_saved', { draftId: draft.draftId, ms: Date.parse(createdAt) - Date.parse(draft.foundAt), photos: photos.length });
   kickSync();
-  return obs;
+  return { observation: obs, reward };
 }

@@ -43,6 +43,11 @@ function seededShuffle<T>(items: T[], seed: string): T[] {
   return out;
 }
 
+export function questSpecies(content: Content, season: SeasonSet, familyId: string): string[] {
+  const pool = [...new Set(season.dex)].filter((id) => taxonById(content, id)?.photo).sort();
+  return seededShuffle(pool, `${season.id}:${familyId}`).slice(0, 10);
+}
+
 /** 생물 카드에서 시작: 그 종 + 헷갈리는 종 2개 */
 export function candidatesFromTaxon(content: Content, taxonId: string, seed: string): string[] {
   const taxon = taxonById(content, taxonId);
@@ -67,12 +72,12 @@ export function candidatesFromZone(content: Content, zoneId: string | null, seas
  * 이름 검색(‘목록에 없어요’, 지도 검색). 카드가 있는 종을 먼저, 그다음 공원 주변 공개 기록에 나온 종을 기록 많은 순으로.
  * M3 species_catalog.json(591개)을 받으면 목록이 더 늘어납니다.
  */
-export function searchTaxa(content: Content, query: string): Taxon[] {
-  const q = query.trim().replace(/\s+/g, '');
+export function searchTaxa(content: Content, query: string, limit = 20): Taxon[] {
+  const q = query.toLowerCase().replace(/\s+/g, '');
   if (!q) return [];
   const rank = (t: Taxon) => (t.catalog ? 2 : t.minor ? 1 : 0);
   return content.taxa
-    .filter((t) => t.koreanName.replace(/\s+/g, '').includes(q) || t.scientificName.toLowerCase().includes(q.toLowerCase()))
+    .filter((t) => [t.koreanName, t.scientificName].some((name) => name.toLowerCase().replace(/\s+/g, '').includes(q)))
     .sort((a, b) => rank(a) - rank(b) || (b.recordCount ?? 0) - (a.recordCount ?? 0))
-    .slice(0, 20);
+    .slice(0, limit);
 }

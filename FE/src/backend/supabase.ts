@@ -18,6 +18,7 @@ const family = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 const team = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { storageKey: 'parkdex-admin-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
 });
+let authPending: Promise<string> | null = null;
 
 function check<T>(res: { data: T; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
@@ -44,12 +45,15 @@ async function uploadOnce(path: string, blob: Blob, contentType: string): Promis
 export const supabaseFamily: FamilyBackend = {
   mode: 'supabase',
 
-  async ensureAuth() {
-    const { data } = await family.auth.getSession();
-    if (data.session) return data.session.user.id;
-    const res = await family.auth.signInAnonymously();
-    if (res.error || !res.data.user) throw new Error(res.error?.message ?? '익명 계정을 만들지 못했어요');
-    return res.data.user.id;
+  ensureAuth() {
+    authPending ??= (async () => {
+      const { data } = await family.auth.getSession();
+      if (data.session) return data.session.user.id;
+      const res = await family.auth.signInAnonymously();
+      if (res.error || !res.data.user) throw new Error(res.error?.message ?? '익명 계정을 만들지 못했어요');
+      return res.data.user.id;
+    })().finally(() => { authPending = null; });
+    return authPending;
   },
 
   async registerConsent({ version, consentedAt, adults, children }) {
@@ -150,8 +154,8 @@ export const supabaseFamily: FamilyBackend = {
     if (!error) return data as IdentifyResult;
     if (error instanceof FunctionsHttpError) {
       const body = (await error.context.json().catch(() => null)) as { error?: string } | null;
-      const known: IdentifyErrorCode[] = ['rate_limited', 'daily_limit', 'global_limit', 'consent_required', 'too_large'];
-      throw new IdentifyError(known.find((c) => c === body?.error) ?? 'failed');
+      const known: IdentifyErrorCode[] = ['rate_limited', 'daily_limit', 'global_limit', 'consent_required', 'too_large', 'invalid_image', 'unavailable'];
+      throw new IdentifyError(known.find((c) => c === body?.error) ?? (error.context.status === 404 ? 'unavailable' : 'failed'));
     }
     throw new IdentifyError('network');
   },

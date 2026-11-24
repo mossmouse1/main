@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { isByteBacked } from '../data/blobBytes';
 import { DEBUG, debugSet } from '../lib/debug';
+import { questMapUrl } from '../lib/dex';
 import { useDex, useObjectUrl, useOnline, usePendingCount, usePendingPhotos } from '../hooks';
 import { Icon } from './Icon';
 
@@ -11,9 +12,10 @@ import { Icon } from './Icon';
  * 버튼은 지도의 블록처럼 생겼고, 지도 홈에서는 지도 위에 떠 있습니다(지도가 화면 전체).
  */
 export function TabLayout() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const dex = useDex();
   const onMap = pathname === '/' || pathname.startsWith('/zone');
+  const onReceipt = (pathname.startsWith('/species/') || pathname === '/records') && new URLSearchParams(search).has('saved');
   return (
     <div className={`app-shell${pathname === '/' ? ' is-map' : ''}`}>
       <SyncBar />
@@ -21,7 +23,7 @@ export function TabLayout() {
         <Outlet />
       </div>
       <nav className="dock" aria-label="주요 화면">
-        <NavLink to="/" end className={onMap ? 'active' : undefined}>
+        <NavLink to={onReceipt ? questMapUrl(dex?.nextClue) : '/'} replace={onReceipt} end className={onMap ? 'active' : undefined}>
           <span className="dock__btn">
             <Icon name="explore" size={22} />
             <span>지도</span>
@@ -34,7 +36,7 @@ export function TabLayout() {
           </span>
         </NavLink>
         <NavLink to="/dex" className={onMap ? undefined : 'active'} aria-label={`도감, ${dex?.filled ?? 0}칸 채움, 모두 ${dex?.total ?? 0}칸`}>
-          <span className="dock__btn">
+          <span className="dock__btn dock__dex">
             <Icon name="book" size={22} />
             <span>도감</span>
             <span className="dock__count">{dex?.filled ?? 0}</span>
@@ -69,9 +71,13 @@ export function SyncBar() {
   );
 }
 
-export function PageHeader({ title, right, backTo = '/' }: { title: string; right?: ReactNode; backTo?: string }) {
+export function PageHeader({ title, right, backTo = '/', returnTo }: { title: string; right?: ReactNode; backTo?: string; returnTo?: string }) {
   const navigate = useNavigate();
   const goBack = () => {
+    if (returnTo) {
+      navigate(returnTo, { replace: true });
+      return;
+    }
     const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
     if (idx > 0) navigate(-1);
     else navigate(backTo, { replace: true });

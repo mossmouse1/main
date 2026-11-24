@@ -1,25 +1,21 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { QuestReward } from '../lib/dex';
 import { Icon } from './Icon';
 
-let justSavedId: string | undefined;
+let pending: { id: string; kind: QuestReward } | undefined;
 
-export function markRecordReward(id: string) {
-  justSavedId = id;
+export function markRecordReward(id: string, kind: QuestReward) {
+  pending = { id, kind };
 }
 
-export function useRecordReward(savedId: string | undefined): boolean {
-  const [rewardedId, setRewardedId] = useState<string>();
+export function useRecordReward(savedId: string | undefined): QuestReward | undefined {
+  const [rewarded, setRewarded] = useState<typeof pending>();
   useEffect(() => {
-    if (!savedId || justSavedId !== savedId) return;
-    // Give the result photo and the initial sync status time to paint before the flip.
-    const timer = setTimeout(() => {
-      if (justSavedId !== savedId) return;
-      justSavedId = undefined;
-      setRewardedId(savedId);
-    }, 360);
-    return () => clearTimeout(timer);
+    if (!savedId || pending?.id !== savedId) return;
+    setRewarded(pending);
+    pending = undefined;
   }, [savedId]);
-  return !!savedId && savedId === rewardedId;
+  return rewarded?.id === savedId ? rewarded?.kind : undefined;
 }
 
 const COLORS = ['#fff3a0', '#e2ae5d', '#9bd264', '#58a977', '#baf0db', '#fffaf1'];
@@ -81,15 +77,16 @@ function RewardParticles() {
   return <canvas ref={canvasRef} className="record-reward__particles" aria-hidden="true" />;
 }
 
-export function RecordReward({ children, active, stamp = '발견', compact = false }: { children: ReactNode; active: boolean; stamp?: string; compact?: boolean }) {
+export function RecordReward({ children, reward }: { children: ReactNode; reward?: QuestReward }) {
+  const complete = reward === 'completion';
   return (
-    <div className={`record-reward${compact ? ' record-reward--compact' : ''}${active ? ' is-active' : ''}`}>
+    <div className={`record-reward${complete ? ' is-complete' : ''}${reward ? ' is-active' : ''}`}>
       <div className="record-reward__card">
         <div className="record-reward__front">{children}</div>
-        {active && <div className="record-reward__back" aria-hidden="true"><Icon name="book" size={compact ? 28 : 54} /></div>}
+        {reward && <div className="record-reward__back" aria-hidden="true"><Icon name={complete ? 'flag' : 'book'} size={54} /></div>}
       </div>
-      {active && <span className="record-reward__stamp" aria-hidden="true"><Icon name="check" size={compact ? 16 : 23} />{stamp}</span>}
-      {active && <RewardParticles />}
+      {reward && <span className="record-reward__stamp" aria-hidden="true"><Icon name="check" size={23} />{complete ? '10종 완료' : '도감 +1'}</span>}
+      {reward && <RewardParticles />}
     </div>
   );
 }

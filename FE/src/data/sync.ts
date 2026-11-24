@@ -83,9 +83,8 @@ export function startSync(): () => void {
   };
 }
 
-async function runOnce(): Promise<void> {
-  if (!isOnline()) return;
-  const backend = await getFamilyBackend();
+/** 종 추천처럼 저장 대기열 밖에서 서버를 부를 때도 먼저 동의를 보냅니다. */
+export async function syncFamilyConsent(backend: FamilyBackend): Promise<boolean> {
   const uid = await backend.ensureAuth();
   const household = await getMeta('household');
   const consented = !!household?.consentedAt;
@@ -101,7 +100,13 @@ async function runOnce(): Promise<void> {
     await setMeta('consentSyncedFor', uid);
   }
   await setMeta('serverUid', uid);
-  if (!consented) return; // 동의 전에는 아무것도 보내지 않습니다.
+  return consented;
+}
+
+async function runOnce(): Promise<void> {
+  if (!isOnline()) return;
+  const backend = await getFamilyBackend();
+  if (!(await syncFamilyConsent(backend))) return;
 
   const items = await db.outbox.orderBy('id').toArray();
   const blocked = new Set<string>();
@@ -203,7 +208,8 @@ async function send(backend: FamilyBackend, item: OutboxItem): Promise<void> {
 async function afterSent(item: OutboxItem): Promise<void> {
   if (item.kind === 'photo') {
     // 서버가 받은 것을 확인했으니 원본은 지우고 화면용 사본만 남깁니다.
-    await db.photos.update(item.refId, { uploaded: true, original: null });
+    const photo = await db.photos.get(item.refId);
+    await db.photos.update(item.refId, { uploaded: true, ...(photo?.display?.size ? { original: null } : {}) });
   }
   if (item.obsId && (await db.outbox.where('obsId').equals(item.obsId).count()) === 0) {
     await db.observations.update(item.obsId, { sync: 'sent' });

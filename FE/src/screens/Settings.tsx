@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { getFamilyBackend } from '../backend';
 import { PageHeader, Stepper } from '../components/Layout';
 import { BACKEND_MODE, CONSENT_VERSION } from '../config';
 import { useContent } from '../content/ContentProvider';
-import { setMeta } from '../data/db';
 import { setPartyDefaults } from '../data/household';
 import { enqueue } from '../data/sync';
 import { useHousehold } from '../hooks';
@@ -15,7 +14,6 @@ import { CONSENT_ITEMS } from './Welcome';
 export function Settings() {
   const household = useHousehold();
   const { content } = useContent();
-  const navigate = useNavigate();
 
   if (household === undefined) return null;
 
@@ -59,21 +57,9 @@ export function Settings() {
 
         {household?.consentedAt && <DeleteRequest />}
 
-        <div className="row">
-          <button className="btn btn--outline" onClick={() => navigate('/welcome')}>
-            처음 안내 다시 보기
-          </button>
-          <button
-            className="btn btn--outline"
-            onClick={async () => {
-              await setMeta('tourSeen', false);
-              await setMeta('cameraTipSeen', false);
-              navigate('/');
-            }}
-          >
-            탐험 가이드 다시 보기
-          </button>
-        </div>
+        <Link to="/?guide=1" className="btn btn--outline">
+          탐험 가이드 다시 보기
+        </Link>
 
         <p className="caption">
           서버: {BACKEND_MODE === 'supabase' ? 'Supabase' : '로컬 모드(이 브라우저 안의 가짜 서버)'} · 콘텐츠 v{content.version} ({content.updatedAt}) · 동의 문구 {CONSENT_VERSION}

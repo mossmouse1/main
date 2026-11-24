@@ -10,8 +10,8 @@
 
 | 기능 | 상태 | 위치 |
 | --- | --- | --- |
-| F01 바로 시작(처음 안내 화면 없이 지도 홈 코치마크 5단계, 동의·사람 수는 첫 기록 때 한 번) | 구현 | `FE/src/screens/MapHome.tsx`(COACH), `FE/src/components/Tour.tsx`, `FE/src/screens/Welcome.tsx` |
-| F02 공원 지도 홈(쿼터뷰 블록 지도 전체 화면, 지도 위 빈 칸 → 사진 딱지, 오늘의 6종 칸, 지금 걷는 곳·걸어온 길, 산책로 따라 길 안내) | 구현 | `FE/src/screens/MapHome.tsx`, `FE/src/components/ParkMap.tsx`, `FE/src/lib/trail.ts` |
+| F01 바로 시작(전체 지도, 퀘스트 시작 버튼, 설정에서 지도 코치마크 열기) | 구현 | `FE/src/screens/MapHome.tsx`, `FE/src/components/Tour.tsx`, `FE/src/screens/Welcome.tsx` |
+| F02 공원 지도 홈(쿼터뷰 블록 지도, 사진 핀, 계절 퀘스트 10종, 내 위치와 산책로 안내) | 구현 | `FE/src/screens/MapHome.tsx`, `FE/src/components/ParkMap.tsx`, `FE/src/lib/trail.ts` |
 | F03 오늘 찾을 종 · F04 생물 카드 | 구현(월별 자료는 연결 전) | `FE/src/screens/SpeciesCard.tsx` |
 | F05 사진(카메라/앨범, 1~3장, 원본 + 1280px 사본, HEIC, EXIF 시각) | 구현 | `FE/src/platform.ts`, `FE/src/lib/photo.ts` |
 | F06 후보 3개 / 목록에 없어요 / 잘 모르겠어요 | 구현 | `FE/src/screens/Record.tsx` |
@@ -33,8 +33,14 @@
 ### 화면 구성(홈을 단순하게)
 
 - 아래쪽 버튼은 3개입니다: 지도 · 촬영(가장 큼) · 도감(채운 칸 수). 내 기록·설정은 도감 화면 머리글에서 엽니다(PRD 4장의 탭 4개와 다름).
-- 지도 홈 위쪽에는 ‘다음에 찾을 생물’ 한 장만 둡니다(오늘의 6종 중 못 찾은 것, 위치가 있으면 가장 가까운 것과 걸어서 몇 분). 생물 가까이 가면 같은 자리가 노란 알림으로 바뀝니다. 아래에는 오늘의 6종 칸과 내 위치 버튼뿐입니다. 근처 생물 알림, 고른 생물 카드, 탐험 중 표시는 그때만 나옵니다.
-- 지도에는 오늘의 6종만 띄웁니다. 못 찾은 생물은 지점마다 점선 ‘빈 칸’, 찾으면 우리 가족이 찍은 자리의 ‘사진 딱지’로 바뀝니다. 나머지 종은 도감의 ‘지도에서 찾기’나 근처 알림으로 나타납니다.
+- 계절 퀘스트 지도 위쪽에는 ‘다음에 찾을 생물’이 나옵니다. 못 찾은 생물의 관찰 지점에 가까워지면 같은 자리에 알림이 뜹니다.
+- 첫 화면에서 전체 지도를 살펴보고 **퀘스트 시작해 보기**를 누르면 첫 생물의 사진과 관찰 지점을 엽니다. **관찰 종 목록**에서 국명·학명으로 검색하고, 생물 카드에서 사진과 출처를 확인할 수 있습니다.
+- 전체 도감 177종에 참고 사진을 제공합니다. 공개 참고 사진은 재사용 가능한 iNaturalist와 위키미디어 커먼즈 사진을 WebP로 크기 조정한 것이며, 촬영자와 사진 원문 및 이용 조건은 생물 카드에서 확인할 수 있습니다. 핀의 위치는 공개 관찰 기록에서 가져옵니다.
+- 지도 하단의 **가을 퀘스트** 또는 **겨울 퀘스트**에서 계절 후보 중 이 기기의 가족에게 무작위로 뽑힌 10종을 보여 줍니다. 뽑힌 목록은 시즌 중에 유지됩니다. 공원 조사구역에서 해당 기간에 남긴 사진으로 10종을 채우면 완료 PNG를 저장하거나 현장 운영진에게 보여줄 수 있습니다.
+- **전체 도감**에는 계절과 관계없이 내가 찍어 저장한 기록이 남습니다. 이름을 모르는 사진이나 직접 적은 이름도 볼 수 있고, 검토로 종이 확인되면 해당 칸에 반영됩니다.
+- 퀘스트의 새 종을 채울 때 저장 화면에 도장과 모션을 표시하고 효과음을 재생합니다. 저장 후 다음 생물을 지도에서 바로 열 수 있습니다. 10종을 모두 모으면 직접 찍은 사진으로 만든 완료 이미지를 저장하거나 현장 운영진에게 보여 줄 수 있습니다. 코치마크는 설정의 **탐험 가이드 다시 보기**에서 열 수 있습니다.
+- **조사팀 현장 사진**에는 2026년 11월 12일 촬영본을 담았습니다. 이름을 확인한 사진은 종 카드와 지도에 연결했고, 지도 좌표는 EXIF의 촬영자 위치입니다.
+- 11월 말 가을 퀘스트는 11월 공원 일대 조류 관찰과 화성특례시의 가을 식생 자료를 반영했습니다. 2026년 12월 1일 한국 시간부터는 공원 공개 관찰 자료에 12~2월 기록이 있는 겨울 후보로 전환합니다. [화성특례시 가을 식생 자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202)
 - 홈에서 뺀 것: 거르기 칩, 가까운 생물 목록, 나침반, 구역 팻말(확대하면 보임), ‘탐험 시작’ 버튼(탐험은 첫 기록을 저장할 때 자동으로 시작), 처음 안내 슬라이드(코치마크로 바꿈).
 
 ### 디자인(블록 디오라마)
@@ -48,10 +54,10 @@
 ### 알려진 한계
 
 - 카메라 핀치 줌 미해결: 아이폰(크롬/사파리)에서 두 손가락 핀치가 반응하지 않습니다. 카메라의 1x/2x 버튼은 동작합니다. 리스너 부착 문제를 고쳤지만 실기기에서 여전히 재현되며, `?debug=1` 진단 패널로 원인을 확인 중입니다.
-- 지도 홈은 쿼터뷰 블록 지도입니다(`FE/public/map/park-iso.svg`, `FE/scripts/build-iso.mjs`). 땅을 10m 칸으로 나눠 OSM 도형대로 블록을 놓았고, 호수·산책로·숲·건물 자리는 실제와 같습니다. 건물 높이는 보기 좋게 줄였고(층수 자료 없음), 숲 언덕의 단은 실제 높이가 아니라 꾸밈입니다. 좌표 변환 값은 `v1.json`의 `map.iso`(`FE/src/lib/iso.ts`)입니다.
+- 지도 홈은 쿼터뷰 블록 지도를 WebP 배경으로 표시합니다(`FE/public/map/park-iso.webp`, SVG 원본 생성 `FE/scripts/build-iso.mjs`). 지도 위에 관찰 핀을 올리며, 확대할 때 같은 관찰 핀은 재사용합니다. OSM 도형을 바탕으로 호수·산책로·숲·건물 위치를 표시하고 건물과 숲 높이는 그림에 맞춰 표현합니다.
 - 블록 지도는 화면을 늘 꽉 채우고 그림 밖으로는 끌 수 없습니다(여백 없음). 그래서 받아 둔 OSM 범위(공원 + 둘레 약 150m) 바깥은 블록 마을·숲으로 채웠습니다. 이 바깥 부분은 꾸밈이며 실제와 다릅니다(주변 지역 OSM을 더 받으면 실제 모습으로 바꿀 수 있음).
 - 생물 위치 고르기·검토 화면은 정확히 누르기 좋게 위에서 본 지도(`FE/public/map/park-map.svg`, `FE/scripts/build-map.mjs`)를 그대로 씁니다. 구역 경계(Z1~Z6)와 시설 위치는 임시 도형입니다.
-- 생물 사진 핀은 GBIF 공개 기록 좌표를 가장 가까운 산책로 위로 옮긴 자리입니다. eBird 핫스폿 대표점(여러 종이 한 좌표에 찍힌 기록)과 위치 오차 150m 넘는 기록은 뺐고, 정밀 기록이 없는 종(주로 나무)은 단서 구역 산책로의 ‘찾아볼 곳’(작고 둥근 핀)으로 표시합니다. 다시 만들 때: `node scripts/fetch-sightings.mjs` → `node scripts/build-sightings.mjs` → `npm run seed:sql`.
+- 산책 지도에서 공개 관찰 핀은 원자료의 좌표에 놓입니다. 구역 기록은 구역 표시로 열 수 있고, 찾아볼 곳은 단서에 근거한 산책 안내입니다. 관찰 지점으로 길을 켜면 가까운 산책로까지 안내합니다.
 - OSM에 호수 서·북쪽 물가길이 없어, 호수 테두리 10m 바깥 둘레를 ‘호숫가 길’로 보탰습니다(`FE/public/map/trails.json`). 실제 답사로 확인이 필요합니다.
 - 내가 걸어온 길(최근 3시간)은 기기(IndexedDB)에만 두고 서버로 보내지 않습니다. 위치는 지도 화면을 연 동안만 읽습니다.
 - 비오톱 데이터는 샘플 1개(호수)뿐입니다.
@@ -95,7 +101,7 @@ FE/                          웹앱(Vite + React + TypeScript)
   src/platform.ts            카메라·위치는 여기서만 부름
   public/content/v1.json     콘텐츠(구역·종 카드·계절 세트)
   public/map/park-map.svg    위에서 본 지도(생물 위치 고르기·검토용, build-map.mjs가 만듦)
-  public/map/park-iso.svg    지도 홈의 쿼터뷰 블록 지도(build-iso.mjs가 만듦)
+  public/map/park-iso.webp   지도 홈의 쿼터뷰 블록 지도(build-iso.mjs가 만듦)
   public/map/trails.json     산책로 선(내 위치 설명·길 안내, build-sightings.mjs가 만듦)
   scripts/                   콘텐츠·지도·시드 생성 스크립트 (gen-seed.mjs 등)
   .env.example               환경변수 견본(값은 비어 있음)
@@ -125,6 +131,38 @@ prd.md                       기획서
 - 키는 공개용(publishable/anon)만 넣습니다. 서비스 키(secret/service_role)는 넣지 않습니다.
 - 두 변수를 비우면 로컬 모드(브라우저 안 가짜 서버)로 동작합니다.
 
+### OpenAI 사진 추천 연결
+
+1. [OpenAI API 키 페이지](https://platform.openai.com/api-keys)에서 키를 발급합니다.
+2. Supabase 프로젝트의 [Edge Function Secrets](https://supabase.com/dashboard/project/_/functions/secrets)에 이름이 **`OPENAI_API_KEY`**인 시크릿을 만들고 발급한 키를 값에 붙여넣습니다. 기본 모델은 `gpt-5.4-mini`입니다. 이미지 입력과 구조화 출력을 지원하는 다른 모델을 쓰려면 같은 곳에 `OPENAI_MODEL`을 추가합니다.
+3. Supabase Authentication의 **Anonymous Sign-Ins**를 켭니다. 기존 원격 DB에는 최신 마이그레이션까지 적용하고, 저장소의 `BE` 폴더에서 Edge Function을 배포합니다. 새 로컬 DB는 Supabase 시작 또는 리셋 시 시드가 적용됩니다.
+
+   ```powershell
+   cd BE
+   npx supabase functions deploy identify-species --project-ref <프로젝트ID>
+   ```
+
+4. 웹앱을 Supabase에 연결하고 휴대폰에서 **촬영 → 관찰 위치 지정 → 생물 확인 → 사진으로 종 추천받기**를 진행합니다. 화면에 고른 사진을 JPEG 사본으로 보내며 후보를 최대 3개 보여줍니다. 후보를 고른 뒤 **맞아요, 도감에 등록**으로 기록합니다.
+
+웹앱에는 위 표의 Supabase 공개 설정 두 가지만 둡니다. OpenAI 키의 위치는 Supabase Edge Function Secrets입니다.
+
+### 공개 관찰 자료 갱신
+
+공원 지도 범위와 [OpenStreetMap 공원 경계](https://www.openstreetmap.org/relation/17419957)가 겹치는 범위를 조회합니다. iNaturalist는 공개 좌표와 재사용 라이선스가 붙은 연구 등급 자료를 사용합니다. GBIF에 올라온 같은 iNaturalist 관찰은 원본 ID로 중복을 제거합니다. 알려진 위치 오차가 100m를 초과하는 좌표는 제외합니다. 원자료에 오차 정보가 없으면 생물 카드에 표시합니다. eBird 체크리스트는 구역 단위로 표시합니다.
+
+- GBIF에서 [네이처링](https://www.gbif.org/publisher/7de30ffe-19bb-489f-a1fb-5e291ad006d5), [국립중앙과학관](https://www.gbif.org/publisher/eb07eeb0-3db9-11d9-8439-b8a03c50a862), [국립생태원](https://www.gbif.org/publisher/6f2da4d9-8bd9-4f4f-852b-22cde4a43a01), [eBird](https://www.gbif.org/dataset/4fa7b334-ce0d-4e88-aaae-2e0c138d049e) 등에서 제공한 관찰을 찾고 [iNaturalist API](https://www.inaturalist.org/api)도 함께 조회합니다. 자료별 라이선스는 기록에 표시합니다.
+- 화성시 어류조사의 기사 인용과 화성시 보도자료에 나온 종은 `FE/scripts/data/dongtan-survey.json`에서 구역 단위로 추가합니다. [화성시민신문의 어류조사 인용](https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499) · [화성특례시 보도자료](https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202)
+- [제5차 전국자연환경조사 GDB](https://www.data.go.kr/data/15138804/fileData.do)의 공개 파일을 지도 범위로 잘라 확인한 결과 좌표 기록은 0건이었습니다. [국립생태원 공원 평가](https://www.nie.re.kr/nie/cmmn/file/fileDown.do?atchFileId=ef309f94394140d7b28f1de56fcaee86&fileSn=2)는 서식처 자료이며, 확인한 [학술논문](https://www.kci.go.kr/kciportal/mobile/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART003134970)은 이용 행태 연구입니다.
+- [루카 운영기관의 공개 기록 게시판](https://admin.luca.or.kr/bbs/board.php?bo_table=B12)에서 동탄호수공원·산척·송방천으로 검색한 결과는 0건이었습니다. [경기생물다양성탐사 공개 CSV](https://www.data.go.kr/data/15117062/fileData.do)는 지역별 관찰 종 수를 집계한 자료입니다. 루카 앱에서 이 공원 개별 기록을 내려받는 공개 경로는 확인되지 않았습니다.
+
+```powershell
+cd FE
+npm run data:observations
+npm run seed:sql
+```
+
+새 종이 추가되면 대상 원격 DB에도 해당 `taxa` 행을 업서트하는 마이그레이션을 적용합니다. 웹 콘텐츠와 서버 종 목록의 ID가 일치해야 촬영 추천과 저장에서 새 종을 사용할 수 있습니다. 전체 시드는 로컬 DB 초기화에 사용합니다.
+
 ## 5. 진단 모드
 
 주소 끝에 `?debug=1`을 붙이면(예: `https://<배포주소>/?debug=1`) 오른쪽 위에 작은 진단 패널이 보입니다. 일반 사용자에게는 보이지 않으며, 그 탭에서만 유지됩니다. 숫자와 상태값만 표시하고 사진 내용·위치·키는 표시하지 않습니다.
@@ -141,7 +179,7 @@ prd.md                       기획서
 | --- | --- | --- |
 | 공개용 키(publishable/anon) | `FE/.env.local`, Vercel 환경변수 | 브라우저에 노출되는 값입니다. 접근 제어는 RLS가 맡습니다. |
 | 서버 전용 키(secret/service_role) | 어디에도 넣지 않습니다 | 이 앱은 필요하지 않습니다. 쓰면 RLS를 우회합니다. |
-| OpenAI 키 | `supabase secrets set`(서버)에만 | 코드, `.env`, 로그, 채팅에 붙이지 않습니다. |
+| OpenAI 키 | Supabase Edge Function Secrets의 `OPENAI_API_KEY` | 대시보드 또는 Supabase CLI에서 설정합니다. |
 
 절대 커밋하지 않는 것:
 
@@ -174,5 +212,5 @@ prd.md                       기획서
 - 그림 지도(임시 SVG), 구역 경계 Z1~Z6와 시설 위치(임시 도형)
 - 비오톱(호수 1개 샘플)
 - 월별 기록 막대, 이름 검색 자료
-- 헷갈리는 종, 단서 문구, 가을·겨울 세트 편성, 동의 문구(초안, 팀 검토 필요)
+- 헷갈리는 종, 단서 문구, 동의 문구(초안, 팀 검토 필요)
 - 자료 이용 조건(`DATA_LICENSE`)

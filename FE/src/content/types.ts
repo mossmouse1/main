@@ -42,6 +42,16 @@ export interface Photo {
   credit: string;
   license: string;
   sourceUrl?: string;
+  caption?: string;
+}
+
+export interface FieldPhoto {
+  id: string;
+  src: string;
+  taxonId: string | null;
+  capturedOn: string | null;
+  location?: { lat: number; lng: number };
+  scene?: boolean;
 }
 
 export interface Biotope {
@@ -53,11 +63,21 @@ export interface Biotope {
   placeholder?: boolean;
 }
 
+export type PublicObservation = {
+  id: string;
+  date: string;
+  source: string;
+  url: string;
+  credit?: string;
+  license?: string;
+} & ({ lat: number; lng: number; uncertaintyM?: number } | { area: string; zoneId?: string });
+
 export interface Taxon {
   id: string;
   koreanName: string;
   scientificName: string;
   category: Category;
+  isPlant?: boolean;
   confusableIds: string[];
   confusableStatus: 'confirmed' | 'draft';
   clue: { zoneIds: string[]; where: string; looks: string[] };
@@ -73,6 +93,7 @@ export interface Taxon {
    * 기록 수 0 = 정밀 기록이 없어 단서 구역 산책로에 둔 ‘찾아볼 곳’(scripts/build-sightings.mjs).
    */
   sightings?: [number, number, number][];
+  publicObservations?: PublicObservation[];
   /** 정원 식재수처럼 심은 것일 가능성이 큰 종 */
   cultivated: boolean;
   /** 후보·검색용으로만 쓰는 종(세트에 들지 않음) */
@@ -110,6 +131,8 @@ export interface Content {
   biotopes: Biotope[];
   taxa: Taxon[];
   seasonSets: SeasonSet[];
+  publicObservationsUpdatedOn?: string;
+  fieldPhotos?: FieldPhoto[];
 }
 
 export const CATEGORY_LABEL: Record<Category, string> = {

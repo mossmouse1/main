@@ -9,7 +9,9 @@
 // 지도 데이터 © OpenStreetMap 기여자 (ODbL)
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as turf from '@turf/turf';
+import sharp from 'sharp';
 import { loadPark } from './lib/osm.mjs';
 
 const root = new URL('..', import.meta.url);
@@ -604,11 +606,13 @@ S.push(`<g>${things.map((t) => t.svg).join('')}</g>`);
 S.push('</svg>');
 const svg = S.join('\n') + '\n';
 writeFileSync(new URL('public/map/park-iso.svg', root), svg);
+const webpPath = fileURLToPath(new URL('public/map/park-iso.webp', root));
+await sharp(Buffer.from(svg)).webp({ quality: 90 }).toFile(webpPath);
 
 // ---------- 콘텐츠: 좌표 변환 값 ----------
 // 화면 좌표 = ((동 − 남) − x0, (동 + 남) / 2 − y0), 동 = (lng − lng0) × mLng, 남 = (lat0 − lat) × mLat  (src/lib/iso.ts)
 content.map.iso = {
-  image: '/map/park-iso.svg',
+  image: '/map/park-iso.webp',
   width: W,
   height: H,
   lat0,
@@ -617,7 +621,7 @@ content.map.iso = {
   mLng: M_LNG,
   x0: X0,
   y0: Y0,
-  rev: createHash('sha1').update(svg).digest('hex').slice(0, 8),
+  rev: createHash('sha1').update(readFileSync(webpPath)).digest('hex').slice(0, 8),
 };
 writeFileSync(contentUrl, JSON.stringify(content, null, 2).replace(/\[\s+(-?[\d.]+),\s+(-?[\d.]+),\s+(\d+)\s+\]/g, '[$1, $2, $3]') + '\n');
 const count = (t) => type.reduce((s, v) => s + (v === t ? 1 : 0), 0);

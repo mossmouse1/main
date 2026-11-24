@@ -15,8 +15,8 @@ describe('buildRequest', () => {
     const props = (r.text.format.schema.properties.candidates.items.properties as any).taxonId;
     expect(props.enum).toEqual(['a', 'b', 'c', 'd']);
     const content = r.input[0].content as any[];
-    expect(content[1]).toMatchObject({ detail: 'high', image_url: 'data:image/jpeg;base64,AAAA' });
-    expect(content[0].text).toContain('b: 쇠물닭 / Gallinula chloropus');
+    expect(content[0]).toMatchObject({ detail: 'high', image_url: 'data:image/jpeg;base64,AAAA' });
+    expect(r.instructions).toContain('b: 쇠물닭 / Gallinula chloropus');
   });
 });
 
@@ -38,6 +38,9 @@ describe('parseResult', () => {
   it('후보가 모두 걸러지면 noMatch', () => {
     expect(parseResult(wrap({ noMatch: false, candidates: [{ taxonId: 'x', confidence: 1 }] }), taxa)).toEqual({ candidates: [], noMatch: true });
   });
+  it('모델이 식별 불가로 답했으면 함께 보낸 후보를 버린다', () => {
+    expect(parseResult(wrap({ noMatch: true, candidates: [{ taxonId: 'a', confidence: 0.9 }] }), taxa)).toEqual({ candidates: [], noMatch: true });
+  });
   it('형식 오류·미완료·거절은 null', () => {
     expect(parseResult({ status: 'incomplete', output: [] }, taxa)).toBeNull();
     expect(parseResult({ status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal', refusal: 'no' }] }] }, taxa)).toBeNull();
@@ -58,7 +61,9 @@ describe('mapQuotaError', () => {
 
 describe('checkInput', () => {
   it('정상, 형식 오류, 너무 큼', () => {
-    expect(checkInput({ imageBase64: 'AAAA', mime: 'image/jpeg' })).toBeNull();
+    expect(checkInput({ imageBase64: '/9j/2Q==', mime: 'image/jpeg' })).toBeNull();
+    expect(checkInput({ imageBase64: 'AAAA', mime: 'image/jpeg' })?.error).toBe('invalid_image');
+    expect(checkInput({ imageBase64: '/9j/' + 'A'.repeat(1020) + '???=', mime: 'image/jpeg' })?.error).toBe('invalid_image');
     expect(checkInput({ imageBase64: 'AAAA', mime: 'image/png' })?.status).toBe(400);
     expect(checkInput({ imageBase64: 'data:image/jpeg;base64,AAAA', mime: 'image/jpeg' })?.status).toBe(400);
     expect(checkInput({ imageBase64: 'A'.repeat(MAX_BASE64_CHARS + 1), mime: 'image/jpeg' })?.status).toBe(413);

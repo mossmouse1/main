@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "updatedAt": "2026-11-16",
+  "version": 4,
+  "updatedAt": "2026-11-24",
   "park": {
     "name": "동탄호수공원",
     "bounds": {
@@ -29,7 +29,7 @@
       127.10073
     ],
     "iso": {
-      "image": "/map/park-iso.svg",
+      "image": "/map/park-iso.webp",
       "width": 1600,
       "height": 2500,
       "lat0": 37.16891,
@@ -38,7 +38,7 @@
       "mLng": 88706,
       "x0": -908,
       "y0": -1070,
-      "rev": "cfe0efcb"
+      "rev": "f759df46"
     }
   },
   "monthCounts": {
@@ -49,7 +49,6 @@
   "placeholders": [
     "taxa[].confusableIds: 물닭·쇠물닭·흰뺨검둥오리 외에는 미확정(draft)",
     "taxa[].clue: 단서 문구 초안. 팀 검토 필요",
-    "seasonSets: 가을 12칸·겨울 세트 편성은 초안",
     "zones: Z1(호수)·Z2(호숫가 35m)·Z3(숲)·Z6(공원 밖)은 OSM 지형에서 계산, Z4·Z5는 공원 안내도 전 임시 남북 분할",
     "facilities: OSM에 있는 이름만(동탄호수·루나분수·태봉산·송방천·섬). 현자의 정원 등 PRD 시설은 위치 확인 후 추가",
     "biotopes: 호수 1개만 임시. biotope_samples_4326.geojson(97개)으로 교체"
@@ -3762,6 +3761,12 @@
           "credit": "Hyppolyte de Saint-Rambert",
           "license": "CC BY-SA 4.0",
           "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nijo_jo_Anas_zonorhyncha.jpg"
+        },
+        {
+          "src": "/photos/field/field-20261112-108.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
         }
       ],
       "pin": {
@@ -3773,6 +3778,35 @@
       "sightings": [
         [37.167606, 127.100142, 1],
         [37.168892, 127.105371, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6785317871",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6785317871",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5532908007",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5532908007",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5636247236",
+          "date": "2024-02-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5636247236",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4780167",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -3837,6 +3871,12 @@
           "credit": "Alexis Lours",
           "license": "CC BY 4.0",
           "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fulica_atra_Georges-Valbon_01.jpg"
+        },
+        {
+          "src": "/photos/field/field-20261112-110.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
         }
       ],
       "pin": {
@@ -3849,6 +3889,35 @@
         [37.167703, 127.101301, 3],
         [37.16832, 127.104622, 1],
         [37.16758, 127.099894, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6771555088",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6771555088",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5857931590",
+          "date": "2024-03-16",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857931590",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.168406,
+          "lng": 127.104593
+        },
+        {
+          "id": "gbif:5647488568",
+          "date": "2024-02-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5647488568",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4780167",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -3989,6 +4058,26 @@
         [37.167912, 127.102098, 2],
         [37.167935, 127.102604, 1],
         [37.169853, 127.101434, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6823019684",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6823019684",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5612818447",
+          "date": "2024-02-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5612818447",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4780167",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4068,6 +4157,63 @@
         [37.168203, 127.104081, 1],
         [37.169932, 127.102012, 1],
         [37.169649, 127.097488, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:5857931942",
+          "date": "2024-07-06",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857931942",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.168482,
+          "lng": 127.100296
+        },
+        {
+          "id": "gbif:6569902067",
+          "date": "2024-06-29",
+          "source": "Birda · GBIF",
+          "url": "https://www.gbif.org/occurrence/6569902067",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "f0adda59ebf9b99990cc2086b3607cf13ee59615be6146b65c5defd8c12fd292",
+          "lat": 37.169788,
+          "lng": 127.101453
+        },
+        {
+          "id": "gbif:5581200635",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5581200635",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5590970096",
+          "date": "2024-02-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5590970096",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4780167",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:4301809571",
+          "date": "2022-08-28",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/4301809571",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3368123",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5051649777",
+          "date": "2020-08-12",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051649777",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.1696,
+          "lng": 127.0977
+        }
       ]
     },
     {
@@ -4129,6 +4275,26 @@
       },
       "sightings": [
         [37.169515, 127.105184, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6618913213",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6618913213",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5698073123",
+          "date": "2024-08-21",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5698073123",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4281298",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4195,6 +4361,12 @@
           "credit": "CharlesLam",
           "license": "CC BY-SA 2.0",
           "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pica_serica,_Hong_Kong.jpg"
+        },
+        {
+          "src": "/photos/field/field-20261112-023.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
         }
       ],
       "pin": {
@@ -4206,6 +4378,26 @@
       "sightings": [
         [37.170211, 127.105534, 1],
         [37.169515, 127.105184, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6619214104",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6619214104",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5667187432",
+          "date": "2024-08-21",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5667187432",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4281298",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4281,6 +4473,17 @@
       },
       "sightings": [
         [37.16991, 127.103386, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6669858314",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6669858314",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4356,6 +4559,17 @@
       },
       "sightings": [
         [37.169937, 127.102088, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6674484316",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6674484316",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4431,6 +4645,46 @@
       "sightings": [
         [37.166209, 127.101222, 1],
         [37.16343, 127.100438, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "inat:332246230",
+          "date": "2025-12-27",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/332246230",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "woobin_byun",
+          "lat": 37.166236,
+          "lng": 127.100641,
+          "uncertaintyM": 15
+        },
+        {
+          "id": "gbif:6726098191",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6726098191",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5857934626",
+          "date": "2024-06-15",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857934626",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.163424,
+          "lng": 127.100317
+        },
+        {
+          "id": "gbif:5593365370",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5593365370",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4731,6 +4985,17 @@
       },
       "sightings": [
         [37.163505, 127.100432, 1]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:5316865708",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5316865708",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4855,6 +5120,17 @@
       "sightings": [
         [37.17203, 127.101365, 0],
         [37.170022, 127.09776, 0]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6670339223",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6670339223",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -4917,6 +5193,17 @@
       "sightings": [
         [37.170126, 127.097868, 0],
         [37.171927, 127.103151, 0]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:6728771061",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6728771061",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
       ]
     },
     {
@@ -5439,6 +5726,12 @@
           "credit": "Photo by David J. Stang",
           "license": "CC BY-SA 4.0",
           "sourceUrl": "https://commons.wikimedia.org/wiki/File:Acer_palmatum_var._dissectum_Tamukeyama_0zz.jpg"
+        },
+        {
+          "src": "/photos/field/field-20261112-024.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
         }
       ],
       "pin": {
@@ -6035,7 +6328,8 @@
         "src": "/photos/date-plum-1.webp",
         "credit": "Zeynel Cebeci",
         "license": "CC BY-SA 4.0",
-        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caucasian_persimmon_-_Diospyros_lotus_07.jpg"
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caucasian_persimmon_-_Diospyros_lotus_07.jpg",
+        "caption": "가지에 달린 열매"
       },
       "cultivated": false,
       "minor": true,
@@ -6045,7 +6339,15 @@
           "src": "/photos/date-plum-1.webp",
           "credit": "Zeynel Cebeci",
           "license": "CC BY-SA 4.0",
-          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caucasian_persimmon_-_Diospyros_lotus_07.jpg"
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caucasian_persimmon_-_Diospyros_lotus_07.jpg",
+          "caption": "가지에 달린 열매"
+        },
+        {
+          "src": "/photos/observed-date-plum-1.webp",
+          "credit": "olrett",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/201418738",
+          "caption": "가지에 달린 잎"
         }
       ],
       "pin": {
@@ -6056,7 +6358,19 @@
       },
       "sightings": [
         [37.167154, 127.100628, 1]
-      ]
+      ],
+      "publicObservations": [
+        {
+          "id": "gbif:5064883654",
+          "date": "2022-07-24",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5064883654",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.16705,
+          "lng": 127.1005
+        }
+      ],
+      "isPlant": true
     },
     {
       "id": "pitch-pine",
@@ -6386,8 +6700,20 @@
       },
       "monthCounts": null,
       "recordCount": 15,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-10670284.webp",
+        "credit": "otiegoat",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/239719394"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-10670284.webp",
+          "credit": "otiegoat",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/239719394"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6406,8 +6732,20 @@
       },
       "monthCounts": null,
       "recordCount": 10,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2495414.webp",
+        "credit": "MPF",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Columba_livia.jpg"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2495414.webp",
+          "credit": "MPF",
+          "license": "CC BY-SA 3.0",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Columba_livia.jpg"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6426,11 +6764,59 @@
       },
       "monthCounts": null,
       "recordCount": 10,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-9797180-1.webp",
+        "credit": "Yavuz Korkmaz",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/17266951"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-9797180-1.webp",
+          "credit": "Yavuz Korkmaz",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/17266951"
+        },
+        {
+          "src": "/photos/field/field-20261112-093.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:6669295033",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6669295033",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:6568732216",
+          "date": "2024-06-29",
+          "source": "Birda · GBIF",
+          "url": "https://www.gbif.org/occurrence/6568732216",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "f0adda59ebf9b99990cc2086b3607cf13ee59615be6146b65c5defd8c12fd292",
+          "lat": 37.16828,
+          "lng": 127.097067
+        },
+        {
+          "id": "gbif:5318685124",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5318685124",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
+      ]
     },
     {
       "id": "gbif-9752617",
@@ -6446,11 +6832,43 @@
       },
       "monthCounts": null,
       "recordCount": 7,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-9752617-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/710058605"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-9752617-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/710058605"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:6729317176",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6729317176",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5857931941",
+          "date": "2024-07-06",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857931941",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.168557,
+          "lng": 127.100363
+        }
+      ]
     },
     {
       "id": "gbif-2481890",
@@ -6466,11 +6884,52 @@
       },
       "monthCounts": null,
       "recordCount": 6,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2481890-1.webp",
+        "credit": "rowan_m",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/114168983"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2481890-1.webp",
+          "credit": "rowan_m",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/114168983"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:6718312125",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6718312125",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5365158303",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5365158303",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        },
+        {
+          "id": "gbif:5517647502",
+          "date": "2024-02-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5517647502",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4780167",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
+      ]
     },
     {
       "id": "gbif-1921150",
@@ -6486,8 +6945,20 @@
       },
       "monthCounts": null,
       "recordCount": 5,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1921150.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766925816"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1921150.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766925816"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6506,8 +6977,20 @@
       },
       "monthCounts": null,
       "recordCount": 4,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2435035.webp",
+        "credit": "chloe ⋆˚꩜｡",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/118019762"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2435035.webp",
+          "credit": "chloe ⋆˚꩜｡",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/118019762"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6526,11 +7009,34 @@
       },
       "monthCounts": null,
       "recordCount": 4,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2487871-1.webp",
+        "credit": "xulescu_g",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/123425023"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2487871-1.webp",
+          "credit": "xulescu_g",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/123425023"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5408149140",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5408149140",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
+      ]
     },
     {
       "id": "gbif-3098912",
@@ -6546,8 +7052,20 @@
       },
       "monthCounts": null,
       "recordCount": 4,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3098912.webp",
+        "credit": "謝麗霦",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/763409526"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3098912.webp",
+          "credit": "謝麗霦",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/763409526"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6566,8 +7084,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1405383.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766925637"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1405383.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766925637"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6586,8 +7116,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1723508.webp",
+        "credit": "Liem Malarney",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/757160634"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1723508.webp",
+          "credit": "Liem Malarney",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/757160634"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6606,8 +7148,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2480876.webp",
+        "credit": "SteveM4560",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/565774265"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2480876.webp",
+          "credit": "SteveM4560",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/565774265"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6626,8 +7180,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2494441.webp",
+        "credit": "SteveM4560",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/463533305"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2494441.webp",
+          "credit": "SteveM4560",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/463533305"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6646,8 +7212,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-4408785.webp",
+        "credit": "admire-lsong (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/753274420"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-4408785.webp",
+          "credit": "admire-lsong (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/753274420"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6666,11 +7244,24 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/field/field-20261112-082.webp",
+        "credit": "프로젝트 조사팀",
+        "license": "현장 촬영",
+        "caption": "2026년 11월 12일 동탄호수공원"
+      },
+      "photos": [
+        {
+          "src": "/photos/field/field-20261112-082.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "isPlant": true
     },
     {
       "id": "gbif-9752149",
@@ -6686,8 +7277,20 @@
       },
       "monthCounts": null,
       "recordCount": 3,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9752149.webp",
+        "credit": "John Krampl",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/127255761"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9752149.webp",
+          "credit": "John Krampl",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/127255761"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6706,8 +7309,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1315111.webp",
+        "credit": "Jonghyun Park",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/639228391"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1315111.webp",
+          "credit": "Jonghyun Park",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/639228391"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6726,11 +7341,35 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1323469-1.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/450024701"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1323469-1.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/450024701"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93553938",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93553938",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.17,
+          "lng": 127.105833
+        }
+      ]
     },
     {
       "id": "gbif-1405951",
@@ -6746,8 +7385,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1405951.webp",
+        "credit": "Sasha Williams",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/101134023"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1405951.webp",
+          "credit": "Sasha Williams",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/101134023"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6766,11 +7417,34 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1427734-1.webp",
+        "credit": "Dennis Vollmar",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/172416863"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1427734-1.webp",
+          "credit": "Dennis Vollmar",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/172416863"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051653667",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051653667",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1427850",
@@ -6786,11 +7460,34 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1427850-1.webp",
+        "credit": "Zinogre",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/133080696"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1427850-1.webp",
+          "credit": "Zinogre",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/133080696"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051668639",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051668639",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1428595",
@@ -6806,11 +7503,34 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1428595-1.webp",
+        "credit": "SteveM4560",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/306089523"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1428595-1.webp",
+          "credit": "SteveM4560",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/306089523"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051641822",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051641822",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-2426634",
@@ -6826,8 +7546,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2426634.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2786813"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2426634.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2786813"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6846,8 +7578,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2434552.webp",
+        "credit": "Марина Садыкова",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/379771229"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2434552.webp",
+          "credit": "Марина Садыкова",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/379771229"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6866,8 +7610,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2481047.webp",
+        "credit": "Shirley Zundell",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/17316283"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2481047.webp",
+          "credit": "Shirley Zundell",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/17316283"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6886,8 +7642,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2482048.webp",
+        "credit": "Gergely Nigg",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/119184155"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2482048.webp",
+          "credit": "Gergely Nigg",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/119184155"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6906,8 +7674,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2484596.webp",
+        "credit": "Andrey Gulivanov",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/64936954"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2484596.webp",
+          "credit": "Andrey Gulivanov",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/64936954"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6926,8 +7706,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2490733.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2781478"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2490733.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2781478"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6946,8 +7738,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2495000.webp",
+        "credit": "Saryu Mae 前 朝琉",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/657798479"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2495000.webp",
+          "credit": "Saryu Mae 前 朝琉",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/657798479"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -6966,11 +7770,57 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-3026454-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/414156127",
+        "caption": "분홍색 꽃차례"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-3026454-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/414156127",
+          "caption": "분홍색 꽃차례"
+        },
+        {
+          "src": "/photos/observed-gbif-3026454-2.webp",
+          "credit": "Oleg Kosterin",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/250271640",
+          "caption": "꽃이 핀 가지와 잎"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:181876037",
+          "date": "2023-09-05",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/181876037",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "jh23_10709",
+          "lat": 37.169234,
+          "lng": 127.105608,
+          "uncertaintyM": 32
+        },
+        {
+          "id": "inat:181883128",
+          "date": "2023-09-05",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/181883128",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "jh23_10706",
+          "lat": 37.169617,
+          "lng": 127.105286,
+          "uncertaintyM": 5
+        }
+      ],
+      "isPlant": true
     },
     {
       "id": "gbif-3085418",
@@ -6986,8 +7836,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3085418.webp",
+        "credit": "Алёна Осипова",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/540658712"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3085418.webp",
+          "credit": "Алёна Осипова",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/540658712"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7006,8 +7868,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-4989904.webp",
+        "credit": "Adrienne van den Beemt",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767320385"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-4989904.webp",
+          "credit": "Adrienne van den Beemt",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767320385"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7026,8 +7900,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5101008.webp",
+        "credit": "Davis Damaledo",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/765236992"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5101008.webp",
+          "credit": "Davis Damaledo",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/765236992"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7046,11 +7932,34 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-5231438-1.webp",
+        "credit": "Alpsdake",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Troglodytes_troglodytes_fumigatus.JPG"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5231438-1.webp",
+          "credit": "Alpsdake",
+          "license": "CC BY-SA 3.0",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Troglodytes_troglodytes_fumigatus.JPG"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:6833503020",
+          "date": "2025-01-26",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/6833503020",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr3626751",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
+      ]
     },
     {
       "id": "gbif-5844385",
@@ -7066,8 +7975,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5844385.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/1552899"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5844385.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/1552899"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7086,8 +8007,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-6100851.webp",
+        "credit": "Andrew Lai",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/446435460"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-6100851.webp",
+          "credit": "Andrew Lai",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/446435460"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7106,8 +8039,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-7341881.webp",
+        "credit": "Andrew Bazdyrev",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/116191357"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-7341881.webp",
+          "credit": "Andrew Bazdyrev",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/116191357"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7126,8 +8071,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8214667.webp",
+        "credit": "Daniel Pineda Vera",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/364941358"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8214667.webp",
+          "credit": "Daniel Pineda Vera",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/364941358"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7146,8 +8103,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9045043.webp",
+        "credit": "Griha Hasanov",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/135708606"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9045043.webp",
+          "credit": "Griha Hasanov",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/135708606"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7166,8 +8135,20 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9178169.webp",
+        "credit": "Corey Farwell",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/628751818"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9178169.webp",
+          "credit": "Corey Farwell",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/628751818"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7186,15 +8167,27 @@
       },
       "monthCounts": null,
       "recordCount": 2,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9687165.webp",
+        "credit": "jubileej (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/491729001"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9687165.webp",
+          "credit": "jubileej (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/491729001"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
     },
     {
       "id": "gbif-1084517",
-      "koreanName": "Gametis jucunda",
+      "koreanName": "풀색꽃무지",
       "scientificName": "Gametis jucunda",
       "category": "other",
       "confusableIds": [],
@@ -7206,11 +8199,35 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1084517-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/362829863"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1084517-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/362829863"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93348818",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93348818",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.168889,
+          "lng": 127.105278
+        }
+      ]
     },
     {
       "id": "gbif-1122093",
@@ -7226,15 +8243,27 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1122093.webp",
+        "credit": "Wang.QG",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/149288455"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1122093.webp",
+          "credit": "Wang.QG",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/149288455"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
     },
     {
       "id": "gbif-11907754",
-      "koreanName": "Theretra japonica",
+      "koreanName": "줄박각시",
       "scientificName": "Theretra japonica",
       "category": "other",
       "confusableIds": [],
@@ -7246,11 +8275,36 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-11907754-1.webp",
+        "credit": "Franz Anthony",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/42689490"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-11907754-1.webp",
+          "credit": "Franz Anthony",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/42689490"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:402315067",
+          "date": "2026-09-17",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/402315067",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "woobin_byun",
+          "lat": 37.165046,
+          "lng": 127.100305,
+          "uncertaintyM": 16
+        }
+      ]
     },
     {
       "id": "gbif-1311477",
@@ -7266,8 +8320,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1311477.webp",
+        "credit": "Gilles San Martin",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/327869324"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1311477.webp",
+          "credit": "Gilles San Martin",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/327869324"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7286,15 +8352,27 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1341976.webp",
+        "credit": "Albertus Horn",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/67970909"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1341976.webp",
+          "credit": "Albertus Horn",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/67970909"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
     },
     {
       "id": "gbif-1423350",
-      "koreanName": "Ischnura asiatica",
+      "koreanName": "아시아실잠자리",
       "scientificName": "Ischnura asiatica",
       "category": "other",
       "confusableIds": [],
@@ -7306,15 +8384,38 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1423350-1.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/39597372"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1423350-1.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/39597372"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051649118",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051649118",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1423395",
-      "koreanName": "Ischnura elegans",
+      "koreanName": "북방아시아실잠자리",
       "scientificName": "Ischnura elegans",
       "category": "other",
       "confusableIds": [],
@@ -7326,15 +8427,38 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1423395-1.webp",
+        "credit": "Prashanth N S",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/50099967"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1423395-1.webp",
+          "credit": "Prashanth N S",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/50099967"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051663880",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051663880",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1423563",
-      "koreanName": "Paracercion calamorum",
+      "koreanName": "등검은실잠자리",
       "scientificName": "Paracercion calamorum",
       "category": "other",
       "confusableIds": [],
@@ -7346,15 +8470,38 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1423563-1.webp",
+        "credit": "Oleg Kosterin",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/358938349"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1423563-1.webp",
+          "credit": "Oleg Kosterin",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/358938349"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051645521",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051645521",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1423564",
-      "koreanName": "Paracercion v-nigrum",
+      "koreanName": "왕실잠자리",
       "scientificName": "Paracercion v-nigrum",
       "category": "other",
       "confusableIds": [],
@@ -7366,11 +8513,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1423564-1.webp",
+        "credit": "Oleg Kosterin",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/101051496"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1423564-1.webp",
+          "credit": "Oleg Kosterin",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/101051496"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051640765",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051640765",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1423882",
@@ -7386,11 +8556,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1423882-1.webp",
+        "credit": "Andrew Parker",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/434366450"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1423882-1.webp",
+          "credit": "Andrew Parker",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/434366450"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051664543",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051664543",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1426318",
@@ -7406,11 +8599,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1426318-1.webp",
+        "credit": "Cynthia Su",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/19911254"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1426318-1.webp",
+          "credit": "Cynthia Su",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/19911254"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051645248",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051645248",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1427855",
@@ -7426,8 +8642,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1427855.webp",
+        "credit": "Arne Fahrenholz",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767160902"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1427855.webp",
+          "credit": "Arne Fahrenholz",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767160902"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7446,11 +8674,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1427915-1.webp",
+        "credit": "Jackie Riley",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/402942939"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1427915-1.webp",
+          "credit": "Jackie Riley",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/402942939"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051667689",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051667689",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1428280",
@@ -7466,15 +8717,27 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1428280.webp",
+        "credit": "carnifex",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/9513954"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1428280.webp",
+          "credit": "carnifex",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/9513954"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
     },
     {
       "id": "gbif-1429229",
-      "koreanName": "Deielia phaon",
+      "koreanName": "밀잠자리붙이",
       "scientificName": "Deielia phaon",
       "category": "other",
       "confusableIds": [],
@@ -7486,11 +8749,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-1429229-1.webp",
+        "credit": "WATANABE Hitoshi 渡辺仁",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/412167976"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-1429229-1.webp",
+          "credit": "WATANABE Hitoshi 渡辺仁",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/412167976"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051665165",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051665165",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-1690860",
@@ -7506,8 +8792,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1690860.webp",
+        "credit": "Andrew Lai",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/283081340"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1690860.webp",
+          "credit": "Andrew Lai",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/283081340"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7526,8 +8824,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1700920.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2786766"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1700920.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2786766"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7546,8 +8856,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1728965.webp",
+        "credit": "sdroege (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/480283"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1728965.webp",
+          "credit": "sdroege (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/480283"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7566,8 +8888,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-1920851.webp",
+        "credit": "Karthik Thrikkadeeri",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/177611547"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-1920851.webp",
+          "credit": "Karthik Thrikkadeeri",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/177611547"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7586,15 +8920,39 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2168311-1.webp",
+        "credit": "Se Lena",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/415807654"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2168311-1.webp",
+          "credit": "Se Lena",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/415807654"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93349078",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93349078",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.17,
+          "lng": 127.100556
+        }
+      ]
     },
     {
       "id": "gbif-2175367",
-      "koreanName": "Myrmarachne formicaria",
+      "koreanName": "산개미거미",
       "scientificName": "Myrmarachne formicaria",
       "category": "other",
       "confusableIds": [],
@@ -7606,11 +8964,35 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2175367-1.webp",
+        "credit": "Michael, Antoni and Nihat Hinczewski",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/514990292"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2175367-1.webp",
+          "credit": "Michael, Antoni and Nihat Hinczewski",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/514990292"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93348972",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93348972",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.170278,
+          "lng": 127.1
+        }
+      ]
     },
     {
       "id": "gbif-2437761",
@@ -7626,8 +9008,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2437761.webp",
+        "credit": "Dimitǎr Boevski",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/255380922"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2437761.webp",
+          "credit": "Dimitǎr Boevski",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/255380922"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7646,8 +9040,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2440931.webp",
+        "credit": "William Stephens",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/168257189"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2440931.webp",
+          "credit": "William Stephens",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/168257189"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7666,11 +9072,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2443002-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/120834277"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2443002-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/120834277"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5857935305",
+          "date": "2024-07-06",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857935305",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.168373,
+          "lng": 127.101061
+        }
+      ]
     },
     {
       "id": "gbif-2452268",
@@ -7686,11 +9115,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2452268-1.webp",
+        "credit": "rachelandjun",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/137108344"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2452268-1.webp",
+          "credit": "rachelandjun",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/137108344"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5857935349",
+          "date": "2024-08-11",
+          "source": "국립중앙과학관 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5857935349",
+          "license": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "lat": 37.169934,
+          "lng": 127.104013
+        }
+      ]
     },
     {
       "id": "gbif-2480880",
@@ -7706,8 +9158,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2480880.webp",
+        "credit": "Jan Ebr &amp; Ivana Ebrová",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/116172611"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2480880.webp",
+          "credit": "Jan Ebr &amp; Ivana Ebrová",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/116172611"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7726,8 +9190,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2481035.webp",
+        "credit": "Людмила Алимова",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/201585505"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2481035.webp",
+          "credit": "Людмила Алимова",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/201585505"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7746,8 +9222,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2481886.webp",
+        "credit": "Toby Y",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/404037992"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2481886.webp",
+          "credit": "Toby Y",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/404037992"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7766,8 +9254,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2490773.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2740961"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2490773.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2740961"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7786,8 +9286,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2491475.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2653566"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2491475.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2653566"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7806,8 +9318,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2491582.webp",
+        "credit": "Людмила Алимова",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/263023473"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2491582.webp",
+          "credit": "Людмила Алимова",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/263023473"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7826,8 +9350,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2492850.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/506520082"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2492850.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/506520082"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7846,8 +9382,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2493071.webp",
+        "credit": "egorbirder",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/138282296"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2493071.webp",
+          "credit": "egorbirder",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/138282296"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7866,8 +9414,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2493095.webp",
+        "credit": "radrat (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/754353584"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2493095.webp",
+          "credit": "radrat (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/754353584"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7886,8 +9446,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2494146.webp",
+        "credit": "stephenmatthews (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/179230143"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2494146.webp",
+          "credit": "stephenmatthews (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/179230143"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7906,8 +9478,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2498017.webp",
+        "credit": "scottwegner (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/753460259"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2498017.webp",
+          "credit": "scottwegner (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/753460259"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7926,11 +9510,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-2498261-1.webp",
+        "credit": "Donald Davesne",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/113803721"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2498261-1.webp",
+          "credit": "Donald Davesne",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/113803721"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5653308160",
+          "date": "2024-03-02",
+          "source": "eBird · GBIF",
+          "url": "https://www.gbif.org/occurrence/5653308160",
+          "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+          "credit": "obsr4805476",
+          "area": "동탄호수공원 일대 · eBird 체크리스트"
+        }
+      ]
     },
     {
       "id": "gbif-2764179",
@@ -7946,8 +9553,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-2764179.webp",
+        "credit": "skitterbug",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/60917702"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-2764179.webp",
+          "credit": "skitterbug",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/60917702"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -7966,11 +9585,46 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-3098951-1.webp",
+        "credit": "Ricard Busquets Reverte",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/252803684",
+        "caption": "주황색 꽃을 가까이서 본 모습"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-3098951-1.webp",
+          "credit": "Ricard Busquets Reverte",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/252803684",
+          "caption": "주황색 꽃을 가까이서 본 모습"
+        },
+        {
+          "src": "/photos/observed-gbif-3098951-2.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/13853253",
+          "caption": "꽃이 핀 식물 전체 모습"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93341723",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93341723",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "jh_11104",
+          "lat": 37.168913,
+          "lng": 127.105418,
+          "uncertaintyM": 9
+        }
+      ],
+      "isPlant": true
     },
     {
       "id": "gbif-3104179",
@@ -7986,8 +9640,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3104179.webp",
+        "credit": "Наталья Пикалова",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767123414"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3104179.webp",
+          "credit": "Наталья Пикалова",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767123414"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8006,8 +9672,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3105742.webp",
+        "credit": "admire-lsong (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/739265729"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3105742.webp",
+          "credit": "admire-lsong (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/739265729"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8026,8 +9704,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3105782.webp",
+        "credit": "Douglas Goldman",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/236567840"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3105782.webp",
+          "credit": "Douglas Goldman",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/236567840"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8046,8 +9736,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3120946.webp",
+        "credit": "Sandy Wolkenberg",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/54094293"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3120946.webp",
+          "credit": "Sandy Wolkenberg",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/54094293"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8066,8 +9768,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3152583.webp",
+        "credit": "kenkneidel (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/159912433"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3152583.webp",
+          "credit": "kenkneidel (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/159912433"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8086,8 +9800,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-3172325.webp",
+        "credit": "violalarson (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/289456398"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-3172325.webp",
+          "credit": "violalarson (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/289456398"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8106,8 +9832,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-4293587.webp",
+        "credit": "Benjamin Burgunder",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/246103570"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-4293587.webp",
+          "credit": "Benjamin Burgunder",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/246103570"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8126,8 +9864,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-4408780.webp",
+        "credit": "Vijay Vanaparthy",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/40949680"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-4408780.webp",
+          "credit": "Vijay Vanaparthy",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/40949680"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8146,8 +9896,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-4532122.webp",
+        "credit": "Jose Gutierrez Higa",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/687919550"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-4532122.webp",
+          "credit": "Jose Gutierrez Higa",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/687919550"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8166,8 +9928,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5028772.webp",
+        "credit": "MUNENORI YAMAKAWA",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/210007160"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5028772.webp",
+          "credit": "MUNENORI YAMAKAWA",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/210007160"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8186,11 +9960,35 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-5034834-1.webp",
+        "credit": "Jonghyun Park",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/74074320"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5034834-1.webp",
+          "credit": "Jonghyun Park",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/74074320"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93349060",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93349060",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.170278,
+          "lng": 127.1
+        }
+      ]
     },
     {
       "id": "gbif-5035198",
@@ -8206,8 +10004,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5035198.webp",
+        "credit": "WATANABE Hitoshi 渡辺仁",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/450760734"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5035198.webp",
+          "credit": "WATANABE Hitoshi 渡辺仁",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/450760734"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8226,11 +10036,34 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-5051752-1.webp",
+        "credit": "Paul Lewis",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/533901104"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5051752-1.webp",
+          "credit": "Paul Lewis",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/533901104"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:5051641574",
+          "date": "2020-06-20",
+          "source": "네이처링 · GBIF",
+          "url": "https://www.gbif.org/occurrence/5051641574",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167452,
+          "lng": 127.098974
+        }
+      ]
     },
     {
       "id": "gbif-5090674",
@@ -8246,8 +10079,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5090674.webp",
+        "credit": "Se Lena",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/403638343"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5090674.webp",
+          "credit": "Se Lena",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/403638343"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8266,8 +10111,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5099473.webp",
+        "credit": "rachelandjun",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/13229964"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5099473.webp",
+          "credit": "rachelandjun",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/13229964"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8286,8 +10143,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5129293.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766974471"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5129293.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766974471"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8306,8 +10175,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5129417.webp",
+        "credit": "Eli Talhouk",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/761626377"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5129417.webp",
+          "credit": "Eli Talhouk",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/761626377"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8326,8 +10207,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5156102.webp",
+        "credit": "Gavin Slater",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/114103412"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5156102.webp",
+          "credit": "Gavin Slater",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/114103412"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8346,11 +10239,36 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-5157899-1.webp",
+        "credit": "Walthery",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Adult_Lycorma_delicatula.jpg"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5157899-1.webp",
+          "credit": "Walthery",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Adult_Lycorma_delicatula.jpg"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:385666860",
+          "date": "2026-07-27",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/385666860",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "tosh369",
+          "lat": 37.170295,
+          "lng": 127.101792,
+          "uncertaintyM": 23
+        }
+      ]
     },
     {
       "id": "gbif-5170994",
@@ -8366,8 +10284,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5170994.webp",
+        "credit": "Анатолий Озерной /Anatoliy Ozernoy",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/29402710"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5170994.webp",
+          "credit": "Анатолий Озерной /Anatoliy Ozernoy",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/29402710"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8386,8 +10316,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5229490.webp",
+        "credit": "liam0066",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767265181"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5229490.webp",
+          "credit": "liam0066",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767265181"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8406,8 +10348,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5289684.webp",
+        "credit": "Cheng-Tao Lin",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/20934268"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5289684.webp",
+          "credit": "Cheng-Tao Lin",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/20934268"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8426,11 +10380,24 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/field/field-20261112-064.webp",
+        "credit": "프로젝트 조사팀",
+        "license": "현장 촬영",
+        "caption": "2026년 11월 12일 동탄호수공원"
+      },
+      "photos": [
+        {
+          "src": "/photos/field/field-20261112-064.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "isPlant": true
     },
     {
       "id": "gbif-5387974",
@@ -8446,8 +10413,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5387974.webp",
+        "credit": "Douglas Goldman",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/260792502"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5387974.webp",
+          "credit": "Douglas Goldman",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/260792502"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8466,8 +10445,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5394163.webp",
+        "credit": "Agustín Zarco",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767281532"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5394163.webp",
+          "credit": "Agustín Zarco",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767281532"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8486,8 +10477,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5394353.webp",
+        "credit": "Young Jun Lee",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/629904183"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5394353.webp",
+          "credit": "Young Jun Lee",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/629904183"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8506,8 +10509,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5788757.webp",
+        "credit": "James Heal",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766308806"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5788757.webp",
+          "credit": "James Heal",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766308806"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8526,8 +10541,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5803588.webp",
+        "credit": "animalia333 (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/765800231"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5803588.webp",
+          "credit": "animalia333 (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/765800231"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8546,11 +10573,36 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-5867671-1.webp",
+        "credit": "Martin Kalfatovic",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/706473373"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5867671-1.webp",
+          "credit": "Martin Kalfatovic",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/706473373"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:385667471",
+          "date": "2026-07-27",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/385667471",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "tosh369",
+          "lat": 37.17028,
+          "lng": 127.101883,
+          "uncertaintyM": 15
+        }
+      ]
     },
     {
       "id": "gbif-5887934",
@@ -8566,15 +10618,27 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-5887934.webp",
+        "credit": "tgodsey24 (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766946838"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-5887934.webp",
+          "credit": "tgodsey24 (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766946838"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
     },
     {
       "id": "gbif-6267489",
-      "koreanName": "Aegosoma sinicum",
+      "koreanName": "버들하늘소",
       "scientificName": "Aegosoma sinicum",
       "category": "other",
       "confusableIds": [],
@@ -8586,11 +10650,36 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-6267489-1.webp",
+        "credit": "Rainer Breitling",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/697691871"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-6267489-1.webp",
+          "credit": "Rainer Breitling",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/697691871"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:385667907",
+          "date": "2026-07-27",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/385667907",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "tosh369",
+          "lat": 37.170728,
+          "lng": 127.100228,
+          "uncertaintyM": 4
+        }
+      ]
     },
     {
       "id": "gbif-7102937",
@@ -8606,8 +10695,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-7102937.webp",
+        "credit": "Sandy Wolkenberg",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/45170873"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-7102937.webp",
+          "credit": "Sandy Wolkenberg",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/45170873"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8626,8 +10727,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-7340170.webp",
+        "credit": "Diego González Dopico",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/460029189"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-7340170.webp",
+          "credit": "Diego González Dopico",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/460029189"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8646,8 +10759,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-7393329.webp",
+        "credit": "andrew2285 (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/747012065"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-7393329.webp",
+          "credit": "andrew2285 (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/747012065"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8666,8 +10791,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-7903735.webp",
+        "credit": "Timur Kalininsky",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/759916328"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-7903735.webp",
+          "credit": "Timur Kalininsky",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/759916328"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8686,8 +10823,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8055182.webp",
+        "credit": "Carrie Seltzer",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/4150550"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8055182.webp",
+          "credit": "Carrie Seltzer",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/4150550"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8706,8 +10855,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8077224.webp",
+        "credit": "Phill Robinson",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/299108591"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8077224.webp",
+          "credit": "Phill Robinson",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/299108591"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8726,8 +10887,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8114276.webp",
+        "credit": "Carlos Carrasco",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766565119"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8114276.webp",
+          "credit": "Carlos Carrasco",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766565119"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8746,8 +10919,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8134528.webp",
+        "credit": "Atsushi Nakajima",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/766441098"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8134528.webp",
+          "credit": "Atsushi Nakajima",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/766441098"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8766,11 +10951,35 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-8225376-1.webp",
+        "credit": "Diego González Dopico",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/431561428"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-8225376-1.webp",
+          "credit": "Diego González Dopico",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/431561428"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:131693790",
+          "date": "2022-08-21",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/131693790",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "jh22_11111",
+          "lat": 37.168007,
+          "lng": 127.096948
+        }
+      ]
     },
     {
       "id": "gbif-8365953",
@@ -8786,8 +10995,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8365953.webp",
+        "credit": "Valerii Glazunov",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/145889581"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8365953.webp",
+          "credit": "Valerii Glazunov",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/145889581"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8806,8 +11027,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-8427624.webp",
+        "credit": "Lek Khauv",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767349981"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-8427624.webp",
+          "credit": "Lek Khauv",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767349981"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8826,8 +11059,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9150405.webp",
+        "credit": "leaf0605 (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/199968101"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9150405.webp",
+          "credit": "leaf0605 (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/199968101"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8846,8 +11091,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9300456.webp",
+        "credit": "damienxw (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/767102550"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9300456.webp",
+          "credit": "damienxw (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/767102550"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8866,8 +11123,20 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9465111.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/2742771"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9465111.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/2742771"
+        }
+      ],
       "cultivated": false,
       "minor": true,
       "catalog": true
@@ -8886,11 +11155,35 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/observed-gbif-9473808-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/392283493"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-9473808-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/392283493"
+        }
+      ],
       "cultivated": false,
       "minor": true,
-      "catalog": true
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "inat:93348885",
+          "date": "2021-09-02",
+          "source": "iNaturalist",
+          "url": "https://www.inaturalist.org/observations/93348885",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "credit": "clurarit",
+          "lat": 37.168056,
+          "lng": 127.102222
+        }
+      ]
     },
     {
       "id": "gbif-9515886",
@@ -8906,10 +11199,513 @@
       },
       "monthCounts": null,
       "recordCount": 1,
-      "photo": null,
-      "photos": [],
+      "photo": {
+        "src": "/photos/catalog-gbif-9515886.webp",
+        "credit": "hannawacker (iNaturalist)",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/8209375"
+      },
+      "photos": [
+        {
+          "src": "/photos/catalog-gbif-9515886.webp",
+          "credit": "hannawacker (iNaturalist)",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/8209375"
+        }
+      ],
       "cultivated": false,
       "minor": true,
+      "catalog": true
+    },
+    {
+      "id": "gbif-9750846",
+      "koreanName": "꾀꼬리",
+      "scientificName": "Oriolus chinensis",
+      "category": "townbird",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-gbif-9750846-1.webp",
+        "credit": "雲一百香果",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/326221649"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-9750846-1.webp",
+          "credit": "雲一百香果",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/326221649"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:3001732896",
+          "date": "2011-06-01",
+          "source": "국립생태원 · GBIF",
+          "url": "https://www.gbif.org/occurrence/3001732896",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.170378,
+          "lng": 127.101789
+        }
+      ]
+    },
+    {
+      "id": "gbif-5228280",
+      "koreanName": "파랑새",
+      "scientificName": "Eurystomus orientalis",
+      "category": "townbird",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-gbif-5228280-1.webp",
+        "credit": "Greg Tasney",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/346931488"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-5228280-1.webp",
+          "credit": "Greg Tasney",
+          "license": "CC BY-SA 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/346931488"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:3001213670",
+          "date": "2005-02-16",
+          "source": "국립생태원 · GBIF",
+          "url": "https://www.gbif.org/occurrence/3001213670",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.170141,
+          "lng": 127.103811
+        }
+      ]
+    },
+    {
+      "id": "gbif-2475532",
+      "koreanName": "물총새",
+      "scientificName": "Alcedo atthis",
+      "category": "townbird",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-gbif-2475532-1.webp",
+        "credit": "SteveM4560",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/347327856"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-gbif-2475532-1.webp",
+          "credit": "SteveM4560",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/347327856"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "gbif:3001219653",
+          "date": "2005-02-16",
+          "source": "국립생태원 · GBIF",
+          "url": "https://www.gbif.org/occurrence/3001219653",
+          "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+          "lat": 37.167893,
+          "lng": 127.1018
+        }
+      ]
+    },
+    {
+      "id": "survey-bluegill",
+      "koreanName": "블루길",
+      "scientificName": "Lepomis macrochirus",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-bluegill-1.webp",
+        "credit": "Kristiina Hurme",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/339074"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-bluegill-1.webp",
+          "credit": "Kristiina Hurme",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/339074"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "survey:2021:bluegill",
+          "date": "2021-12",
+          "source": "화성시 어류조사 · 화성시민신문 인용",
+          "url": "https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499",
+          "area": "동탄호수공원 수역",
+          "zoneId": "Z1"
+        }
+      ]
+    },
+    {
+      "id": "survey-crucian-carp",
+      "koreanName": "붕어",
+      "scientificName": "Carassius auratus",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-crucian-carp-1.webp",
+        "credit": "Yung-Lun Lin",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/296296901"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-crucian-carp-1.webp",
+          "credit": "Yung-Lun Lin",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/296296901"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "survey:2021:crucian-carp",
+          "date": "2021-12",
+          "source": "화성시 어류조사 · 화성시민신문 인용",
+          "url": "https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499",
+          "area": "동탄호수공원 수역",
+          "zoneId": "Z1"
+        }
+      ]
+    },
+    {
+      "id": "survey-japanese-crucian-carp",
+      "koreanName": "떡붕어",
+      "scientificName": "Carassius cuvieri",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-japanese-crucian-carp-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/168500878"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-japanese-crucian-carp-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/168500878"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "survey:2021:japanese-crucian-carp",
+          "date": "2021-12",
+          "source": "화성시 어류조사 · 화성시민신문 인용",
+          "url": "https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499",
+          "area": "동탄호수공원 수역",
+          "zoneId": "Z1"
+        }
+      ]
+    },
+    {
+      "id": "survey-common-carp",
+      "koreanName": "잉어",
+      "scientificName": "Cyprinus carpio",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-common-carp-1.webp",
+        "credit": "Quinn",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/443517060"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-common-carp-1.webp",
+          "credit": "Quinn",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/443517060"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "survey:2021:common-carp",
+          "date": "2021-12",
+          "source": "화성시 어류조사 · 화성시민신문 인용",
+          "url": "https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499",
+          "area": "동탄호수공원 수역",
+          "zoneId": "Z1"
+        }
+      ]
+    },
+    {
+      "id": "survey-miscanthus-sinensis",
+      "koreanName": "억새",
+      "scientificName": "Miscanthus sinensis",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-miscanthus-sinensis-1.webp",
+        "credit": "iNaturalist",
+        "license": "CC0",
+        "sourceUrl": "https://www.inaturalist.org/photos/178000377",
+        "caption": "이삭을 가까이서 본 모습"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-miscanthus-sinensis-1.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/178000377",
+          "caption": "이삭을 가까이서 본 모습"
+        },
+        {
+          "src": "/photos/observed-survey-miscanthus-sinensis-2.webp",
+          "credit": "chiuluan",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/108036705",
+          "caption": "잎과 줄기를 함께 본 모습"
+        }
+      ],
+      "cultivated": true,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "city:2026:miscanthus-sinensis",
+          "date": "2026-10-12",
+          "source": "화성특례시 보도자료",
+          "url": "https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202",
+          "area": "동탄호수공원 · ‘파랑새’ 품종"
+        }
+      ],
+      "isPlant": true
+    },
+    {
+      "id": "survey-miscanthus-sacchariflorus",
+      "koreanName": "물억새",
+      "scientificName": "Miscanthus sacchariflorus",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-miscanthus-sacchariflorus-1.webp",
+        "credit": "Fyodor Pudovikov",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/182574295",
+        "caption": "하얀 이삭을 가까이서 본 모습"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-miscanthus-sacchariflorus-1.webp",
+          "credit": "Fyodor Pudovikov",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/182574295",
+          "caption": "하얀 이삭을 가까이서 본 모습"
+        },
+        {
+          "src": "/photos/observed-survey-miscanthus-sacchariflorus-2.webp",
+          "credit": "iNaturalist",
+          "license": "CC0",
+          "sourceUrl": "https://www.inaturalist.org/photos/446191667",
+          "caption": "물억새가 무리 지어 자란 모습"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "city:2026:miscanthus-sacchariflorus",
+          "date": "2026-10-12",
+          "source": "화성특례시 보도자료",
+          "url": "https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202",
+          "area": "동탄호수공원"
+        }
+      ],
+      "isPlant": true
+    },
+    {
+      "id": "survey-fountain-grass",
+      "koreanName": "수크령",
+      "scientificName": "Pennisetum alopecuroides",
+      "category": "other",
+      "confusableIds": [],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [],
+        "where": "",
+        "looks": []
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/observed-survey-fountain-grass-1.webp",
+        "credit": "Kim, Hyun-tae",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://www.inaturalist.org/photos/52759394",
+        "caption": "솔처럼 뻗은 이삭"
+      },
+      "photos": [
+        {
+          "src": "/photos/observed-survey-fountain-grass-1.webp",
+          "credit": "Kim, Hyun-tae",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/52759394",
+          "caption": "솔처럼 뻗은 이삭"
+        },
+        {
+          "src": "/photos/observed-survey-fountain-grass-2.webp",
+          "credit": "Andrew Conboy",
+          "license": "CC BY 4.0",
+          "sourceUrl": "https://www.inaturalist.org/photos/323079476",
+          "caption": "이삭과 길게 늘어진 잎"
+        },
+        {
+          "src": "/photos/field/field-20261112-085.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        },
+        {
+          "src": "/photos/field/field-20261112-088.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        }
+      ],
+      "cultivated": false,
+      "minor": true,
+      "catalog": true,
+      "publicObservations": [
+        {
+          "id": "city:2026:fountain-grass",
+          "date": "2026-10-12",
+          "source": "화성특례시 보도자료",
+          "url": "https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202",
+          "area": "동탄호수공원"
+        }
+      ],
+      "isPlant": true
+    },
+    {
+      "id": "field-common-reed",
+      "koreanName": "갈대",
+      "scientificName": "Phragmites australis",
+      "category": "other",
+      "isPlant": true,
+      "confusableIds": [
+        "survey-miscanthus-sinensis",
+        "survey-miscanthus-sacchariflorus"
+      ],
+      "confusableStatus": "draft",
+      "clue": {
+        "zoneIds": [
+          "Z2"
+        ],
+        "where": "호숫가의 키 큰 풀을 살펴보세요.",
+        "looks": [
+          "키 큰 줄기 위에 여러 갈래로 갈라진 갈색 또는 회갈색 이삭이 달려요."
+        ]
+      },
+      "monthCounts": null,
+      "photo": {
+        "src": "/photos/field/field-20261112-123.webp",
+        "credit": "프로젝트 조사팀",
+        "license": "현장 촬영",
+        "caption": "2026년 11월 12일 동탄호수공원"
+      },
+      "photos": [
+        {
+          "src": "/photos/field/field-20261112-123.webp",
+          "credit": "프로젝트 조사팀",
+          "license": "현장 촬영",
+          "caption": "2026년 11월 12일 동탄호수공원"
+        }
+      ],
+      "cultivated": false,
+      "minor": false,
       "catalog": true
     }
   ],
@@ -8917,92 +11713,1339 @@
     {
       "id": "autumn-2026",
       "season": "가을",
-      "label": "가을 세트",
+      "label": "가을 관찰 퀘스트",
       "startsOn": "2026-09-01",
       "endsOn": "2026-11-30",
-      "draft": true,
+      "draft": false,
       "todaySix": [
         "spot-billed-duck",
         "eurasian-coot",
         "oriental-magpie",
-        "daurian-redstart",
-        "cornelian-cherry",
-        "winged-spindle"
+        "brown-eared-bulbul",
+        "survey-miscanthus-sinensis",
+        "survey-fountain-grass"
       ],
       "dex": [
+        "oriental-magpie",
         "spot-billed-duck",
         "eurasian-coot",
-        "oriental-magpie",
-        "daurian-redstart",
-        "cornelian-cherry",
-        "winged-spindle",
-        "brown-eared-bulbul",
+        "gbif-9797180",
+        "survey-fountain-grass",
         "japanese-maple",
-        "persimmon",
-        "korean-red-pine",
-        "japanese-winterberry",
-        "chinese-fringetree"
+        "gbif-5371712",
+        "gbif-5358748",
+        "field-common-reed",
+        "brown-eared-bulbul",
+        "daurian-redstart",
+        "japanese-tit",
+        "tree-sparrow",
+        "marsh-tit",
+        "survey-miscanthus-sinensis",
+        "survey-miscanthus-sacchariflorus"
       ],
       "recordCounts": {
-        "cornelian-cherry": 7,
-        "winged-spindle": 7,
-        "japanese-maple": 4,
-        "persimmon": 4,
-        "korean-red-pine": 3,
-        "japanese-winterberry": 3,
-        "chinese-fringetree": 3,
-        "spot-billed-duck": 5,
-        "eurasian-coot": 5,
-        "oriental-magpie": 5,
-        "brown-eared-bulbul": 4,
-        "daurian-redstart": 2
+        "oriental-magpie": 2,
+        "spot-billed-duck": 2,
+        "eurasian-coot": 4,
+        "gbif-9797180": 2,
+        "survey-fountain-grass": 2,
+        "japanese-maple": 1,
+        "gbif-5371712": 1,
+        "gbif-5358748": 1,
+        "field-common-reed": 1,
+        "brown-eared-bulbul": 1,
+        "daurian-redstart": 1,
+        "japanese-tit": 1,
+        "tree-sparrow": 1,
+        "marsh-tit": 1,
+        "survey-miscanthus-sinensis": 1,
+        "survey-miscanthus-sacchariflorus": 1
       },
-      "recordCountsBasis": "2020년 이후, 반경 1.5km · 나무·열매 9~11월, 새 11~2월 공개 기록 수(M3 분석)"
+      "recordCountsBasis": "11월 12일 조사팀 현장 사진과 동탄호수공원 가을 관찰 자료"
     },
     {
       "id": "winter-2026",
       "season": "겨울",
-      "label": "겨울 세트",
+      "label": "겨울 관찰 퀘스트",
       "startsOn": "2026-12-01",
       "endsOn": "2027-02-28",
-      "draft": true,
+      "draft": false,
       "todaySix": [
+        "spot-billed-duck",
         "eurasian-coot",
         "common-merganser",
-        "brown-eared-bulbul",
-        "japanese-tit",
-        "korean-red-pine",
-        "japanese-winterberry"
+        "great-crested-grebe",
+        "oriental-magpie",
+        "japanese-tit"
       ],
       "dex": [
         "spot-billed-duck",
         "eurasian-coot",
         "common-merganser",
         "great-crested-grebe",
+        "mallard",
         "oriental-magpie",
-        "brown-eared-bulbul",
         "daurian-redstart",
+        "brown-eared-bulbul",
         "japanese-tit",
-        "naumanns-thrush",
-        "tree-sparrow",
-        "korean-red-pine",
-        "japanese-winterberry"
+        "marsh-tit",
+        "varied-tit",
+        "gbif-9797180",
+        "gbif-2481890",
+        "gbif-5231438"
       ],
       "recordCounts": {
-        "spot-billed-duck": 5,
-        "eurasian-coot": 5,
-        "common-merganser": 5,
-        "oriental-magpie": 5,
-        "brown-eared-bulbul": 4,
-        "great-crested-grebe": 2,
-        "daurian-redstart": 2,
+        "spot-billed-duck": 2,
+        "eurasian-coot": 2,
+        "common-merganser": 2,
+        "great-crested-grebe": 1,
+        "mallard": 1,
+        "oriental-magpie": 1,
+        "daurian-redstart": 1,
+        "brown-eared-bulbul": 1,
         "japanese-tit": 2,
-        "common-kestrel": 2,
-        "large-billed-crow": 2,
-        "naumanns-thrush": 2,
-        "tree-sparrow": 1
+        "marsh-tit": 1,
+        "varied-tit": 1,
+        "gbif-9797180": 1,
+        "gbif-2481890": 2,
+        "gbif-5231438": 1
       },
-      "recordCountsBasis": "2020년 이후, 반경 1.5km · 11~2월 공개 기록 수(M3 분석)"
+      "recordCountsBasis": "동탄호수공원 공개 관찰 자료의 12~2월 기록"
+    }
+  ],
+  "publicObservationsUpdatedOn": "2026-11-24",
+  "fieldPhotos": [
+    {
+      "id": "field-20261112-001",
+      "src": "/photos/field/field-20261112-001.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16948,
+        "lng": 127.10511
+      }
+    },
+    {
+      "id": "field-20261112-002",
+      "src": "/photos/field/field-20261112-002.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16989,
+        "lng": 127.10519
+      }
+    },
+    {
+      "id": "field-20261112-004",
+      "src": "/photos/field/field-20261112-004.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16968,
+        "lng": 127.10445
+      }
+    },
+    {
+      "id": "field-20261112-005",
+      "src": "/photos/field/field-20261112-005.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16967,
+        "lng": 127.10429
+      }
+    },
+    {
+      "id": "field-20261112-006",
+      "src": "/photos/field/field-20261112-006.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16968,
+        "lng": 127.10422
+      }
+    },
+    {
+      "id": "field-20261112-007",
+      "src": "/photos/field/field-20261112-007.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16972,
+        "lng": 127.10404
+      }
+    },
+    {
+      "id": "field-20261112-008",
+      "src": "/photos/field/field-20261112-008.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16974,
+        "lng": 127.10385
+      }
+    },
+    {
+      "id": "field-20261112-009",
+      "src": "/photos/field/field-20261112-009.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16995,
+        "lng": 127.10364
+      }
+    },
+    {
+      "id": "field-20261112-010",
+      "src": "/photos/field/field-20261112-010.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16994,
+        "lng": 127.10359
+      }
+    },
+    {
+      "id": "field-20261112-011",
+      "src": "/photos/field/field-20261112-011.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16994,
+        "lng": 127.10356
+      }
+    },
+    {
+      "id": "field-20261112-012",
+      "src": "/photos/field/field-20261112-012.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10351
+      }
+    },
+    {
+      "id": "field-20261112-013",
+      "src": "/photos/field/field-20261112-013.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16993,
+        "lng": 127.10347
+      }
+    },
+    {
+      "id": "field-20261112-014",
+      "src": "/photos/field/field-20261112-014.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10342
+      }
+    },
+    {
+      "id": "field-20261112-015",
+      "src": "/photos/field/field-20261112-015.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16993,
+        "lng": 127.10342
+      }
+    },
+    {
+      "id": "field-20261112-016",
+      "src": "/photos/field/field-20261112-016.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10321
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-017",
+      "src": "/photos/field/field-20261112-017.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16996,
+        "lng": 127.10284
+      }
+    },
+    {
+      "id": "field-20261112-018",
+      "src": "/photos/field/field-20261112-018.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16997,
+        "lng": 127.10269
+      }
+    },
+    {
+      "id": "field-20261112-019",
+      "src": "/photos/field/field-20261112-019.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16997,
+        "lng": 127.10245
+      }
+    },
+    {
+      "id": "field-20261112-020",
+      "src": "/photos/field/field-20261112-020.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16998,
+        "lng": 127.10245
+      }
+    },
+    {
+      "id": "field-20261112-021",
+      "src": "/photos/field/field-20261112-021.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16999,
+        "lng": 127.10243
+      }
+    },
+    {
+      "id": "field-20261112-022",
+      "src": "/photos/field/field-20261112-022.webp",
+      "taxonId": "oriental-magpie",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16995,
+        "lng": 127.10233
+      }
+    },
+    {
+      "id": "field-20261112-023",
+      "src": "/photos/field/field-20261112-023.webp",
+      "taxonId": "oriental-magpie",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16996,
+        "lng": 127.10235
+      }
+    },
+    {
+      "id": "field-20261112-024",
+      "src": "/photos/field/field-20261112-024.webp",
+      "taxonId": "japanese-maple",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16996,
+        "lng": 127.10204
+      }
+    },
+    {
+      "id": "field-20261112-025",
+      "src": "/photos/field/field-20261112-025.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16997,
+        "lng": 127.10178
+      }
+    },
+    {
+      "id": "field-20261112-026",
+      "src": "/photos/field/field-20261112-026.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16997,
+        "lng": 127.10174
+      }
+    },
+    {
+      "id": "field-20261112-027",
+      "src": "/photos/field/field-20261112-027.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16994,
+        "lng": 127.10169
+      }
+    },
+    {
+      "id": "field-20261112-028",
+      "src": "/photos/field/field-20261112-028.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10165
+      }
+    },
+    {
+      "id": "field-20261112-029",
+      "src": "/photos/field/field-20261112-029.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16986,
+        "lng": 127.10159
+      }
+    },
+    {
+      "id": "field-20261112-030",
+      "src": "/photos/field/field-20261112-030.webp",
+      "taxonId": "spot-billed-duck",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16981,
+        "lng": 127.10159
+      }
+    },
+    {
+      "id": "field-20261112-031",
+      "src": "/photos/field/field-20261112-031.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16976,
+        "lng": 127.10145
+      }
+    },
+    {
+      "id": "field-20261112-032",
+      "src": "/photos/field/field-20261112-032.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16976,
+        "lng": 127.10145
+      }
+    },
+    {
+      "id": "field-20261112-033",
+      "src": "/photos/field/field-20261112-033.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16972,
+        "lng": 127.10118
+      }
+    },
+    {
+      "id": "field-20261112-034",
+      "src": "/photos/field/field-20261112-034.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16972,
+        "lng": 127.10117
+      }
+    },
+    {
+      "id": "field-20261112-035",
+      "src": "/photos/field/field-20261112-035.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16972,
+        "lng": 127.10103
+      }
+    },
+    {
+      "id": "field-20261112-036",
+      "src": "/photos/field/field-20261112-036.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16972,
+        "lng": 127.10103
+      }
+    },
+    {
+      "id": "field-20261112-037",
+      "src": "/photos/field/field-20261112-037.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16973,
+        "lng": 127.10097
+      }
+    },
+    {
+      "id": "field-20261112-038",
+      "src": "/photos/field/field-20261112-038.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16982,
+        "lng": 127.10069
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-039",
+      "src": "/photos/field/field-20261112-039.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16982,
+        "lng": 127.10069
+      }
+    },
+    {
+      "id": "field-20261112-040",
+      "src": "/photos/field/field-20261112-040.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16987,
+        "lng": 127.10062
+      }
+    },
+    {
+      "id": "field-20261112-041",
+      "src": "/photos/field/field-20261112-041.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10052
+      }
+    },
+    {
+      "id": "field-20261112-042",
+      "src": "/photos/field/field-20261112-042.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16992,
+        "lng": 127.10053
+      }
+    },
+    {
+      "id": "field-20261112-043",
+      "src": "/photos/field/field-20261112-043.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16993,
+        "lng": 127.10053
+      }
+    },
+    {
+      "id": "field-20261112-044",
+      "src": "/photos/field/field-20261112-044.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17005,
+        "lng": 127.10033
+      }
+    },
+    {
+      "id": "field-20261112-045",
+      "src": "/photos/field/field-20261112-045.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17005,
+        "lng": 127.10033
+      }
+    },
+    {
+      "id": "field-20261112-046",
+      "src": "/photos/field/field-20261112-046.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17013,
+        "lng": 127.10027
+      }
+    },
+    {
+      "id": "field-20261112-047",
+      "src": "/photos/field/field-20261112-047.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17026,
+        "lng": 127.10012
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-048",
+      "src": "/photos/field/field-20261112-048.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17025,
+        "lng": 127.10011
+      }
+    },
+    {
+      "id": "field-20261112-049",
+      "src": "/photos/field/field-20261112-049.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17034,
+        "lng": 127.10011
+      }
+    },
+    {
+      "id": "field-20261112-050",
+      "src": "/photos/field/field-20261112-050.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1704,
+        "lng": 127.10005
+      }
+    },
+    {
+      "id": "field-20261112-051",
+      "src": "/photos/field/field-20261112-051.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17042,
+        "lng": 127.10001
+      }
+    },
+    {
+      "id": "field-20261112-052",
+      "src": "/photos/field/field-20261112-052.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17044,
+        "lng": 127.10002
+      }
+    },
+    {
+      "id": "field-20261112-053",
+      "src": "/photos/field/field-20261112-053.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17047,
+        "lng": 127.09994
+      }
+    },
+    {
+      "id": "field-20261112-054",
+      "src": "/photos/field/field-20261112-054.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17061,
+        "lng": 127.09989
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-055",
+      "src": "/photos/field/field-20261112-055.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17073,
+        "lng": 127.09982
+      }
+    },
+    {
+      "id": "field-20261112-056",
+      "src": "/photos/field/field-20261112-056.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17074,
+        "lng": 127.09981
+      }
+    },
+    {
+      "id": "field-20261112-057",
+      "src": "/photos/field/field-20261112-057.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17076,
+        "lng": 127.09978
+      }
+    },
+    {
+      "id": "field-20261112-058",
+      "src": "/photos/field/field-20261112-058.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17086,
+        "lng": 127.09969
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-059",
+      "src": "/photos/field/field-20261112-059.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17087,
+        "lng": 127.09966
+      }
+    },
+    {
+      "id": "field-20261112-060",
+      "src": "/photos/field/field-20261112-060.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17086,
+        "lng": 127.09966
+      }
+    },
+    {
+      "id": "field-20261112-061",
+      "src": "/photos/field/field-20261112-061.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17082,
+        "lng": 127.09956
+      }
+    },
+    {
+      "id": "field-20261112-062",
+      "src": "/photos/field/field-20261112-062.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17086,
+        "lng": 127.09945
+      }
+    },
+    {
+      "id": "field-20261112-063",
+      "src": "/photos/field/field-20261112-063.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17088,
+        "lng": 127.09941
+      }
+    },
+    {
+      "id": "field-20261112-064",
+      "src": "/photos/field/field-20261112-064.webp",
+      "taxonId": "gbif-5371712",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17089,
+        "lng": 127.09936
+      }
+    },
+    {
+      "id": "field-20261112-065",
+      "src": "/photos/field/field-20261112-065.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17091,
+        "lng": 127.09926
+      }
+    },
+    {
+      "id": "field-20261112-066",
+      "src": "/photos/field/field-20261112-066.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1709,
+        "lng": 127.09927
+      }
+    },
+    {
+      "id": "field-20261112-067",
+      "src": "/photos/field/field-20261112-067.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17087,
+        "lng": 127.09919
+      }
+    },
+    {
+      "id": "field-20261112-068",
+      "src": "/photos/field/field-20261112-068.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17081,
+        "lng": 127.09914
+      }
+    },
+    {
+      "id": "field-20261112-069",
+      "src": "/photos/field/field-20261112-069.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17078,
+        "lng": 127.09911
+      }
+    },
+    {
+      "id": "field-20261112-070",
+      "src": "/photos/field/field-20261112-070.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17074,
+        "lng": 127.0991
+      }
+    },
+    {
+      "id": "field-20261112-071",
+      "src": "/photos/field/field-20261112-071.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1707,
+        "lng": 127.09898
+      }
+    },
+    {
+      "id": "field-20261112-072",
+      "src": "/photos/field/field-20261112-072.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17066,
+        "lng": 127.09894
+      }
+    },
+    {
+      "id": "field-20261112-073",
+      "src": "/photos/field/field-20261112-073.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1705,
+        "lng": 127.09839
+      }
+    },
+    {
+      "id": "field-20261112-074",
+      "src": "/photos/field/field-20261112-074.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17045,
+        "lng": 127.09837
+      }
+    },
+    {
+      "id": "field-20261112-075",
+      "src": "/photos/field/field-20261112-075.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17043,
+        "lng": 127.09833
+      }
+    },
+    {
+      "id": "field-20261112-076",
+      "src": "/photos/field/field-20261112-076.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17036,
+        "lng": 127.0983
+      }
+    },
+    {
+      "id": "field-20261112-077",
+      "src": "/photos/field/field-20261112-077.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17026,
+        "lng": 127.09814
+      }
+    },
+    {
+      "id": "field-20261112-078",
+      "src": "/photos/field/field-20261112-078.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17011,
+        "lng": 127.09785
+      }
+    },
+    {
+      "id": "field-20261112-079",
+      "src": "/photos/field/field-20261112-079.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.17,
+        "lng": 127.09776
+      }
+    },
+    {
+      "id": "field-20261112-080",
+      "src": "/photos/field/field-20261112-080.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16979,
+        "lng": 127.09742
+      }
+    },
+    {
+      "id": "field-20261112-081",
+      "src": "/photos/field/field-20261112-081.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16981,
+        "lng": 127.09743
+      }
+    },
+    {
+      "id": "field-20261112-082",
+      "src": "/photos/field/field-20261112-082.webp",
+      "taxonId": "gbif-5358748",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16977,
+        "lng": 127.09746
+      }
+    },
+    {
+      "id": "field-20261112-083",
+      "src": "/photos/field/field-20261112-083.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16968,
+        "lng": 127.09744
+      }
+    },
+    {
+      "id": "field-20261112-084",
+      "src": "/photos/field/field-20261112-084.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16962,
+        "lng": 127.09737
+      }
+    },
+    {
+      "id": "field-20261112-085",
+      "src": "/photos/field/field-20261112-085.webp",
+      "taxonId": "survey-fountain-grass",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16953,
+        "lng": 127.09737
+      }
+    },
+    {
+      "id": "field-20261112-086",
+      "src": "/photos/field/field-20261112-086.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16946,
+        "lng": 127.09731
+      }
+    },
+    {
+      "id": "field-20261112-087",
+      "src": "/photos/field/field-20261112-087.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16946,
+        "lng": 127.09733
+      }
+    },
+    {
+      "id": "field-20261112-088",
+      "src": "/photos/field/field-20261112-088.webp",
+      "taxonId": "survey-fountain-grass",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16929,
+        "lng": 127.09731
+      }
+    },
+    {
+      "id": "field-20261112-089",
+      "src": "/photos/field/field-20261112-089.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16886,
+        "lng": 127.09718
+      }
+    },
+    {
+      "id": "field-20261112-090",
+      "src": "/photos/field/field-20261112-090.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16879,
+        "lng": 127.09716
+      }
+    },
+    {
+      "id": "field-20261112-091",
+      "src": "/photos/field/field-20261112-091.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16853,
+        "lng": 127.09708
+      }
+    },
+    {
+      "id": "field-20261112-092",
+      "src": "/photos/field/field-20261112-092.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16828,
+        "lng": 127.09707
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-093",
+      "src": "/photos/field/field-20261112-093.webp",
+      "taxonId": "gbif-9797180",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16829,
+        "lng": 127.09708
+      }
+    },
+    {
+      "id": "field-20261112-094",
+      "src": "/photos/field/field-20261112-094.webp",
+      "taxonId": "gbif-9797180",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16829,
+        "lng": 127.09707
+      }
+    },
+    {
+      "id": "field-20261112-095",
+      "src": "/photos/field/field-20261112-095.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16807,
+        "lng": 127.09698
+      }
+    },
+    {
+      "id": "field-20261112-096",
+      "src": "/photos/field/field-20261112-096.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16801,
+        "lng": 127.09696
+      }
+    },
+    {
+      "id": "field-20261112-097",
+      "src": "/photos/field/field-20261112-097.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.168,
+        "lng": 127.09696
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-098",
+      "src": "/photos/field/field-20261112-098.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16801,
+        "lng": 127.09696
+      }
+    },
+    {
+      "id": "field-20261112-099",
+      "src": "/photos/field/field-20261112-099.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16798,
+        "lng": 127.09694
+      }
+    },
+    {
+      "id": "field-20261112-100",
+      "src": "/photos/field/field-20261112-100.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16793,
+        "lng": 127.09694
+      }
+    },
+    {
+      "id": "field-20261112-101",
+      "src": "/photos/field/field-20261112-101.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16793,
+        "lng": 127.09694
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-102",
+      "src": "/photos/field/field-20261112-102.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16792,
+        "lng": 127.09694
+      }
+    },
+    {
+      "id": "field-20261112-103",
+      "src": "/photos/field/field-20261112-103.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1678,
+        "lng": 127.0969
+      }
+    },
+    {
+      "id": "field-20261112-104",
+      "src": "/photos/field/field-20261112-104.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16753,
+        "lng": 127.0968
+      }
+    },
+    {
+      "id": "field-20261112-105",
+      "src": "/photos/field/field-20261112-105.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16746,
+        "lng": 127.09684
+      }
+    },
+    {
+      "id": "field-20261112-106",
+      "src": "/photos/field/field-20261112-106.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16742,
+        "lng": 127.09684
+      }
+    },
+    {
+      "id": "field-20261112-107",
+      "src": "/photos/field/field-20261112-107.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16742,
+        "lng": 127.09695
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-108",
+      "src": "/photos/field/field-20261112-108.webp",
+      "taxonId": "spot-billed-duck",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16743,
+        "lng": 127.09695
+      }
+    },
+    {
+      "id": "field-20261112-109",
+      "src": "/photos/field/field-20261112-109.webp",
+      "taxonId": "eurasian-coot",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16742,
+        "lng": 127.09694
+      }
+    },
+    {
+      "id": "field-20261112-110",
+      "src": "/photos/field/field-20261112-110.webp",
+      "taxonId": "eurasian-coot",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16742,
+        "lng": 127.09694
+      }
+    },
+    {
+      "id": "field-20261112-111",
+      "src": "/photos/field/field-20261112-111.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16719,
+        "lng": 127.09726
+      }
+    },
+    {
+      "id": "field-20261112-112",
+      "src": "/photos/field/field-20261112-112.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16719,
+        "lng": 127.09733
+      }
+    },
+    {
+      "id": "field-20261112-113",
+      "src": "/photos/field/field-20261112-113.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16734,
+        "lng": 127.09741
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-115",
+      "src": "/photos/field/field-20261112-115.webp",
+      "taxonId": "eurasian-coot",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1674,
+        "lng": 127.09807
+      }
+    },
+    {
+      "id": "field-20261112-116",
+      "src": "/photos/field/field-20261112-116.webp",
+      "taxonId": "eurasian-coot",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.1674,
+        "lng": 127.09807
+      }
+    },
+    {
+      "id": "field-20261112-117",
+      "src": "/photos/field/field-20261112-117.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16731,
+        "lng": 127.09918
+      }
+    },
+    {
+      "id": "field-20261112-118",
+      "src": "/photos/field/field-20261112-118.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16745,
+        "lng": 127.09958
+      }
+    },
+    {
+      "id": "field-20261112-119",
+      "src": "/photos/field/field-20261112-119.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16764,
+        "lng": 127.09996
+      }
+    },
+    {
+      "id": "field-20261112-120",
+      "src": "/photos/field/field-20261112-120.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16766,
+        "lng": 127.10019
+      }
+    },
+    {
+      "id": "field-20261112-121",
+      "src": "/photos/field/field-20261112-121.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16765,
+        "lng": 127.10031
+      },
+      "scene": true
+    },
+    {
+      "id": "field-20261112-122",
+      "src": "/photos/field/field-20261112-122.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16773,
+        "lng": 127.10057
+      }
+    },
+    {
+      "id": "field-20261112-123",
+      "src": "/photos/field/field-20261112-123.webp",
+      "taxonId": "field-common-reed",
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16772,
+        "lng": 127.10056
+      }
+    },
+    {
+      "id": "field-20261112-124",
+      "src": "/photos/field/field-20261112-124.webp",
+      "taxonId": null,
+      "capturedOn": "2026-11-12",
+      "location": {
+        "lat": 37.16781,
+        "lng": 127.10065
+      },
+      "scene": true
     }
   ]
 }

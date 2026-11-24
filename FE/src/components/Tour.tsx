@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 
 export interface TourStep {
@@ -34,6 +34,7 @@ export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
   const [index, setIndex] = useState(0);
   const [hole, setHole] = useState<Box | null>(null);
   const [frame, setFrame] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [cardHeight, setCardHeight] = useState(0);
   const overlay = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLElement>(null);
   const step = steps[index];
@@ -43,24 +44,26 @@ export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
     card.current?.focus({ preventScroll: true });
   }, [index]);
 
-  // 지도가 움직이는 동안에도 따라가도록 자주 잽니다.
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const rootEl = overlay.current;
+    const cardEl = card.current;
+    if (!rootEl || !cardEl) return;
+    const el = step.target();
     const measure = () => {
-      const root = overlay.current?.getBoundingClientRect();
-      const el = step.target();
-      if (!root) return;
-      setFrame({ w: root.width, h: root.height });
+      const root = rootEl.getBoundingClientRect();
+      setFrame((old) => old.w === root.width && old.h === root.height ? old : { w: root.width, h: root.height });
+      setCardHeight(cardEl.offsetHeight);
       if (!el) return setHole(null);
       const r = el.getBoundingClientRect();
-      setHole({ x: r.left - root.left - PAD, y: r.top - root.top - PAD, w: r.width + PAD * 2, h: r.height + PAD * 2 });
+      const box = { x: r.left - root.left - PAD, y: r.top - root.top - PAD, w: r.width + PAD * 2, h: r.height + PAD * 2 };
+      setHole((old) => old?.x === box.x && old.y === box.y && old.w === box.w && old.h === box.h ? old : box);
     };
     measure();
-    const id = setInterval(measure, 200);
-    window.addEventListener('resize', measure);
-    return () => {
-      clearInterval(id);
-      window.removeEventListener('resize', measure);
-    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(rootEl);
+    observer.observe(cardEl);
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
   }, [step]);
 
   useEffect(() => {
@@ -70,13 +73,14 @@ export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
   }, [onDone]);
 
   const last = index === steps.length - 1;
-  const cardW = Math.min(CARD_MAX_W, frame.w - 32);
+  const cardW = Math.max(0, Math.min(CARD_MAX_W, frame.w - 32));
   // 대상이 화면 위쪽이면 카드는 아래에, 아래쪽이면 위에
   const below = !hole || hole.y + hole.h / 2 < frame.h / 2;
   const cx = hole ? hole.x + hole.w / 2 : frame.w / 2;
   const cardLeft = Math.min(Math.max(16, cx - cardW / 2), frame.w - 16 - cardW);
   const arrowLeft = Math.min(Math.max(26, cx - cardLeft), cardW - 26);
-  const cardPos = hole ? (below ? { top: hole.y + hole.h + 16 } : { bottom: frame.h - hole.y + 16 }) : { top: frame.h / 3 };
+  const preferredTop = hole ? (below ? hole.y + hole.h + 16 : hole.y - cardHeight - 16) : (frame.h - cardHeight) / 2;
+  const cardTop = Math.max(12, Math.min(preferredTop, frame.h - cardHeight - 16));
 
   return (
     <div ref={overlay} className={`tour${hole ? '' : ' tour--dim'}`} role="dialog" aria-modal="true" aria-label={label}>
@@ -87,8 +91,8 @@ export function Tour({ steps, label, finishLabel = '시작하기', onDone }: {
           aria-hidden="true"
         />
       )}
-      <section key={index} ref={card} tabIndex={-1} aria-live="polite" className={`tour__card${below ? ' is-below' : ' is-above'}`} style={{ ...cardPos, left: cardLeft, width: cardW }}>
-        {hole && <span className="tour__arrow" style={{ left: arrowLeft }} aria-hidden="true" />}
+      <section key={index} ref={card} tabIndex={-1} aria-live="polite" className={`tour__card${below ? ' is-below' : ' is-above'}`} style={{ top: cardTop, left: cardLeft, width: cardW }}>
+        {hole && cardTop === preferredTop && <span className="tour__arrow" style={{ left: arrowLeft }} aria-hidden="true" />}
         <div className="tour__top">
           <ol className="tour__steps" aria-label={`${steps.length}단계 중 ${index + 1}단계`}>
             {steps.map((s, i) => (

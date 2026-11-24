@@ -100,9 +100,9 @@ export function ContentAdmin() {
           <strong>
             {s.label} ({s.startsOn} ~ {s.endsOn}){s.draft ? ' · 초안' : ''}
           </strong>
-          <span>오늘 6종: {s.todaySix.map((id) => taxonById(content, id)?.koreanName).join(', ')}</span>
+          <span>퀘스트 후보 {s.dex.length}종 · 가족별 10종</span>
           <span>
-            도감 {s.dex.length}칸: {s.dex.map((id) => taxonById(content, id)?.koreanName).join(', ')}
+            후보: {s.dex.map((id) => taxonById(content, id)?.koreanName).join(', ')}
           </span>
         </div>
       ))}

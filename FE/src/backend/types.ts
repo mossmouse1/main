@@ -36,7 +36,7 @@ export interface IdentifyResult {
 }
 
 /** identifySpecies 실패 이유(화면에서 한국어로 바꿉니다) */
-export type IdentifyErrorCode = 'rate_limited' | 'daily_limit' | 'global_limit' | 'consent_required' | 'too_large' | 'network' | 'failed';
+export type IdentifyErrorCode = 'rate_limited' | 'daily_limit' | 'global_limit' | 'consent_required' | 'too_large' | 'invalid_image' | 'unavailable' | 'network' | 'failed';
 export class IdentifyError extends Error {
   constructor(public code: IdentifyErrorCode) {
     super(code);

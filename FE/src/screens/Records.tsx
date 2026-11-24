@@ -3,18 +3,20 @@ import { Link, useSearchParams } from 'react-router';
 import { IdStatusBadge, SyncBadge } from '../components/Badges';
 import { Icon } from '../components/Icon';
 import { BlobImage, PageHeader, Toast } from '../components/Layout';
-import { RecordReward, useRecordReward } from '../components/RecordReward';
+import { RecordNextActions } from '../components/RecordNextActions';
 import { useContent } from '../content/ContentProvider';
 import { taxonById, zoneById } from '../content/helpers';
 import { db } from '../data/db';
 import { retryNow } from '../data/sync';
 import type { LocalObservation, LocalWalk } from '../data/types';
-import { useOnline, usePendingCount } from '../hooks';
+import { useDex, useOnline, usePendingCount } from '../hooks';
+import { questMapUrl } from '../lib/dex';
 import { formatDate, formatTime } from '../lib/time';
 
 /** S9 우리 기록: 기록 목록, 검토 상태, 전송 대기 표시 */
 export function Records() {
   const { content } = useContent();
+  const dex = useDex();
   const pending = usePendingCount();
   const online = useOnline();
   const observations = useLiveQuery(() => db.observations.orderBy('createdAt').reverse().toArray(), [], []);
@@ -24,7 +26,6 @@ export function Records() {
 
   const [params] = useSearchParams();
   const saved = observations.find((o) => o.id === params.get('saved'));
-  const reward = useRecordReward(saved?.id);
   const savedToast = saved && (
     <Toast tone="soft">
       <Icon name="bookmark" size={20} />
@@ -36,7 +37,9 @@ export function Records() {
   );
   const walkById = new Map(walks.map((w) => [w.id, w]));
   const groups: { walkId: string; items: LocalObservation[] }[] = [];
+  const focus = params.get('focus');
   for (const o of observations) {
+    if (focus && o.id !== focus) continue;
     const g = groups.find((x) => x.walkId === o.walkId);
     if (g) g.items.push(o);
     else groups.push({ walkId: o.walkId, items: [o] });
@@ -47,12 +50,15 @@ export function Records() {
       <PageHeader
         title="내 기록"
         backTo="/dex"
+        returnTo={saved ? questMapUrl(dex?.nextClue) : undefined}
         right={
           <Link to="/settings" className="icon-btn" aria-label="설정">
             <Icon name="gear" size={26} />
           </Link>
         }
       />
+      {savedToast && <div className="record-saved-notice">{savedToast}</div>}
+      {saved && <RecordNextActions dex={dex} />}
       <div className="page__body stack">
         {observations.length > 0 && (
           <dl className="tally">
@@ -70,7 +76,6 @@ export function Records() {
             </div>
           </dl>
         )}
-        {savedToast && <RecordReward active={reward} stamp="기록" compact>{savedToast}</RecordReward>}
         {pending > 0 && (
           <div className="card row row--between">
             <span>

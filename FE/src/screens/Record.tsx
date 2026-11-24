@@ -9,10 +9,11 @@ import { SpeciesArt } from '../components/SpeciesArt';
 import { BACKEND_MODE, DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
 import { useContent } from '../content/ContentProvider';
 import { candidatesFromTaxon, candidatesFromZone, searchTaxa, taxonById, zoneById } from '../content/helpers';
-import { CATEGORY_LABEL, type Content, type Taxon } from '../content/types';
+import { CATEGORY_LABEL, type Content, type SeasonSet, type Taxon } from '../content/types';
 import { db, getMeta, setMeta } from '../data/db';
 import { addPhotos, discardDraft, pickTaxon, removePhoto, setObserver, startDraft, updateDraft } from '../data/draft';
 import { saveObservation } from '../data/observations';
+import { syncFamilyConsent } from '../data/sync';
 import { track } from '../data/track';
 import type { MediaSource, PickSource, RecordDraft } from '../data/types';
 import { getFamilyBackend } from '../backend';
@@ -471,22 +472,21 @@ export function RecordWhere() {
   );
 }
 
-type Choice = { taxonId: string | null; source: PickSource; freeText: string | null };
+type Choice = { taxonId: string | null; source: PickSource; freeText: string | null; candidateIds?: string[] };
 
-async function saveWith(content: Content, draft: RecordDraft, choice: Choice) {
+async function saveWith(content: Content, season: SeasonSet, draft: RecordDraft, choice: Choice) {
   await pickTaxon(choice.taxonId, choice.source, choice.freeText);
   return saveObservation(
     content,
-    { ...draft, taxonId: choice.taxonId, pickSource: choice.source, freeTextName: choice.freeText },
+    { ...draft, taxonId: choice.taxonId, pickSource: choice.source, freeTextName: choice.freeText, candidateIds: choice.candidateIds ?? draft.candidateIds },
     { subject: draft.subject!, radiusM: draft.radiusM ?? DEFAULT_RADIUS, method: draft.locationMethod ?? 'tap' },
+    season,
   );
 }
 
 /** 사진 카드: 찍은 사진, 다시 찍기, 사진 추가(최대 3장) */
-function ShotCard({ draft, canEdit = true }: { draft: RecordDraft; canEdit?: boolean }) {
+function ShotCard({ draft, photo, onSelect }: { draft: RecordDraft; photo: RecordDraft['photos'][number]; onSelect: (id: string | null) => void }) {
   const navigate = useNavigate();
-  const [index, setIndex] = useState(0);
-  const photo = draft.photos[Math.min(index, draft.photos.length - 1)];
   return (
     <div className="shot">
       <div className="shot__photo">
@@ -494,21 +494,19 @@ function ShotCard({ draft, canEdit = true }: { draft: RecordDraft; canEdit?: boo
         <span className="shot__badge">
           <Icon name="camera" size={18} /> 촬영한 사진
         </span>
-        {canEdit && (
-          <button className="shot__retake" onClick={() => navigate('/record/photo?then=pick&replace=1')}>
-            <Icon name="refresh" size={20} /> 다시 찍기
-          </button>
-        )}
+        <button className="shot__retake" onClick={() => navigate('/record/photo?then=pick&replace=1')}>
+          <Icon name="refresh" size={20} /> 다시 찍기
+        </button>
       </div>
-      {canEdit && (draft.photos.length > 1 || draft.photos.length < MAX_PHOTOS) && (
+      {(draft.photos.length > 1 || draft.photos.length < MAX_PHOTOS) && (
         <ul className="shot__thumbs" aria-label="찍은 사진">
           {draft.photos.length > 1 &&
             draft.photos.map((p, i) => (
               <li key={p.id}>
-                <button className={`shot__thumb${i === index ? ' is-on' : ''}`} onClick={() => setIndex(i)} aria-label={`사진 ${i + 1} 보기`}>
+                <button className={`shot__thumb${p.id === photo.id ? ' is-on' : ''}`} onClick={() => onSelect(p.id)} aria-label={`사진 ${i + 1} 보기`} aria-pressed={p.id === photo.id}>
                   <BlobImage blob={p.display ?? p.original} alt="" />
                 </button>
-                <button className="shot__remove" onClick={() => void removePhoto(p.id).then(() => setIndex(0))} aria-label={`사진 ${i + 1} 지우기`}>
+                <button className="shot__remove" onClick={() => void removePhoto(p.id).then(() => { if (p.id === photo.id) onSelect(null); })} aria-label={`사진 ${i + 1} 지우기`}>
                   <Icon name="close" size={14} />
                 </button>
               </li>
@@ -556,6 +554,9 @@ const IDENTIFY_ERROR_TEXT: Record<string, string> = {
   daily_limit: '오늘 추천받을 수 있는 횟수를 다 썼어요. 이름은 직접 찾아 주세요.',
   global_limit: '오늘은 추천 기능이 많이 쓰여서 잠시 쉬어요. 이름은 직접 찾아 주세요.',
   consent_required: '동의를 먼저 마쳐야 추천받을 수 있어요.',
+  unavailable: '사진 추천 서버를 아직 사용할 수 없어요. 이름은 직접 찾을 수 있어요.',
+  too_large: '사진이 너무 커요. 다른 사진을 골라 주세요.',
+  invalid_image: '이 사진을 읽지 못했어요. 다시 찍거나 다른 사진을 골라 주세요.',
   network: '인터넷 연결을 확인하고 다시 눌러 주세요.',
 };
 /** 같은 사진은 결과를 기억해 다시 부르지 않습니다(호출 횟수 절약). */
@@ -563,9 +564,8 @@ const identifyCache = new Map<string, IdentifyResult>();
 const TRUST_MIN = 0.3;
 
 /** 사진으로 종 추천받기: 버튼을 눌렀을 때만 부릅니다. */
-function PhotoSuggest({ draft, onPick, onManual }: { draft: RecordDraft; onPick: (taxonId: string, candidateIds: string[]) => void; onManual: () => void }) {
+function PhotoSuggest({ photo, onPick, onManual }: { photo: RecordDraft['photos'][number]; onPick: (taxonId: string, candidateIds: string[]) => void; onManual: () => void }) {
   const { content } = useContent();
-  const photo = draft.photos[0];
   const [, bump] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -576,12 +576,15 @@ function PhotoSuggest({ draft, onPick, onManual }: { draft: RecordDraft; onPick:
     setBusy(true);
     setError('');
     try {
-      const blob = await makeIdentifyCopy(photo.display ?? photo.original);
-      if (!blob) throw new IdentifyError('failed');
-      identifyCache.set(photo.id, await (await getFamilyBackend()).identifySpecies(blob));
+      if (!navigator.onLine) throw new IdentifyError('network');
+      const blob = (photo.display && await makeIdentifyCopy(photo.display)) || await makeIdentifyCopy(photo.original);
+      if (!blob) throw new IdentifyError('invalid_image');
+      const backend = await getFamilyBackend();
+      if (!(await syncFamilyConsent(backend))) throw new IdentifyError('consent_required');
+      identifyCache.set(photo.id, await backend.identifySpecies(blob));
       bump((n) => n + 1);
     } catch (e) {
-      setError(IDENTIFY_ERROR_TEXT[e instanceof IdentifyError ? e.code : ''] ?? '추천을 받지 못했어요. 이름은 직접 찾아 주세요.');
+      setError(IDENTIFY_ERROR_TEXT[e instanceof IdentifyError ? e.code : ''] ?? '추천을 받지 못했어요. 다시 시도하거나 이름을 직접 찾아 주세요.');
     }
     setBusy(false);
   };
@@ -591,23 +594,24 @@ function PhotoSuggest({ draft, onPick, onManual }: { draft: RecordDraft; onPick:
 
   return (
     <section className="sec">
-      {!result && (
+      {!result && <>
         <button className="btn btn--outline btn--block" disabled={busy} onClick={() => void run()}>
           {busy ? '사진을 살펴보는 중…' : '사진으로 종 추천받기'}
         </button>
-      )}
+        <p className="caption">추천을 요청하면 선택한 사진의 위치 정보가 제거된 사본을 OpenAI로 보내요.</p>
+      </>}
       {error && <p className="caption" role="alert">{error}</p>}
       {result && trusted && (
         <>
           <h2 className="sec__title">사진과 닮은 생물이에요</h2>
           <ul className="alt-list">
-            {cards.map(({ c, t }) => (
+            {cards.map(({ t }) => (
               <li key={t.id}>
                 <button className="alt" onClick={() => onPick(t.id, cards.map((x) => x.t.id))}>
                   <SpeciesArt taxon={t} size="sm" />
                   <span>
                     <strong>{t.koreanName}</strong>
-                    <span className="muted">{t.scientificName} · 확신도 {Math.round(c.confidence * 100)}%</span>
+                    <span className="muted">{t.scientificName}</span>
                   </span>
                 </button>
               </li>
@@ -618,7 +622,7 @@ function PhotoSuggest({ draft, onPick, onManual }: { draft: RecordDraft; onPick:
       )}
       {result && !trusted && (
         <>
-          <p className="caption">목록에 없는 것 같아요. 직접 찾아볼래요.</p>
+          <p className="caption">이 사진에서 가능성 높은 종을 찾지 못했어요.</p>
           <button className="btn btn--outline btn--block" onClick={onManual}>이름으로 직접 찾기</button>
         </>
       )}
@@ -633,9 +637,11 @@ export function RecordPick() {
   const season = useSeason();
   const navigate = useNavigate();
   const [choice, setChoice] = useState<Choice | null>(null);
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [others, setOthers] = useState(false);
   const [query, setQuery] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   useEffect(() => {
     if (!draft || draft.candidateIds.length) return;
@@ -652,6 +658,7 @@ export function RecordPick() {
   if (!draft.photos.length) return <Navigate to="/record/photo" replace />;
   if (!draft.subject) return <Navigate to="/record/where" replace />;
   if (!draft.candidateIds.length) return null;
+  const photo = draft.photos.find((item) => item.id === selectedPhotoId) ?? draft.photos[0];
 
   // 예상 결과: 카드에서 왔으면 찾던 종, 아니면 이 구역 후보 중 공개 기록이 가장 많은 종(AI 판별 아님, PRD F18)
   const fromCard = !!draft.sourceTaxonId && draft.candidateIds.includes(draft.sourceTaxonId);
@@ -662,23 +669,30 @@ export function RecordPick() {
   const name = taxon?.koreanName ?? (current.freeText ? `‘${current.freeText}’` : '');
   const basis =
     current.source === 'photo_ai' ? '사진 추천(AI)에서 고른 생물이에요' : current.source === 'search' ? '이름으로 찾은 생물이에요' : current.source === 'free_text' ? '직접 적은 이름이에요' : current.taxonId !== predictedId ? '직접 고른 후보예요' : fromCard ? '찾으러 온 생물이에요' : '이 구역에서 가장 많이 기록됐어요';
-  const alternatives = draft.candidateIds.filter((id) => id !== current.taxonId).slice(0, current.source === 'card' || current.source === 'zone' ? 2 : 3);
+  const alternatives = (current.candidateIds ?? draft.candidateIds).filter((id) => id !== current.taxonId).slice(0, current.source === 'card' || current.source === 'zone' ? 2 : 3);
   const results = query.trim() ? searchTaxa(content, query) : season.dex.map((id) => taxonById(content, id)).filter((t): t is Taxon => !!t);
 
   const confirm = async () => {
     if (saving) return;
     setSaving(true);
+    setSaveFailed(false);
     const audio = prepareRewardAudio();
-    const obs = await saveWith(content, draft, current);
-    markRecordReward(obs.id);
-    void playRewardAudio(audio);
-    navigate(obs.taxonId ? `/species/${obs.taxonId}?saved=${obs.id}` : `/records?saved=${obs.id}`, { replace: true });
+    try {
+      const { observation, reward } = await saveWith(content, season, draft, current);
+      if (reward) {
+        markRecordReward(observation.id, reward);
+        void playRewardAudio(audio, reward === 'completion');
+      }
+      navigate(observation.taxonId ? `/species/${observation.taxonId}?saved=${observation.id}` : `/records?saved=${observation.id}`, { replace: true });
+    } catch {
+      setSaveFailed(true);
+      setSaving(false);
+    }
   };
   const choose = (c: Choice) => {
     setChoice(c);
     setOthers(false);
     setQuery('');
-    // 휴대폰은 문서가, 넓은 화면은 휴대폰 틀 안쪽 층이 스크롤합니다.
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.querySelector('.device__scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -697,7 +711,19 @@ export function RecordPick() {
         }
       />
       <div className="record__body stack">
-        <ShotCard draft={draft} />
+        <ShotCard draft={draft} photo={photo} onSelect={(id) => {
+          setSelectedPhotoId(id);
+          if (id !== photo.id && choice?.source === 'photo_ai') setChoice(null);
+        }} />
+
+        {BACKEND_MODE === 'supabase' && (
+          <PhotoSuggest
+            key={photo.id}
+            photo={photo}
+            onManual={() => setOthers(true)}
+            onPick={(taxonId, candidateIds) => choose({ taxonId, source: 'photo_ai', freeText: null, candidateIds })}
+          />
+        )}
 
         <section className="guess">
           <p className="kicker">
@@ -721,17 +747,6 @@ export function RecordPick() {
           </section>
         )}
 
-        {BACKEND_MODE === 'supabase' && (
-          <PhotoSuggest
-            draft={draft}
-            onManual={() => setOthers(true)}
-            onPick={(taxonId, ids) => {
-              void updateDraft({ candidateIds: ids });
-              choose({ taxonId, source: 'photo_ai', freeText: null });
-            }}
-          />
-        )}
-
         {alternatives.length > 0 && (
           <section className="sec">
             <h2 className="sec__title">혹시 이 생물인가요?</h2>
@@ -741,7 +756,12 @@ export function RecordPick() {
                 if (!t) return null;
                 return (
                   <li key={id}>
-                    <button className="alt" onClick={() => choose({ taxonId: id, source: candidateSource, freeText: null })}>
+                    <button className="alt" onClick={() => choose({
+                      taxonId: id,
+                      source: current.source === 'photo_ai' ? 'photo_ai' : candidateSource,
+                      freeText: null,
+                      candidateIds: current.candidateIds,
+                    })}>
                       <SpeciesArt taxon={t} size="sm" />
                       <span>
                         <strong>{t.koreanName}</strong>
@@ -758,8 +778,9 @@ export function RecordPick() {
         <WhereRow draft={draft} />
 
         <div className="stack stack--tight">
+          {saveFailed && <p className="notice" role="alert">기록을 저장하지 못했어요. 다시 저장해 주세요.</p>}
           <button className="btn btn--primary btn--block btn--big" disabled={saving} onClick={() => void confirm()}>
-            맞아요, 도감에 등록
+            {saving ? '저장 중…' : '맞아요, 도감에 등록'}
           </button>
           <button className="btn btn--outline btn--block btn--big" onClick={() => setOthers(true)}>
             다른 생물이에요
@@ -812,10 +833,11 @@ export function RecordPick() {
 /** 아직 모르겠어요: 사진은 남기고 이름은 나중에(미동정). 관찰 메모는 ‘가족이 적은 이름·메모’로 갑니다. */
 export function RecordUnknown() {
   const draft = useDraft();
-  const { content } = useContent();
+  const { content, season } = useContent();
   const navigate = useNavigate();
   const [memo, setMemo] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   if (draft === undefined) return null;
   if (draft === null) return <Navigate to="/" replace />;
@@ -826,11 +848,14 @@ export function RecordUnknown() {
   const save = async () => {
     if (saving) return;
     setSaving(true);
-    const audio = prepareRewardAudio();
-    const obs = await saveWith(content, draft, { taxonId: null, source: 'unknown', freeText: memo.trim().slice(0, 60) || null });
-    markRecordReward(obs.id);
-    void playRewardAudio(audio);
-    navigate(`/records?saved=${obs.id}`, { replace: true });
+    setSaveFailed(false);
+    try {
+      const { observation } = await saveWith(content, season, draft, { taxonId: null, source: 'unknown', freeText: memo.trim().slice(0, 60) || null });
+      navigate(`/records?saved=${observation.id}`, { replace: true });
+    } catch {
+      setSaveFailed(true);
+      setSaving(false);
+    }
   };
 
   return (
@@ -877,8 +902,9 @@ export function RecordUnknown() {
             <Icon name="camera" size={22} /> 다시 촬영하기
           </button>
           <button className="btn btn--secondary btn--block btn--big" disabled={saving} onClick={() => void save()}>
-            <Icon name="bookmark" size={20} /> 미확인 기록으로 저장
+            <Icon name="bookmark" size={20} /> {saving ? '저장 중…' : '미확인 기록으로 저장'}
           </button>
+          {saveFailed && <p className="notice" role="alert">기록을 저장하지 못했어요. 다시 저장해 주세요.</p>}
           <button
             className="link-btn"
             onClick={() =>
@@ -938,7 +964,7 @@ export function ClueCard({ taxon }: { taxon: Taxon }) {
       </ul>
       <div className="clue__foot">
         <span className="caption">사진을 찍고 확인하면 칸이 열려요</span>
-        <Link to={`/?focus=${taxon.id}`} className="btn btn--secondary btn--small">
+        <Link to={`/?public=0&focus=${taxon.id}`} className="btn btn--secondary btn--small">
           <Icon name="pin" size={18} /> 지도에서 찾기
         </Link>
       </div>

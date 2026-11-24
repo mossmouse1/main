@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "seed:sql": "node scripts/gen-seed.mjs"
+    "seed:sql": "node scripts/gen-seed.mjs",
+    "data:observations": "node scripts/update-park-observations.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

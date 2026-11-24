@@ -19,16 +19,20 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return fail(405, 'method_not_allowed');
 
   const authorization = req.headers.get('Authorization') ?? '';
+  const token = authorization.match(/^Bearer\s+(\S+)$/i)?.[1];
+  if (!token) return fail(401, 'unauthorized');
   const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
     global: { headers: { Authorization: authorization } },
     auth: { persistSession: false },
   });
-  const { data: auth } = await sb.auth.getUser(authorization.replace(/^Bearer\s+/i, ''));
+  const { data: auth } = await sb.auth.getUser(token);
   if (!auth.user) return fail(401, 'unauthorized');
 
   const body = await req.json().catch(() => null);
   const bad = checkInput(body);
   if (bad) return fail(bad.status, bad.error);
+  const apiKey = Deno.env.get('OPENAI_API_KEY')?.trim();
+  if (!apiKey) return fail(503, 'unavailable');
 
   // 한도 확인 + 호출 기록(통과하면 1회 소진)
   const quota = await sb.rpc('consume_identify_quota');
@@ -47,12 +51,13 @@ Deno.serve(async (req) => {
   try {
     const res = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${Deno.env.get('OPENAI_API_KEY') ?? ''}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(buildRequest(Deno.env.get('OPENAI_MODEL') || DEFAULT_MODEL, taxa, body.imageBase64, body.mime)),
-      signal: AbortSignal.timeout(20_000),
+      signal: AbortSignal.timeout(35_000),
     });
     if (!res.ok) {
       console.error('openai_status', res.status); // 본문은 남기지 않음
+      if (res.status === 401 || res.status === 403 || res.status === 404 || res.status === 429) return fail(503, 'unavailable');
       return fail(502, 'upstream_error');
     }
     const result = parseResult(await res.json(), taxa);

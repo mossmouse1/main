@@ -51,11 +51,11 @@ export interface MetaValues {
   onboarded: boolean;
   /** 계절 세트별로 가족이 이미 본(NEW가 지난) 칸 */
   dexSeen: Record<string, string[]>;
+  questSpecies: Record<string, string[]>;
   /** 서버 계정 id와, 동의가 그 계정으로 전송됐는지 */
   serverUid: string;
   consentSyncedFor: string;
-  /** 지도 탐험 가이드·촬영 첫 안내를 봤는지 */
-  tourSeen: boolean;
+  /** 촬영 첫 안내를 봤는지 */
   cameraTipSeen: boolean;
   /** 지도에 그리는 내가 걸어온 길(최근 3시간, 기기에만 둠). data/trackLog.ts */
   trackLog: [number, number, number][];

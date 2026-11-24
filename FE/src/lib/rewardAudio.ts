@@ -36,12 +36,12 @@ export function prepareRewardAudio(): Promise<AudioContext | null> {
   }
 }
 
-export async function playRewardAudio(prepared: Promise<AudioContext | null>) {
+export async function playRewardAudio(prepared: Promise<AudioContext | null>, completed: boolean) {
   const audio = await prepared;
   if (!audio || audio.state !== 'running' || isRewardMuted()) return;
 
   const start = audio.currentTime + 0.015;
-  const melody = [523.25, 659.25, 783.99, 1046.5];
+  const melody = completed ? [523.25, 659.25, 783.99, 880, 1046.5, 1318.51] : [523.25, 659.25, 783.99];
   melody.forEach((pitch, i) => {
     const at = start + i * 0.087;
     for (const [ratio, volume, decay] of [[1, 0.12, 0.23], [4, 0.029, 0.082], [9.1, 0.009, 0.05]]) {

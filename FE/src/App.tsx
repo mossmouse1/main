@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigationType } from 'react-router';
 import { DebugPanel } from './components/DebugPanel';
 import { TabLayout } from './components/Layout';
 import { DEBUG } from './lib/debug';
@@ -10,7 +10,10 @@ import { checkAutoEnd, touchWalk } from './data/walks';
 import { useHousehold } from './hooks';
 import { preloadPhotoTools } from './lib/photo';
 import { Dex } from './screens/Dex';
+import { QuestCompletion } from './screens/QuestCompletion';
 import { MapHome } from './screens/MapHome';
+import { FieldPhotos } from './screens/FieldPhotos';
+import { PublicObservations } from './screens/PublicObservations';
 import { RecordDone, RecordPhoto, RecordPick, RecordUnknown, RecordWhere } from './screens/Record';
 import { Records } from './screens/Records';
 import { Settings } from './screens/Settings';
@@ -38,7 +41,10 @@ export function App() {
         <Route path="welcome" element={<Welcome />} />
         <Route element={<TabLayout />}>
           <Route index element={<MapHome />} />
+          <Route path="public-observations" element={<PublicObservations />} />
           <Route path="dex" element={<Dex />} />
+          <Route path="dex/field" element={<FieldPhotos />} />
+          <Route path="dex/complete" element={<QuestCompletion />} />
           <Route path="records" element={<Records />} />
           <Route path="zone/:id" element={<ZoneDetail />} />
           <Route path="species/:id" element={<SpeciesCard />} />
@@ -63,11 +69,22 @@ export function App() {
 
 /**
  * 가족 화면 공통: 전송 대기열, 탐험 자동 종료, 사용 기록.
- * 처음 안내 화면은 없습니다. 처음 연 사람은 지도 홈의 코치마크로 안내하고,
- * 동의는 처음 기록할 때(RequireConsent) 한 번만 받습니다.
+ * 전체 지도에서 바로 시작하고 동의는 처음 기록할 때(RequireConsent) 한 번만 받습니다.
  */
 function FamilyShell() {
   const location = useLocation();
+  const navigation = useNavigationType();
+  const scroll = useRef<HTMLDivElement>(null);
+  const previousPath = useRef(location.pathname);
+
+  useLayoutEffect(() => {
+    if (previousPath.current !== location.pathname && navigation !== 'POP') {
+      scroll.current?.querySelector('.tab-page')?.scrollTo(0, 0);
+      scroll.current?.scrollTo(0, 0);
+      window.scrollTo(0, 0);
+    }
+    previousPath.current = location.pathname;
+  }, [location.pathname, navigation]);
 
   useEffect(() => {
     void getHousehold();
@@ -94,7 +111,7 @@ function FamilyShell() {
   return (
     <div className="stage">
       <div className="device">
-        <div className="device__scroll">
+        <div className="device__scroll" ref={scroll}>
           <Outlet />
         </div>
       </div>

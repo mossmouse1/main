@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useContent } from './content/ContentProvider';
-import { activeSeason } from './content/helpers';
 import { db, getMeta } from './data/db';
 import type { Household, LocalWalk } from './data/types';
 import { computeDex, type DexState } from './lib/dex';
@@ -54,8 +53,7 @@ export function useNow(intervalMs = 30_000): number {
 }
 
 export function useSeason() {
-  const { content } = useContent();
-  return useMemo(() => activeSeason(content), [content]);
+  return useContent().season;
 }
 
 export function useDex(): DexState | undefined {

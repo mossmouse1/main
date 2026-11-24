@@ -6,16 +6,17 @@ import { Icon } from '../components/Icon';
 import { FoundStamp } from '../components/Illustrations';
 import { BlobImage, PageHeader, Toast } from '../components/Layout';
 import { MonthBars } from '../components/MonthBars';
+import { RecordNextActions } from '../components/RecordNextActions';
 import { RecordReward, useRecordReward } from '../components/RecordReward';
 import { PhotoCredit, SpeciesArt } from '../components/SpeciesArt';
 import { useContent } from '../content/ContentProvider';
-import { seasonContains, taxonById, zoneById } from '../content/helpers';
+import { taxonById, zoneById } from '../content/helpers';
 import { CATEGORY_LABEL } from '../content/types';
 import { db } from '../data/db';
 import { startDraft } from '../data/draft';
 import { useDex, useSeason } from '../hooks';
+import { questMapUrl } from '../lib/dex';
 import { formatDate, formatTime } from '../lib/time';
-import { ClueCard } from './Record';
 
 /** S3 생물 카드(생물 도감): 사진, 알아보는 법, 만나는 곳, 우리 가족 기록, 월별 기록, 헷갈리는 종. 저장 직후에는 ‘새로운 발견!’ */
 export function SpeciesCard() {
@@ -27,7 +28,7 @@ export function SpeciesCard() {
   const dex = useDex();
   const navigate = useNavigate();
   const taxon = taxonById(content, id);
-  const [hero, setHero] = useState<'mine' | number>('mine');
+  const [hero, setHero] = useState<'mine' | number>(() => params.get('photo') === 'reference' ? 0 : 'mine');
 
   const mine = useLiveQuery(
     async () => {
@@ -43,17 +44,16 @@ export function SpeciesCard() {
   const saved = savedId ? mine.find((m) => m.obs.id === savedId) : undefined;
   const reward = useRecordReward(saved?.obs.id);
   if (!taxon) return <Navigate to="/" replace />;
-  const found = !!dex?.foundIds.has(taxon.id);
+  const found = !!dex?.collectionFoundIds.has(taxon.id);
   const refs = taxon.photos?.length ? taxon.photos : taxon.photo ? [taxon.photo] : [];
-  const myPhoto = mine.find((m) => m.photo)?.photo;
+  const myPhoto = saved?.photo ?? mine.find((m) => m.photo)?.photo;
   const showMine = hero === 'mine' && !!myPhoto;
   const refPhoto = refs[typeof hero === 'number' ? hero : 0] ?? null;
   const zone = zoneById(content, taxon.clue.zoneIds[0]);
   const dexIndex = season.dex.indexOf(taxon.id);
-  const cell = dex?.cells.find((c) => c.taxon.id === taxon.id);
-  const newDiscovery = !!saved && !!cell && seasonContains(season, saved.obs.observedAt) && mine.filter(({ obs }) => seasonContains(season, obs.observedAt)).length === 1;
   const firstSeen = mine.length ? mine[mine.length - 1].obs.observedAt : null;
   const photoCount = mine.reduce((n, m) => n + m.obs.photoIds.length, 0);
+  const fieldPhotos = (content.fieldPhotos ?? []).filter((photo) => photo.taxonId === taxon.id);
 
   const onShoot = async () => {
     await startDraft(taxon.id);
@@ -61,24 +61,22 @@ export function SpeciesCard() {
   };
 
   const heroCard = (
-    <div className="species-hero">
+    <div className={`species-hero${!showMine && refPhoto ? ' species-hero--reference' : ''}${saved ? ' species-hero--saved' : ''}`}>
       {showMine ? (
         <BlobImage blob={myPhoto.display ?? myPhoto.original} alt={`우리가 찍은 ${taxon.koreanName}`} className="species-hero__img" />
       ) : (
         <SpeciesArt taxon={taxon} photo={refPhoto} size="fill" />
       )}
-      <span className="species-hero__badge">{showMine ? '내가 찍은 사진' : '참고 사진'}</span>
+      {(showMine || refPhoto) && <span className="species-hero__badge">{showMine ? '내가 찍은 사진' : '참고 사진'}</span>}
       {saved && (
         <Toast>
           <Icon name="check" size={20} />
-          {newDiscovery ? (
+          {reward ? (
             <>
-              새로운 발견! 도감 {dex?.filled} / {dex?.total} <b className="toast__plus">+1</b>
+              {reward === 'completion' ? '계절 도감 완성!' : '새로운 발견!'} <b className="toast__plus">+1</b>
             </>
-          ) : cell ? (
-            <>기록했어요 · 도감 {dex?.filled} / {dex?.total}</>
           ) : (
-            <>기록했어요 · 소중한 기록이에요</>
+            <>내 기록에 저장했어요</>
           )}
         </Toast>
       )}
@@ -86,8 +84,10 @@ export function SpeciesCard() {
   );
   return (
     <main className="page species-page">
-      <PageHeader title="생물 도감" />
-      <RecordReward active={reward} stamp={newDiscovery ? '발견' : '기록'}>{heroCard}</RecordReward>
+      <PageHeader title={saved ? `${taxon.koreanName} 기록` : '생물 도감'} returnTo={saved ? questMapUrl(dex?.nextClue) : undefined} />
+      <RecordReward reward={reward}>{heroCard}</RecordReward>
+      {saved && <RecordNextActions dex={dex} newTaxonId={reward ? taxon.id : undefined} />}
+      {!showMine && refPhoto?.caption && <p className="reference-caption">{refPhoto.caption}</p>}
       {!showMine && refPhoto && <PhotoCredit photo={refPhoto} />}
 
       <div className="page__body">
@@ -102,7 +102,7 @@ export function SpeciesCard() {
             )}
             {refs.map((p, i) => (
               <li key={p.src}>
-                <button className={!showMine && refPhoto === p ? 'is-on' : ''} onClick={() => setHero(i)} aria-pressed={!showMine && refPhoto === p} aria-label={`참고 사진 ${i + 1}`}>
+                <button className={!showMine && refPhoto === p ? 'is-on' : ''} onClick={() => setHero(i)} aria-pressed={!showMine && refPhoto === p} aria-label={p.caption ?? `참고 사진 ${i + 1}`}>
                   <img src={p.src} alt="" loading="lazy" />
                 </button>
               </li>
@@ -114,14 +114,54 @@ export function SpeciesCard() {
           <div className="species-head__text">
             <p className="kicker">
               {dexIndex >= 0 ? `No.${String(dexIndex + 1).padStart(3, '0')} · ` : ''}
-              {CATEGORY_LABEL[taxon.category]}
+              {taxon.isPlant && taxon.category === 'other' ? '식물' : CATEGORY_LABEL[taxon.category]}
             </p>
             <h1 className="species-title">{taxon.koreanName}</h1>
             <p className="sci">{taxon.scientificName}</p>
           </div>
           {found ? <FoundStamp date={firstSeen} /> : <span className="unfound-chip">미발견</span>}
         </header>
-        {taxon.cultivated && <p className="note-line">심어 기른 나무일 수 있어요</p>}
+        {taxon.cultivated && <p className="note-line">정원에 심은 식물일 수 있어요</p>}
+        <button className="btn btn--primary btn--block" onClick={() => void onShoot()}>
+          <Icon name="camera" size={22} /> {found ? '관찰 사진 추가' : '찾았어요! 사진 찍기'}
+        </button>
+        {fieldPhotos.length > 0 && (
+          <section className="sec">
+            <div className="sec__head"><h2 className="sec__title">조사팀 현장 사진</h2><span>{fieldPhotos.length}장</span></div>
+            <ul className="thumbs" aria-label="현장 사진 원본 보기">
+              {fieldPhotos.map((photo) => (
+                <li key={photo.id}>
+                  <a href={photo.src} target="_blank" rel="noreferrer"><img src={photo.src} alt={`${taxon.koreanName} ${photo.capturedOn ?? ''} 현장 사진`} loading="lazy" /></a>
+                </li>
+              ))}
+            </ul>
+            <Link to={`/?public=1&focus=${taxon.id}`} className="more-link"><Icon name="map" size={18} /> 촬영 위치 보기</Link>
+          </section>
+        )}
+        {!!taxon.publicObservations?.length && (
+          <section className="sec">
+            <div className="sec__head">
+              <h2 className="sec__title">공원 공개 관찰 기록</h2>
+              <span>{taxon.publicObservations.length}건</span>
+            </div>
+            <Link to={`/?public=1&focus=${taxon.id}`} className="more-link">
+              <Icon name="map" size={18} /> 공개 관찰 지도에서 보기
+            </Link>
+            <ul className="rows">
+              {taxon.publicObservations.map((record) => (
+                <li className="public-record" key={record.id}>
+                  <span>{record.date} · {'area' in record ? `구역 기록 · ${record.area}` : `관찰 좌표 ${record.lat}, ${record.lng}`}</span>
+                  <span className="caption">
+                    <a href={record.url} target="_blank" rel="noreferrer">{record.source}</a>
+                    {record.credit && ` · ${record.credit}`}
+                    {record.license && <> · <a href={record.license} target="_blank" rel="noreferrer">이용 조건</a></>}
+                    {'lat' in record && (record.uncertaintyM == null ? ' · 위치 정확도 미제공' : ` · 위치 오차 ${record.uncertaintyM}m`)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {taxon.clue.looks.length > 0 && (
           <section className="sec">
@@ -174,17 +214,14 @@ export function SpeciesCard() {
               ))}
             </ul>
           )}
-          <div className="sec__actions">
-            <button className="btn btn--primary btn--block" onClick={() => void onShoot()}>
-              <Icon name="camera" size={22} /> {found ? '관찰 사진 추가' : '찾았어요! 사진 찍기'}
-            </button>
-            <Link to={`/?focus=${taxon.id}`} className="btn btn--secondary btn--block">
-              <Icon name="map" size={20} /> 지도에서 관찰 구역 보기
-            </Link>
-          </div>
+          {!taxon.publicObservations?.length && !fieldPhotos.length && !!taxon.sightings?.some((spot) => spot[2] === 0) && (
+            <div className="sec__actions">
+              <Link to={`/?public=0&focus=${taxon.id}`} className="btn btn--secondary btn--block">
+                <Icon name="map" size={20} /> 지도에서 관찰 구역 보기
+              </Link>
+            </div>
+          )}
         </section>
-
-        {saved && dex?.nextClue && dex.nextClue.id !== taxon.id && <ClueCard taxon={dex.nextClue} />}
 
         <section className="sec">
           <h2 className="sec__title">언제 많이 보일까요</h2>

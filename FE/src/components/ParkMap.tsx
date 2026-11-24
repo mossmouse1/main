@@ -22,13 +22,23 @@ export interface PhotoPin {
   category: Category;
   /** 사진 주소(생물 사진 또는 우리 가족이 찍은 사진) */
   photo: string | null;
-  /** record: 공개 기록 지점 · hint: 단서 구역의 ‘찾아볼 곳’ · mine: 우리 가족 기록 */
-  kind: 'record' | 'hint' | 'mine';
+  /** record: 공개 관찰 지점 · area: 구역 자료 · hint: 찾아볼 곳 · mine: 우리 가족 기록 */
+  kind: 'record' | 'area' | 'hint' | 'mine';
   found: boolean;
 }
 
-const KIND_PRIORITY: Record<PhotoPin['kind'], number> = { mine: 3, record: 2, hint: 1 };
+const KIND_PRIORITY: Record<PhotoPin['kind'], number> = { mine: 4, record: 3, area: 2, hint: 1 };
+const pinTitle = (pin: PhotoPin) => `${pin.label}${pin.kind === 'area' ? ' 구역 기록' : pin.kind === 'hint' ? ' 찾아볼 곳' : ''}`;
 const CLUSTER_PX = 50;
+const photoIcon = (html: string) => L.divIcon({ className: 'map-icon map-icon--photo', html, iconSize: [44, 44], iconAnchor: [22, 60] });
+
+interface PhotoMarker {
+  layer: L.Marker;
+  html: string;
+  title: string;
+  z: number;
+  onClick: () => void;
+}
 
 interface Props {
   imageUrl: string;
@@ -51,10 +61,11 @@ interface Props {
   questPinKey?: string;
   waterZone?: Zone;
   scanZones?: Zone[] | null;
-  /** 더 확대할 수 없는데 여러 종이 한 묶음일 때 */
-  onClusterPick?: (taxonIds: string[]) => void;
+  /** 한 묶음에서 종별 대표 지점과 이름을 보여 줍니다. */
+  onClusterPick?: (pins: PhotoPin[]) => void;
+  openClustersOnClick?: boolean;
   selectedId?: string | null;
-  onSpeciesClick?: (id: string) => void;
+  onSpeciesClick?: (id: string, pin: PhotoPin) => void;
   facilities?: Facility[];
   /** heading: 걷는 방향(북 0°). 있으면 내 위치 점에 방향 부채꼴을 그립니다. */
   me?: (ObserverFix & { heading?: number | null }) | null;
@@ -156,12 +167,6 @@ function fitTo(map: L.Map, pts: L.LatLng[], top: number, bottom: number, side: n
   map.flyTo(map.unproject(L.point(((minX + maxX) / 2) * s, ((minY + maxY) / 2) * s + (bottom - top) / 2), zoom), zoom, { duration: 0.6 });
 }
 
-const hashDelay = (s: string) => {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  return ((h % 26) / 10).toFixed(1);
-};
-
 /**
  * 그림 지도 이미지 1장을 실제 좌표에 맞춰 올립니다(타일 서버 없음).
  * - 위에서 본 지도: 공원 전체가 보이는 배율의 1~4배, 이동은 공원 범위 근처로 묶습니다.
@@ -174,6 +179,7 @@ export function ParkMap(props: Props) {
   const fitZoom = useRef(0);
   const groups = useRef<Record<'zones' | 'facilities' | 'photos' | 'track' | 'me' | 'subject' | 'route', L.LayerGroup> | null>(null);
   const drawPhotos = useRef<() => void>(() => {});
+  const photoMarkers = useRef(new Map<string, PhotoMarker>());
   const latest = useRef(props);
   latest.current = props;
 
@@ -256,7 +262,14 @@ export function ParkMap(props: Props) {
     map.on('zoomend', toggleLabels);
     toggleLabels();
     // 사진 묶음은 배율마다 다시 계산합니다.
-    map.on('zoomend', () => drawPhotos.current());
+    let photoFrame = 0;
+    const schedulePhotos = () => {
+      cancelAnimationFrame(photoFrame);
+      photoFrame = requestAnimationFrame(() => drawPhotos.current());
+    };
+    map.on('zoomend', schedulePhotos);
+    map.on('movestart', () => map.getContainer().classList.add('is-moving'));
+    map.on('moveend', () => map.getContainer().classList.remove('is-moving'));
     map.on('dragstart', () => latest.current.onUserMove?.());
 
     const ro = new ResizeObserver(() => {
@@ -268,6 +281,8 @@ export function ParkMap(props: Props) {
     mapRef.current = map;
     return () => {
       ro.disconnect();
+      cancelAnimationFrame(photoFrame);
+      photoMarkers.current.clear();
       // 이동 애니메이션 중에 화면을 떠나도 남은 프레임이 지도를 건드리지 않게 먼저 멈춥니다.
       map.stop();
       map.remove();
@@ -350,22 +365,43 @@ export function ParkMap(props: Props) {
       const g = groups.current?.photos;
       const map = mapRef.current;
       if (!g || !map) return;
-      g.clearLayers();
+      const markers = photoMarkers.current;
+      const shown = new Set<string>();
       const pins = latest.current.photoPins ?? [];
       const sel = latest.current.selectedId ?? null;
       const questKey = latest.current.questPinKey;
       const zoom = map.getZoom();
       const atMax = zoom >= map.getMaxZoom() - 0.05;
-      const face = (p: PhotoPin, quest = false) =>
-        (p.found || quest) && p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async"/>` : `<span class="ph__sil">${categoryIconSvg(p.category, p.kind === 'hint' ? 20 : 23)}</span>`;
+      const face = (p: PhotoPin) =>
+        p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async"/>` : `<span class="ph__sil">${categoryIconSvg(p.category, p.kind === 'hint' ? 20 : 23)}</span>`;
       const bubble = (p: PhotoPin, cls: string, extra: string, label: string) =>
-        `<span class="ph ph--${p.kind} ph--${p.category}${p.found ? ' is-found' : ' is-empty'}${cls}${p.key === questKey ? ' is-quest' : ''}" style="--d:-${hashDelay(p.key)}s"><span class="ph__shadow"></span><span class="ph__float">${extra}<span class="ph__card">${face(p, p.key === questKey)}</span>${
+        `<span class="ph ph--${p.kind} ph--${p.category}${p.found ? ' is-found' : ' is-empty'}${cls}${p.key === questKey ? ' is-quest' : ''}"><span class="ph__shadow"></span><span class="ph__float">${extra}<span class="ph__card">${face(p)}</span>${
           p.found ? `<span class="ph__check">${CHECK_SVG}</span>` : ''
         }</span>${label}</span>`;
-      const marker = (at: L.LatLng, html: string, title: string, z: number, onClick: () => void) => {
-        const icon = L.divIcon({ className: 'map-icon map-icon--photo', html, iconSize: [44, 44], iconAnchor: [22, 60] });
-        const pin = L.marker(at, { icon, title, keyboard: true, zIndexOffset: z, riseOnHover: true }).on('click', onClick).addTo(g);
-        pin.getElement()?.setAttribute('aria-label', title);
+      const marker = (key: string, at: L.LatLng, html: string, title: string, z: number, onClick: () => void) => {
+        shown.add(key);
+        const current = markers.get(key);
+        if (!current) {
+          const layer = L.marker(at, { icon: photoIcon(html), title, keyboard: true, zIndexOffset: z, riseOnHover: true });
+          const entry = { layer, html, title, z, onClick };
+          layer.on('click', () => entry.onClick()).addTo(g);
+          layer.getElement()?.setAttribute('aria-label', title);
+          markers.set(key, entry);
+          return;
+        }
+        current.onClick = onClick;
+        if (!current.layer.getLatLng().equals(at)) current.layer.setLatLng(at);
+        if (current.z !== z) current.layer.setZIndexOffset(z);
+        if (current.html !== html) current.layer.setIcon(photoIcon(html));
+        if (current.title !== title || current.html !== html) {
+          current.layer.options.title = title;
+          const el = current.layer.getElement();
+          if (el) {
+            el.title = title;
+            el.setAttribute('aria-label', title);
+          }
+        }
+        Object.assign(current, { html, title, z });
       };
 
       // 선택한 종과 퀘스트 대표 지점은 개별 핀으로 표시합니다.
@@ -380,15 +416,16 @@ export function ParkMap(props: Props) {
       );
       for (const c of clusters) {
         const top = c.items[0];
-        const taxa = [...new Set(c.items.map((p) => p.taxonId))];
+        const byTaxon = new Map<string, PhotoPin>();
+        for (const pin of c.items) if (!byTaxon.has(pin.taxonId)) byTaxon.set(pin.taxonId, pin);
+        const taxa = [...byTaxon.values()];
         const one = taxa.length === 1;
-        const second = one ? null : c.items.find((p) => p.taxonId !== top.taxonId)!;
-        const extra = one ? '' : `<span class="ph__peek">${face(second!)}</span><span class="ph__n">${taxa.length}</span>`;
-        const label = one ? `<span class="ph__label">${esc(top.label)}</span>` : '';
-        const title = one ? `${top.label}${top.kind === 'hint' ? ' 찾아볼 곳' : ''}` : `생물 ${taxa.length}종: ${[...new Set(c.items.map((p) => p.label))].join(', ')}`;
-        marker(map.unproject([c.x, c.y], zoom), bubble(top, `${sel ? ' is-dim' : ''}${one ? '' : ' is-group'}`, extra, label), title, KIND_PRIORITY[top.kind] * 10, () => {
-          if (one) return latest.current.onSpeciesClick?.(top.taxonId);
-          if (atMax) return latest.current.onClusterPick?.(taxa);
+        const extra = one ? '' : `<span class="ph__peek">${face(taxa[1])}</span><span class="ph__n">${taxa.length}종</span>`;
+        const label = one ? `<span class="ph__label">${esc(pinTitle(top))}</span>` : '';
+        const title = one ? pinTitle(top) : `${c.items.every((p) => p.kind === 'area') ? '구역 기록' : '생물'} ${taxa.length}종 · ${taxa.map((p) => p.label).join(', ')}`;
+        marker(top.key, map.unproject([c.x, c.y], zoom), bubble(top, `${sel ? ' is-dim' : ''}${one ? '' : ' is-group'}`, extra, label), title, KIND_PRIORITY[top.kind] * 10, () => {
+          if (one) return latest.current.onSpeciesClick?.(top.taxonId, top);
+          if (latest.current.openClustersOnClick || atMax) return latest.current.onClusterPick?.(taxa);
           fitTo(
             map,
             c.items.map((p) => bridge.to(p.lat, p.lng)),
@@ -402,9 +439,14 @@ export function ParkMap(props: Props) {
         const quest = p.key === questKey;
         const selected = p.taxonId === sel;
         const cls = selected ? ' is-selected' : sel ? ' is-dim' : '';
-        const title = quest ? `퀘스트 · ${p.label}` : p.kind === 'hint' ? `${p.label} 찾아볼 곳` : p.label;
+        const title = quest ? `퀘스트 · ${pinTitle(p)}` : pinTitle(p);
         const z = quest && (!sel || selected) ? 2500 : selected ? 2000 : 0;
-        marker(bridge.to(p.lat, p.lng), bubble(p, cls, '', ''), title, z, () => latest.current.onSpeciesClick?.(p.taxonId));
+        marker(p.key, bridge.to(p.lat, p.lng), bubble(p, cls, '', ''), title, z, () => latest.current.onSpeciesClick?.(p.taxonId, p));
+      }
+      for (const [key, entry] of markers) {
+        if (shown.has(key)) continue;
+        g.removeLayer(entry.layer);
+        markers.delete(key);
       }
     };
     drawPhotos.current();

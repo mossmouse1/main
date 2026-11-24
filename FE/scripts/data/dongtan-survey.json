@@ -1,0 +1,45 @@
+[
+  {
+    "id": "survey-bluegill",
+    "scientific": "Lepomis macrochirus",
+    "korean": "블루길",
+    "record": {"id":"survey:2021:bluegill","date":"2021-12","source":"화성시 어류조사 · 화성시민신문 인용","url":"https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499","area":"동탄호수공원 수역","zoneId":"Z1"}
+  },
+  {
+    "id": "survey-crucian-carp",
+    "scientific": "Carassius auratus",
+    "korean": "붕어",
+    "record": {"id":"survey:2021:crucian-carp","date":"2021-12","source":"화성시 어류조사 · 화성시민신문 인용","url":"https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499","area":"동탄호수공원 수역","zoneId":"Z1"}
+  },
+  {
+    "id": "survey-japanese-crucian-carp",
+    "scientific": "Carassius cuvieri",
+    "korean": "떡붕어",
+    "record": {"id":"survey:2021:japanese-crucian-carp","date":"2021-12","source":"화성시 어류조사 · 화성시민신문 인용","url":"https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499","area":"동탄호수공원 수역","zoneId":"Z1"}
+  },
+  {
+    "id": "survey-common-carp",
+    "scientific": "Cyprinus carpio",
+    "korean": "잉어",
+    "record": {"id":"survey:2021:common-carp","date":"2021-12","source":"화성시 어류조사 · 화성시민신문 인용","url":"https://www.ohmynews.com/NWS_Web/View/at_pg.aspx?CNTN_CD=A0003061499","area":"동탄호수공원 수역","zoneId":"Z1"}
+  },
+  {
+    "id": "survey-miscanthus-sinensis",
+    "scientific": "Miscanthus sinensis",
+    "korean": "억새",
+    "cultivated": true,
+    "record": {"id":"city:2026:miscanthus-sinensis","date":"2026-10-12","source":"화성특례시 보도자료","url":"https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202","area":"동탄호수공원 · ‘파랑새’ 품종"}
+  },
+  {
+    "id": "survey-miscanthus-sacchariflorus",
+    "scientific": "Miscanthus sacchariflorus",
+    "korean": "물억새",
+    "record": {"id":"city:2026:miscanthus-sacchariflorus","date":"2026-10-12","source":"화성특례시 보도자료","url":"https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202","area":"동탄호수공원"}
+  },
+  {
+    "id": "survey-fountain-grass",
+    "scientific": "Pennisetum alopecuroides",
+    "korean": "수크령",
+    "record": {"id":"city:2026:fountain-grass","date":"2026-10-12","source":"화성특례시 보도자료","url":"https://www.hscity.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1051&q_bbscttSn=20261012181158202","area":"동탄호수공원"}
+  }
+]

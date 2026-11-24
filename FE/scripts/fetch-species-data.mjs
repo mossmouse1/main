@@ -2,7 +2,7 @@
 //  - GBIF 공개 기록: 공원 중심 반경 1.5km, 2020년 이후 → 종별 월별 기록 수, 공원 주변 종 목록(‘목록에 없어요’ 검색)
 //  - 위키데이터·위키미디어 커먼즈: 한국어 이름, 사진(CC0·CC BY·CC BY-SA만, 사진마다 저작자·이용 조건·원본 링크 저장)
 // 받은 원자료는 scripts/data/species-data.json에 남깁니다. 다시 돌리면 최신 값으로 바뀝니다.
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
@@ -181,6 +181,7 @@ for (let i = 0; i < names.length; i += 80) {
 // 콘텐츠 종: 주요 종은 사진 3장, 나머지 1장
 const wanted = new Map();
 for (const t of content.taxa.filter((x) => !x.catalog)) {
+  if (t.publicObservations?.length && t.photo) continue;
   const w = wd.get(t.scientificName);
   if (!w) continue;
   const need = t.minor ? 1 : 3;
@@ -191,7 +192,6 @@ for (const t of content.taxa.filter((x) => !x.catalog)) {
 const info = await imageInfo([...new Set([...wanted.values()].flatMap((w) => w.files))]);
 
 mkdirSync(photoDir, { recursive: true });
-for (const f of readdirSync(photoDir)) rmSync(new URL(f, photoDir));
 console.log('커먼즈: 사진 받기…');
 for (const [id, { files, need }] of wanted) {
   const picks = files
@@ -213,20 +213,30 @@ writeFileSync(new URL('scripts/data/species-data.json', root), JSON.stringify({ 
 const birdWaterOrders = new Set(['Anseriformes', 'Gruiformes', 'Podicipediformes', 'Pelecaniformes', 'Charadriiformes', 'Suliformes', 'Ciconiiformes', 'Gaviiformes']);
 const category = (c) => (c.class === 'Aves' ? (birdWaterOrders.has(c.order) ? 'waterbird' : 'townbird') : 'other');
 
+const previousCatalog = new Map(content.taxa.filter((t) => t.catalog).map((t) => [t.id, t]));
 content.taxa = content.taxa.filter((t) => !t.catalog);
 for (const t of content.taxa) {
   const r = raw.taxa[t.id];
   t.monthCounts = r.months;
   t.recordCount = r.total;
-  t.photos = r.photos ?? [];
-  t.photo = t.photos[0] ?? null;
+  if (r.photos?.length) {
+    t.photos = r.photos;
+    t.photo = r.photos[0];
+  }
 }
-const usedNames = new Set(content.taxa.map((t) => t.koreanName));
+const usedNames = new Set([...content.taxa, ...previousCatalog.values()].map((t) => t.koreanName));
 for (const c of raw.catalog.sort((a, b) => b.count - a.count)) {
+  const id = `gbif-${c.gbifKey}`;
+  const existing = previousCatalog.get(id);
+  if (existing) {
+    content.taxa.push({ ...existing, recordCount: c.count });
+    previousCatalog.delete(id);
+    continue;
+  }
   const ko = wd.get(c.scientificName)?.ko;
   const koreanName = ko && /[가-힣]/.test(ko) && !usedNames.has(ko) ? ko : null;
   content.taxa.push({
-    id: `gbif-${c.gbifKey}`,
+    id,
     koreanName: koreanName ?? c.scientificName,
     scientificName: c.scientificName,
     category: category(c),
@@ -243,6 +253,7 @@ for (const c of raw.catalog.sort((a, b) => b.count - a.count)) {
   });
   if (koreanName) usedNames.add(koreanName);
 }
+content.taxa.push(...previousCatalog.values());
 content.monthCounts = {
   basis: '2020년 이후, 공원 중심 반경 1.5km',
   source: 'GBIF 공개 기록(iNaturalist·eBird 등)',

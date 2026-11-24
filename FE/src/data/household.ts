@@ -1,17 +1,19 @@
 import { CONSENT_VERSION } from '../config';
 import { uuid } from '../lib/uuid';
 import { requestPersistentStorage } from '../platform';
-import { getMeta, setMeta } from './db';
+import { db, getMeta, setMeta } from './db';
 import { kickSync } from './sync';
 import type { Household } from './types';
 
 /** 기기 쪽 가족 정보. 이름·연락처·아이 정보는 받지 않습니다. */
 export async function getHousehold(): Promise<Household> {
-  const existing = await getMeta('household');
-  if (existing) return existing;
-  const created: Household = { id: uuid(), consentVersion: null, consentedAt: null, adults: null, children: null };
-  await setMeta('household', created);
-  return created;
+  return db.transaction('rw', db.meta, async () => {
+    const existing = await getMeta('household');
+    if (existing) return existing;
+    const created: Household = { id: uuid(), consentVersion: null, consentedAt: null, adults: null, children: null };
+    await setMeta('household', created);
+    return created;
+  });
 }
 
 export const hasConsent = (h: Household | undefined) => !!h?.consentedAt;

@@ -4,8 +4,12 @@ import type { Content, SeasonSet, Taxon } from '../content/types';
 export interface DexObservation {
   id: string;
   taxonId: string | null;
+  freeTextName?: string | null;
   observedAt: string;
   hidden: boolean;
+  outsidePark: boolean;
+  zoneId: string | null;
+  photoIds: string[];
   reviewChanged: boolean;
   reviewSeen: boolean;
 }
@@ -28,14 +32,35 @@ export interface DexState {
   foundIds: Set<string>;
   /** 검토에서 종이 바뀌었는데 가족이 아직 못 본 기록 수(칸이 비게 된 경우 포함) */
   changedUnseen: number;
+  completion: DexCompletion | null;
+  collectionFoundIds: Set<string>;
+  unnamed: { id: string; name: string | null; observedAt: string }[];
+}
+
+export interface DexCompletion {
+  completedAt: string;
+  entries: { taxon: Taxon; photoIds: string[] }[];
+}
+
+export type QuestReward = 'discovery' | 'completion';
+
+export function questMapUrl(nextClue?: Taxon | null): string {
+  return nextClue ? `/?public=0&focus=${encodeURIComponent(nextClue.id)}` : '/?public=0';
+}
+
+export function isQuestObservation(content: Content, season: SeasonSet, observation: DexObservation): boolean {
+  return !!observation.taxonId && !observation.hidden && !!observation.photoIds?.length &&
+    !observation.outsidePark && observation.zoneId !== 'Z6' &&
+    content.zones.some((zone) => zone.id === observation.zoneId) && seasonContains(season, observation.observedAt);
 }
 
 /**
- * 칸은 이번 계절 세트로 만들고, 그 종으로 고른 기록이 계절 안에 한 건이라도 있으면 채웁니다.
+ * 공원 조사구역에서 해당 계절에 사진을 남긴 종으로 칸을 채웁니다.
  * 검토에서 종이 바뀌면 taxonId가 바뀌므로 자연히 다시 계산됩니다. 팀이 숨긴 기록은 세지 않습니다.
  */
 export function computeDex(content: Content, season: SeasonSet, observations: DexObservation[], seen: string[]): DexState {
-  const valid = observations.filter((o) => o.taxonId && !o.hidden && seasonContains(season, o.observedAt));
+  const photographed = observations.filter((o) => !o.hidden && o.photoIds?.length);
+  const valid = photographed.filter((o) => isQuestObservation(content, season, o));
   const foundIds = new Set(valid.map((o) => o.taxonId!));
   const seenSet = new Set(seen);
   const cells = season.dex
@@ -48,12 +73,33 @@ export function computeDex(content: Content, season: SeasonSet, observations: De
       changedByReview: valid.some((o) => o.taxonId === taxon.id && o.reviewChanged && !o.reviewSeen),
     }));
   const nextId = [...season.todaySix, ...season.dex].find((id) => !foundIds.has(id));
+  const filled = cells.filter((c) => c.filled).length;
+  let completion: DexCompletion | null = null;
+  if (filled === 10 && filled === season.dex.length && filled === cells.length) {
+    const byTaxon = new Map<string, DexObservation[]>();
+    for (const observation of [...valid].sort((a, b) => a.observedAt.localeCompare(b.observedAt))) {
+      const id = observation.taxonId!;
+      const records = byTaxon.get(id) ?? [];
+      records.push(observation);
+      byTaxon.set(id, records);
+    }
+    const records = cells.map(({ taxon }) => ({ taxon, observations: byTaxon.get(taxon.id)! }));
+    completion = {
+      completedAt: records.map(({ observations }) => observations[0].observedAt).sort().at(-1)!,
+      entries: records.map(({ taxon, observations }) => ({ taxon, photoIds: observations.flatMap((o) => o.photoIds) })),
+    };
+  }
   return {
     cells,
-    filled: cells.filter((c) => c.filled).length,
+    filled,
     total: cells.length,
     nextClue: taxonById(content, nextId) ?? null,
     foundIds,
     changedUnseen: observations.filter((o) => !o.hidden && o.reviewChanged && !o.reviewSeen).length,
+    completion,
+    collectionFoundIds: new Set(photographed.flatMap((o) => taxonById(content, o.taxonId) ? [o.taxonId!] : [])),
+    unnamed: photographed.filter((o) => !taxonById(content, o.taxonId))
+      .map((o) => ({ id: o.id, name: o.freeTextName ?? null, observedAt: o.observedAt }))
+      .sort((a, b) => b.observedAt.localeCompare(a.observedAt)),
   };
 }

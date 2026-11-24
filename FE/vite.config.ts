@@ -41,8 +41,8 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/content/'),
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'content' },
+            handler: 'NetworkFirst',
+            options: { cacheName: 'content', networkTimeoutSeconds: 3 },
           },
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/photos/'),
