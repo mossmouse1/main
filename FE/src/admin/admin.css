@@ -10,7 +10,8 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 10px 24px;
+  /* 본문과 같은 최대 너비(1200px)로 맞춥니다. */
+  padding: 10px calc(max(0px, (100% - 1200px) / 2) + 24px);
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
@@ -39,14 +40,26 @@
 }
 .admin__banner {
   margin: 0;
-  padding: 8px 24px;
+  padding: 8px calc(max(0px, (100% - 1200px) / 2) + 24px);
   background: var(--warn-bg);
   color: var(--warn-ink);
   font-weight: 600;
 }
+.admin__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 .admin__page {
-  max-width: 960px;
   padding: 24px;
+}
+/* 표가 넓으면 표만 가로로 밀어 봅니다. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
 }
 .admin-login {
   width: min(400px, 100%);
@@ -278,5 +291,60 @@
   .table {
     display: block;
     overflow-x: auto;
+  }
+}
+
+/* 보고서 */
+.report section {
+  break-inside: avoid-page;
+}
+.report .stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+.report .table {
+  font-size: 14px;
+}
+.report .table tr {
+  break-inside: avoid;
+}
+.report__controls {
+  align-items: flex-end;
+}
+
+/* 인쇄(Ctrl+P): 머리글·조작 요소를 빼고 보고서만 흑백으로 */
+@media print {
+  .admin__header,
+  .admin__banner,
+  .report__controls {
+    display: none;
+  }
+  .admin,
+  .admin .card,
+  .report .table {
+    background: #fff;
+    box-shadow: none;
+  }
+  .admin__page {
+    padding: 0;
+  }
+  .admin__body {
+    max-width: none;
+  }
+  .table-scroll {
+    overflow: visible;
+  }
+  .report .table th,
+  .report .table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #999;
+  }
+  .report .badge {
+    border: 1px solid #000;
+    background: none;
+    color: #000;
+  }
+  .report .stats {
+    box-shadow: none;
+    border: 1px solid #999;
   }
 }

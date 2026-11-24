@@ -5,6 +5,7 @@ import type { AdminBackend } from '../backend/types';
 import { BACKEND_MODE } from '../config';
 import { ContentAdmin } from './ContentAdmin';
 import { ExportPage } from './ExportPage';
+import { ReportPage } from './ReportPage';
 import { Review } from './Review';
 import './admin.css';
 
@@ -37,9 +38,10 @@ export default function AdminApp() {
         <header className="admin__header">
           <strong>우리 공원 생명 도감 · 팀 검토</strong>
           <nav>
-            <NavLink to="review">검토 대기열</NavLink>
-            <NavLink to="export">내보내기</NavLink>
-            <NavLink to="content">콘텐츠·지표</NavLink>
+            {/* 절대 경로: /admin/* 안에서 상대 경로를 쓰면 누를 때마다 /admin/report/review…로 쌓입니다. */}
+            <NavLink to="/admin/report">보고서</NavLink>
+            <NavLink to="/admin/review">검토 대기열</NavLink>
+            {/* 내보내기·콘텐츠·지표는 메뉴에서만 뺐습니다(/admin/export, /admin/content 경로는 그대로). */}
           </nav>
           <span className="admin__user">
             {user.email}
@@ -59,12 +61,15 @@ export default function AdminApp() {
         {BACKEND_MODE === 'local' && (
           <p className="admin__banner">로컬 모드: 이 브라우저에서 남긴 기록만 보여요. 실제 운영은 Supabase를 연결하세요.</p>
         )}
+        <div className="admin__body">
         <Routes>
-          <Route index element={<Navigate to="review" replace />} />
+          <Route index element={<Navigate to="/admin/report" replace />} />
+          <Route path="report" element={<ReportPage />} />
           <Route path="review" element={<Review />} />
           <Route path="export" element={<ExportPage />} />
           <Route path="content" element={<ContentAdmin />} />
         </Routes>
+        </div>
       </div>
     </AdminContext.Provider>
   );

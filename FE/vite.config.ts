@@ -37,7 +37,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/admin/],
         globPatterns: ['**/*.{js,css,html,svg,png}'],
         // heic2any는 HEIC 변환이 필요할 때만, 생물 사진은 볼 때 받아 둡니다(첫 접속 데이터 절약).
-        globIgnores: ['**/heic2any-*.js', '**/photos/**'],
+        // 관리자(/admin) 코드와 엑셀 라이브러리(browser-*)는 가족 기기에 미리 받아 두지 않습니다.
+        globIgnores: ['**/heic2any-*.js', '**/photos/**', '**/AdminApp-*', '**/reportXlsx-*.js', '**/browser-*.js'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/content/'),
