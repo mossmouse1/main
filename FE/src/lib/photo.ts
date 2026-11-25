@@ -1,4 +1,5 @@
-import { DISPLAY_LONG_EDGE, IDENTIFY_LONG_EDGE } from '../config';
+import { IDENTIFY_JPEG_QUALITY, IDENTIFY_LONG_EDGE } from '@shared/identify';
+import { DISPLAY_LONG_EDGE } from '../config';
 
 export function isHeic(file: Blob & { name?: string }): boolean {
   return /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name ?? '');
@@ -30,9 +31,9 @@ export function makeDisplayCopy(file: File): Promise<Blob | null> {
   return resizeJpeg(file, DISPLAY_LONG_EDGE, 0.85);
 }
 
-/** 종 추천용 사본(긴 변 768px 이하 JPEG, 품질 0.7). 전송량과 비용을 줄이려고 작게 보냅니다. */
+/** 종 식별용 JPEG 사본. 원본 메타데이터는 포함하지 않습니다. */
 export function makeIdentifyCopy(file: Blob): Promise<Blob | null> {
-  return resizeJpeg(file as File, IDENTIFY_LONG_EDGE, 0.7);
+  return resizeJpeg(file as File, IDENTIFY_LONG_EDGE, IDENTIFY_JPEG_QUALITY);
 }
 
 async function resizeJpeg(file: File, longEdge: number, quality: number): Promise<Blob | null> {

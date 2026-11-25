@@ -22,13 +22,14 @@ export interface PhotoPin {
   category: Category;
   /** 사진 주소(생물 사진 또는 우리 가족이 찍은 사진) */
   photo: string | null;
-  /** record: 공개 관찰 지점 · area: 구역 자료 · hint: 찾아볼 곳 · mine: 우리 가족 기록 */
-  kind: 'record' | 'area' | 'hint' | 'mine';
+  /** record: 공개 관찰 지점 · area: 구역 자료 · community: 가족 관찰 격자 · hint: 찾아볼 곳 · mine: 우리 가족 기록 */
+  kind: 'record' | 'area' | 'community' | 'hint' | 'mine';
+  observationId?: string;
   found: boolean;
 }
 
-const KIND_PRIORITY: Record<PhotoPin['kind'], number> = { mine: 4, record: 3, area: 2, hint: 1 };
-const pinTitle = (pin: PhotoPin) => `${pin.label}${pin.kind === 'area' ? ' 구역 기록' : pin.kind === 'hint' ? ' 찾아볼 곳' : ''}`;
+const KIND_PRIORITY: Record<PhotoPin['kind'], number> = { mine: 5, record: 4, community: 3, area: 2, hint: 1 };
+const pinTitle = (pin: PhotoPin) => pin.kind === 'mine' ? `${pin.label} · 내 기록` : pin.label;
 const CLUSTER_PX = 50;
 const photoIcon = (html: string) => L.divIcon({ className: 'map-icon map-icon--photo', html, iconSize: [44, 44], iconAnchor: [22, 60] });
 
@@ -48,7 +49,6 @@ interface Props {
    * 쿼터뷰에서는 그림이 화면을 늘 꽉 채우고(여백 없음), 그림 밖으로는 끌 수 없습니다.
    */
   iso?: IsoSpec | null;
-  attribution?: string;
   zones?: Zone[];
   showZones?: boolean;
   /** outline: 점선 경계(위치 고르기·검토), label: 구역 이름표(지도 홈) */
@@ -183,7 +183,7 @@ export function ParkMap(props: Props) {
   const latest = useRef(props);
   latest.current = props;
 
-  const { imageUrl, bounds, iso, attribution, scale } = props;
+  const { imageUrl, bounds, iso, scale } = props;
   const bridge = useMemo(() => makeBridge(bounds, iso), [bounds, iso]);
 
   useEffect(() => {
@@ -204,7 +204,6 @@ export function ParkMap(props: Props) {
       bounceAtZoomLimits: false,
     });
     imageOverlay.current = L.imageOverlay(latest.current.imageUrl, img, { alt: '동탄호수공원 지도' }).addTo(map);
-    if (attribution) L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution(attribution).addTo(map);
     if (scale && !bridge.iso) L.control.scale({ imperial: false, position: 'bottomleft', maxWidth: 90 }).addTo(map);
 
     const applyZoomLimits = () => {
@@ -290,7 +289,7 @@ export function ParkMap(props: Props) {
       imageOverlay.current = null;
       groups.current = null;
     };
-  }, [bounds, bridge, attribution, scale]);
+  }, [bounds, bridge, scale]);
 
   useEffect(() => {
     const overlay = imageOverlay.current;
@@ -416,16 +415,20 @@ export function ParkMap(props: Props) {
       );
       for (const c of clusters) {
         const top = c.items[0];
-        const byTaxon = new Map<string, PhotoPin>();
-        for (const pin of c.items) if (!byTaxon.has(pin.taxonId)) byTaxon.set(pin.taxonId, pin);
-        const taxa = [...byTaxon.values()];
-        const one = taxa.length === 1;
-        const extra = one ? '' : `<span class="ph__peek">${face(taxa[1])}</span><span class="ph__n">${taxa.length}종</span>`;
+        const byEntry = new Map<string, PhotoPin>();
+        for (const pin of c.items) {
+          const key = pin.kind === 'mine' || pin.kind === 'community' ? pin.key : pin.taxonId;
+          if (!byEntry.has(key)) byEntry.set(key, pin);
+        }
+        const entries = [...byEntry.values()];
+        const one = entries.length === 1;
+        const count = `${entries.length}${entries.some((p) => p.kind === 'mine' || p.kind === 'community') ? '개' : '종'}`;
+        const extra = one ? '' : `<span class="ph__peek">${face(entries[1])}</span><span class="ph__n">${count}</span>`;
         const label = one ? `<span class="ph__label">${esc(pinTitle(top))}</span>` : '';
-        const title = one ? pinTitle(top) : `${c.items.every((p) => p.kind === 'area') ? '구역 기록' : '생물'} ${taxa.length}종 · ${taxa.map((p) => p.label).join(', ')}`;
+        const title = one ? pinTitle(top) : `관찰 핀 ${count} · ${entries.map(pinTitle).join(', ')}`;
         marker(top.key, map.unproject([c.x, c.y], zoom), bubble(top, `${sel ? ' is-dim' : ''}${one ? '' : ' is-group'}`, extra, label), title, KIND_PRIORITY[top.kind] * 10, () => {
           if (one) return latest.current.onSpeciesClick?.(top.taxonId, top);
-          if (latest.current.openClustersOnClick || atMax) return latest.current.onClusterPick?.(taxa);
+          if (latest.current.openClustersOnClick || atMax) return latest.current.onClusterPick?.(entries);
           fitTo(
             map,
             c.items.map((p) => bridge.to(p.lat, p.lng)),

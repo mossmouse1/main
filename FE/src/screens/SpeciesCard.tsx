@@ -84,7 +84,7 @@ export function SpeciesCard() {
   );
   return (
     <main className="page species-page">
-      <PageHeader title={saved ? `${taxon.koreanName} 기록` : '생물 도감'} returnTo={saved ? questMapUrl(dex?.nextClue) : undefined} />
+      <PageHeader title={saved ? `${taxon.koreanName} 기록` : '생물 도감'} returnTo={saved ? questMapUrl() : undefined} />
       <RecordReward reward={reward}>{heroCard}</RecordReward>
       {saved && <RecordNextActions dex={dex} newTaxonId={reward ? taxon.id : undefined} />}
       {!showMine && refPhoto?.caption && <p className="reference-caption">{refPhoto.caption}</p>}

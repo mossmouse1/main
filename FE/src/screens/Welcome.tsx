@@ -71,6 +71,7 @@ function ConsentStep({ defaults, onDone, next }: {
         ))}
         <p className="caption">동의 문구 초안 · {CONSENT_VERSION}</p>
       </fieldset>
+      <p className="caption">같은 100m 격자에서 여러 가족이 같은 종을 기록하면 가족 수를 지도에 표시해요.</p>
 
       <section className="card stack">
         <h2>위치 사용</h2>

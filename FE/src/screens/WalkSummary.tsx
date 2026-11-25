@@ -8,16 +8,13 @@ import { useContent } from '../content/ContentProvider';
 import { taxonById } from '../content/helpers';
 import type { Taxon } from '../content/types';
 import { db } from '../data/db';
-import { useDex } from '../hooks';
 import { formatDate, formatDuration, minutesBetween } from '../lib/time';
-import { NextClue } from './Record';
 
-/** S10 오늘의 탐험: 탐험 시간, 찾은 종, 다음에 찾을 단서 */
+/** 오늘의 탐험 시간과 찾은 종을 보여 줍니다. */
 export function WalkSummary() {
   const [params] = useSearchParams();
   const id = params.get('id');
   const { content } = useContent();
-  const dex = useDex();
   const walk = useLiveQuery(async () => {
     if (id) return (await db.walks.get(id)) ?? null;
     const ended = (await db.walks.orderBy('startedAt').reverse().toArray()).find((w) => w.endedAt);
@@ -96,12 +93,6 @@ export function WalkSummary() {
         )}
 
         {walk.effortText && <p className="caption">조사 노력: {walk.effortText}</p>}
-        {dex?.nextClue && (
-          <>
-            <h2>다음에 찾을 단서</h2>
-            <NextClue taxonId={dex.nextClue.id} />
-          </>
-        )}
         <div className="row">
           <Link to="/dex" className="btn btn--secondary">
             도감 보기

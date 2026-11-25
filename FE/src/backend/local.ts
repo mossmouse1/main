@@ -394,7 +394,13 @@ export const localFamily: FamilyBackend = {
   },
 
   async identifySpecies() {
-    throw new IdentifyError('failed'); // 로컬 모드에서는 화면이 버튼을 숨깁니다.
+    throw new IdentifyError('unavailable');
+  },
+  async fetchCommunityMap() {
+    return [];
+  },
+  watchCommunityMap() {
+    return () => {};
   },
 };
 

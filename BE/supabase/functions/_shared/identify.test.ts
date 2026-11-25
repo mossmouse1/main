@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildRequest, checkInput, mapQuotaError, MAX_BASE64_CHARS, parseResult, type TaxonLite } from './identify';
+import { buildRequest, checkInput, mapQuotaError, MAX_BASE64_CHARS, parseResult, visibleIdentifyCandidates, type TaxonLite } from './identify';
 
 const taxa: TaxonLite[] = [
   { id: 'a', korean_name: '청둥오리', scientific_name: 'Anas platyrhynchos', category: 'bird' },
@@ -21,7 +21,7 @@ describe('buildRequest', () => {
 });
 
 describe('parseResult', () => {
-  it('목록에 없는 종과 중복을 버리고 확신도를 0~1로 맞추며 3개까지만 남긴다', () => {
+  it('목록에 없는 종과 중복, 범위 밖 점수를 버리고 3개까지만 남긴다', () => {
     const r = parseResult(
       wrap({ noMatch: false, candidates: [{ taxonId: 'zzz', confidence: 0.9 }, { taxonId: 'a', confidence: 1.7 }, { taxonId: 'a', confidence: 0.5 }, { taxonId: 'b', confidence: 0.3 }, { taxonId: 'c', confidence: 0.2 }, { taxonId: 'd', confidence: 0.1 }] }),
       taxa,
@@ -29,7 +29,7 @@ describe('parseResult', () => {
     expect(r).toEqual({
       noMatch: false,
       candidates: [
-        { taxonId: 'a', koreanName: '청둥오리', confidence: 1 },
+        { taxonId: 'a', koreanName: '청둥오리', confidence: 0.5 },
         { taxonId: 'b', koreanName: '쇠물닭', confidence: 0.3 },
         { taxonId: 'c', koreanName: '왕버들', confidence: 0.2 },
       ],
@@ -46,6 +46,23 @@ describe('parseResult', () => {
     expect(parseResult({ status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal', refusal: 'no' }] }] }, taxa)).toBeNull();
     expect(parseResult({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: 'not json' }] }] }, taxa)).toBeNull();
     expect(parseResult(null, taxa)).toBeNull();
+  });
+});
+
+describe('visibleIdentifyCandidates', () => {
+  const candidate = { taxonId: 'a', koreanName: '청둥오리', confidence: 0.5 };
+  const accepts = (id: string) => id === 'a';
+
+  it('화면과 평가에서 낮거나 범위를 벗어난 점수를 추천하지 않는다', () => {
+    for (const confidence of [0.49, 1.1, NaN, Infinity]) {
+      expect(visibleIdentifyCandidates({ noMatch: false, candidates: [{ ...candidate, confidence }] }, accepts)).toEqual([]);
+    }
+    expect(visibleIdentifyCandidates({ noMatch: false, candidates: [candidate] }, accepts)).toEqual([candidate]);
+  });
+
+  it('미동정 결과와 현재 도감에 없는 종은 추천에서 제외한다', () => {
+    expect(visibleIdentifyCandidates({ noMatch: true, candidates: [candidate] }, accepts)).toEqual([]);
+    expect(visibleIdentifyCandidates({ noMatch: false, candidates: [{ ...candidate, taxonId: 'b' }] }, accepts)).toEqual([]);
   });
 });
 

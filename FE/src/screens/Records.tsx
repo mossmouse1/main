@@ -50,7 +50,7 @@ export function Records() {
       <PageHeader
         title="내 기록"
         backTo="/dex"
-        returnTo={saved ? questMapUrl(dex?.nextClue) : undefined}
+        returnTo={saved ? questMapUrl() : undefined}
         right={
           <Link to="/settings" className="icon-btn" aria-label="설정">
             <Icon name="gear" size={26} />

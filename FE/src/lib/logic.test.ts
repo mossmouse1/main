@@ -117,7 +117,7 @@ describe('가족 도감', () => {
     );
     expect(dex.filled).toBe(1);
     expect(dex.cells.find((c) => c.taxon.id === 'eurasian-coot')?.isNew).toBe(true);
-    expect(dex.nextClue?.id).toBe('spot-billed-duck');
+    expect(dex.cells.find((c) => c.taxon.id === 'spot-billed-duck')?.filled).toBe(false);
   });
   it('이미 본 칸은 NEW가 아니고, 검토로 바뀐 칸은 표시된다', () => {
     const dex = computeDex(content, autumn, [obs('eurasian-coot', { reviewChanged: true, reviewSeen: false })], ['eurasian-coot']);

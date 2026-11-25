@@ -1,30 +1,29 @@
+import { visibleIdentifyCandidates } from '@shared/identify';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { BlobImage } from '../components/Layout';
+import { MapAttribution } from '../components/MapAttribution';
 import { ParkMap } from '../components/ParkMap';
 import { markRecordReward } from '../components/RecordReward';
 import { SpeciesArt } from '../components/SpeciesArt';
-import { BACKEND_MODE, DEFAULT_RADIUS, MAX_PHOTOS, NEAR_ME_BASE_RADIUS, RADIUS_CHOICES } from '../config';
+import { BACKEND_MODE, DEFAULT_RADIUS, MAX_PHOTOS, RADIUS_CHOICES } from '../config';
 import { useContent } from '../content/ContentProvider';
-import { candidatesFromTaxon, candidatesFromZone, searchTaxa, taxonById, zoneById } from '../content/helpers';
+import { candidatesFromTaxon, candidatesFromZone, searchTaxa, taxonById } from '../content/helpers';
 import { CATEGORY_LABEL, type Content, type SeasonSet, type Taxon } from '../content/types';
 import { db, getMeta, setMeta } from '../data/db';
 import { addPhotos, discardDraft, pickTaxon, removePhoto, setObserver, startDraft, updateDraft } from '../data/draft';
+import { usePhotoIdentification } from '../data/identify';
 import { saveObservation } from '../data/observations';
-import { syncFamilyConsent } from '../data/sync';
 import { track } from '../data/track';
-import type { MediaSource, PickSource, RecordDraft } from '../data/types';
-import { getFamilyBackend } from '../backend';
-import { IdentifyError, type IdentifyResult } from '../backend/types';
+import type { LocationMethod, MediaSource, PickSource, RecordDraft } from '../data/types';
 import { useSeason } from '../hooks';
 import { DEBUG, debugInc, debugSet } from '../lib/debug';
 import { usePinchZoom } from '../lib/usePinchZoom';
 import { clampZoom, zoomLimits } from '../lib/zoom';
-import { makeIdentifyCopy } from '../lib/photo';
 import { playRewardAudio, prepareRewardAudio } from '../lib/rewardAudio';
-import { withEul, withRo } from '../lib/josa';
+import { withEul } from '../lib/josa';
 import { distanceM, findZone, formatDistance, inBounds, type LatLng } from '../lib/geo';
 import { captureFrame, getPosition, hardwareZoomRange, openCameraStream, pickPhotos, setHardwareZoom, stopStream, type Facing } from '../platform';
 
@@ -158,9 +157,10 @@ export function RecordPhoto() {
     [],
   );
   const [busy, setBusy] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const [tip, setTip] = useState(false);
   const [flash, setFlash] = useState(false);
-  const askedPosition = useRef(false);
+  const askedPosition = useRef<string | null>(null);
 
   useEffect(() => {
     if (draft === null) void startDraft(null);
@@ -168,9 +168,10 @@ export function RecordPhoto() {
 
   // 촬영자 위치는 기록을 시작할 때 한 번 읽습니다.
   useEffect(() => {
-    if (!draft || draft.observer || askedPosition.current) return;
-    askedPosition.current = true;
-    void getPosition().then((fix) => fix && setObserver(fix));
+    if (!draft || draft.observer || askedPosition.current === draft.draftId) return;
+    const { draftId } = draft;
+    askedPosition.current = draftId;
+    void getPosition().then((fix) => fix && setObserver(draftId, fix));
   }, [draft]);
 
   useEffect(() => {
@@ -217,16 +218,25 @@ export function RecordPhoto() {
   const target = taxonById(content, draft.sourceTaxonId);
   const last = draft.photos[draft.photos.length - 1];
 
-  const goNext = () => navigate(backToPick || draft.subject ? '/record/pick' : '/record/where', { replace: backToPick });
+  const goNext = () => navigate(draft.subject ? '/record/pick' : '/record/where', { replace: backToPick });
 
   const add = async (files: File[], source: MediaSource) => {
     if (!files.length) return;
     setBusy(true);
-    if (replace) await updateDraft({ photos: [] });
-    await addPhotos(files, source);
-    track('record_photo', { draftId: draft.draftId, photos: (replace ? 0 : draft.photos.length) + files.length, source });
-    setBusy(false);
-    goNext();
+    setPhotoFailed(false);
+    try {
+      const added = await addPhotos(files, source, replace);
+      if (!added) {
+        setPhotoFailed(true);
+        return;
+      }
+      track('record_photo', { draftId: draft.draftId, photos: (replace ? 0 : draft.photos.length) + added, source });
+      goNext();
+    } catch {
+      setPhotoFailed(true);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const shoot = async () => {
@@ -350,13 +360,15 @@ export function RecordPhoto() {
         </button>
       </div>
       <p className="camera__foot" role="status">
-        {busy ? '사진을 저장하는 중…' : target ? `${withEul(target.koreanName)} 찍고 이름을 확인해요` : '촬영 후 생물 이름을 확인하고 등록해요'}
+        {busy ? '사진을 저장하는 중…' : photoFailed ? '사진을 저장하지 못했어요. 다시 찍거나 앨범에서 골라 주세요.' : BACKEND_MODE === 'supabase'
+          ? '사진의 위치 정보를 지운 사본을 OpenAI로 보내 생물 이름을 찾습니다.'
+          : target ? `${withEul(target.koreanName)} 찍고 이름을 확인해요` : '촬영 후 생물 이름을 확인하고 등록해요'}
       </p>
     </main>
   );
 }
 
-/** S6 있던 곳: 찍은 사람 위치 ≠ 생물 위치. 지도를 탭하고 반경을 고릅니다(PRD F07). */
+/** 촬영 위치를 기본으로 쓰고, 지도에서 생물이 있던 곳을 따로 고를 수 있습니다. */
 export function RecordWhere() {
   const draft = useDraft();
   const { content, mapUrl, isoUrl } = useContent();
@@ -364,17 +376,12 @@ export function RecordWhere() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const editing = params.get('then') === 'pick';
-  const [subject, setSubject] = useState<LatLng | null | undefined>(undefined);
-  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS);
-  const [nearMe, setNearMe] = useState(false);
-
-  // 이미 고른 위치가 있으면(확인 화면에서 ‘수정’) 그대로 띄웁니다.
-  useEffect(() => {
-    if (!draft || subject !== undefined) return;
-    setSubject(draft.subject ?? null);
-    if (draft.radiusM && draft.locationMethod === 'tap') setRadius(draft.radiusM);
-    setNearMe(draft.locationMethod === 'near_me');
-  }, [draft, subject]);
+  const [selection, setSelection] = useState<{ subject: LatLng; method: LocationMethod }>();
+  const [selectedRadius, setSelectedRadius] = useState<number>();
+  const [saving, setSaving] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const identification = usePhotoIdentification(draft?.photos[0]);
+  const likelyName = identifiedCandidates(content, identification.result)[0]?.koreanName;
 
   if (draft === undefined) return null;
   if (draft === null) return <Navigate to="/" replace />;
@@ -382,12 +389,15 @@ export function RecordWhere() {
 
   const observer = draft.observer;
   const observerInPark = !!observer && inBounds(observer, content.park.bounds);
-  const nearRadius = observer ? NEAR_ME_BASE_RADIUS + observer.accuracy : NEAR_ME_BASE_RADIUS;
-  const name = taxonById(content, draft.taxonId ?? draft.sourceTaxonId)?.koreanName ?? '찍은 생물';
+  const subject = selection?.subject ?? draft.subject ?? observer;
+  const method = selection?.method ?? draft.locationMethod ?? (observer ? 'near_me' : 'tap');
+  const nearMe = method === 'near_me';
+  const radius = selectedRadius ?? draft.radiusM ?? DEFAULT_RADIUS;
+  const effectiveRadius = nearMe && observer ? Math.min(5000, Math.max(radius, observer.accuracy)) : radius;
   const zone = subject ? findZone(subject, content.zones) : null;
 
   const distanceText = nearMe
-    ? '찍은 곳 근처로 저장해요'
+    ? '촬영 위치 기준'
     : !subject
       ? '지도를 눌러 주세요'
       : observer
@@ -395,9 +405,16 @@ export function RecordWhere() {
         : '찍은 곳 위치를 알 수 없어요';
 
   const confirm = async () => {
-    if (!subject) return;
-    await updateDraft({ subject, radiusM: nearMe ? nearRadius : radius, locationMethod: nearMe ? 'near_me' : 'tap' });
-    navigate('/record/pick', { replace: editing });
+    if (!subject || saving) return;
+    setSaving(true);
+    setSaveFailed(false);
+    try {
+      await updateDraft({ subject: { lat: subject.lat, lng: subject.lng }, radiusM: effectiveRadius, locationMethod: method });
+      navigate('/record/pick', { replace: editing });
+    } catch {
+      setSaveFailed(true);
+      setSaving(false);
+    }
   };
 
   return (
@@ -408,12 +425,13 @@ export function RecordWhere() {
         help={
           <>
             <h2>생물이 있던 곳을 눌러요</h2>
-            <p>찍은 사람 자리가 아니라 생물이 있던 자리예요. 정확히 모르면 반경을 넓게 고르거나 ‘내 근처예요’를 눌러요.</p>
+            <p>촬영 위치에서 바로 반경을 고를 수 있어요. 생물이 다른 곳에 있었다면 지도에서 그곳을 눌러 주세요.</p>
           </>
         }
       />
-      <p className="record__hint">
-        <strong>{name}</strong>이(가) 있던 곳을 지도에서 눌러 주세요.
+      <p className="record__hint" role="status">
+        {likelyName ? <><strong>AI 추정 · {likelyName}</strong><br /></> : identification.pending ? <>AI가 사진 속 생물을 살펴보는 중이에요.<br /></> : null}
+        {subject ? '반경을 고르거나 지도에서 위치를 조정해 주세요.' : '촬영 위치를 쓸 수 없으면 지도에서 생물이 있던 곳을 눌러 주세요.'}
       </p>
       <div className="record__map">
         {/* 지도 홈과 같은 블록 지도. 누른 곳은 그 뒤 땅의 자리로 정합니다(나무·건물 위를 눌러도). */}
@@ -421,51 +439,49 @@ export function RecordWhere() {
           imageUrl={iso ? isoUrl! : mapUrl}
           iso={iso}
           bounds={content.park.bounds}
-          attribution={content.map.attribution}
           scale
           zones={content.zones}
           facilities={content.facilities}
           me={observerInPark ? observer : null}
           meLabel="찍은 곳"
           subject={subject ?? null}
-          radiusM={nearMe ? nearRadius : radius}
-          focus={subject ?? (observerInPark ? observer : null)}
+          radiusM={effectiveRadius}
+          focus={subject && inBounds(subject, content.park.bounds) ? subject : null}
           focusScale={iso ? 2.6 : 2.5}
-          onMapClick={(p) => {
-            setSubject(p);
-            setNearMe(false);
-          }}
+          flyTo={observerInPark && nearMe && observer ? { to: observer, key: Date.parse(observer.at), scale: 2.5 } : null}
+          onMapClick={(p) => setSelection({ subject: p, method: 'tap' })}
         />
+        {content.map.attribution && <MapAttribution text={content.map.attribution} />}
       </div>
       <div className="where-panel">
         <div className="row row--between">
           <div className="where-panel__text">
             <strong aria-live="polite">{distanceText}</strong>
-            {zone && <span className="muted">{zone.name}</span>}
+            {subject && !inBounds(subject, content.park.bounds)
+              ? <span className="muted">공원 밖</span>
+              : zone && <span className="muted">{zone.name}</span>}
           </div>
           <button
             className={`chip${nearMe ? ' is-on' : ''}`}
             aria-pressed={nearMe}
             disabled={!observer}
-            onClick={() => {
-              if (!observer) return;
-              setNearMe(true);
-              setSubject({ lat: observer.lat, lng: observer.lng });
-            }}
+            onClick={() => observer && setSelection({ subject: observer, method: 'near_me' })}
           >
-            내 근처예요
+            촬영 위치 사용
           </button>
         </div>
         <div className="row row--tight" role="group" aria-label="반경">
           <span className="muted">반경</span>
           {RADIUS_CHOICES.map((r) => (
-            <button key={r} className={`chip${!nearMe && radius === r ? ' is-on' : ''}`} aria-pressed={!nearMe && radius === r} disabled={nearMe} onClick={() => setRadius(r)}>
+            <button key={r} className={`chip${radius === r ? ' is-on' : ''}`} aria-pressed={radius === r} onClick={() => setSelectedRadius(r)}>
               {r}m
             </button>
           ))}
         </div>
-        <button className="btn btn--primary btn--block btn--big" disabled={!subject} onClick={() => void confirm()}>
-          {editing ? '이 위치로 정하기' : '다음: 이름 확인'}
+        {effectiveRadius > radius && <p className="caption">GPS 오차를 포함해 반경 {effectiveRadius}m로 저장해요.</p>}
+        {saveFailed && <p className="caption" role="alert">위치를 저장하지 못했어요. 다시 눌러 주세요.</p>}
+        <button className="btn btn--primary btn--block btn--big" disabled={!subject || saving} onClick={() => void confirm()}>
+          {saving ? '저장 중…' : editing ? '이 위치로 정하기' : '다음 · 이름 확인'}
         </button>
       </div>
     </main>
@@ -559,78 +575,12 @@ const IDENTIFY_ERROR_TEXT: Record<string, string> = {
   invalid_image: '이 사진을 읽지 못했어요. 다시 찍거나 다른 사진을 골라 주세요.',
   network: '인터넷 연결을 확인하고 다시 눌러 주세요.',
 };
-/** 같은 사진은 결과를 기억해 다시 부르지 않습니다(호출 횟수 절약). */
-const identifyCache = new Map<string, IdentifyResult>();
-const TRUST_MIN = 0.3;
-
-/** 사진으로 종 추천받기: 버튼을 눌렀을 때만 부릅니다. */
-function PhotoSuggest({ photo, onPick, onManual }: { photo: RecordDraft['photos'][number]; onPick: (taxonId: string, candidateIds: string[]) => void; onManual: () => void }) {
-  const { content } = useContent();
-  const [, bump] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const result = identifyCache.get(photo.id);
-
-  const run = async () => {
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    try {
-      if (!navigator.onLine) throw new IdentifyError('network');
-      const blob = (photo.display && await makeIdentifyCopy(photo.display)) || await makeIdentifyCopy(photo.original);
-      if (!blob) throw new IdentifyError('invalid_image');
-      const backend = await getFamilyBackend();
-      if (!(await syncFamilyConsent(backend))) throw new IdentifyError('consent_required');
-      identifyCache.set(photo.id, await backend.identifySpecies(blob));
-      bump((n) => n + 1);
-    } catch (e) {
-      setError(IDENTIFY_ERROR_TEXT[e instanceof IdentifyError ? e.code : ''] ?? '추천을 받지 못했어요. 다시 시도하거나 이름을 직접 찾아 주세요.');
-    }
-    setBusy(false);
-  };
-
-  const cards = result?.candidates.map((c) => ({ c, t: taxonById(content, c.taxonId) })).filter((x): x is { c: IdentifyResult['candidates'][number]; t: Taxon } => !!x.t) ?? [];
-  const trusted = !!result && !result.noMatch && cards.length > 0 && cards[0].c.confidence >= TRUST_MIN;
-
-  return (
-    <section className="sec">
-      {!result && <>
-        <button className="btn btn--outline btn--block" disabled={busy} onClick={() => void run()}>
-          {busy ? '사진을 살펴보는 중…' : '사진으로 종 추천받기'}
-        </button>
-        <p className="caption">추천을 요청하면 선택한 사진의 위치 정보가 제거된 사본을 OpenAI로 보내요.</p>
-      </>}
-      {error && <p className="caption" role="alert">{error}</p>}
-      {result && trusted && (
-        <>
-          <h2 className="sec__title">사진과 닮은 생물이에요</h2>
-          <ul className="alt-list">
-            {cards.map(({ t }) => (
-              <li key={t.id}>
-                <button className="alt" onClick={() => onPick(t.id, cards.map((x) => x.t.id))}>
-                  <SpeciesArt taxon={t} size="sm" />
-                  <span>
-                    <strong>{t.koreanName}</strong>
-                    <span className="muted">{t.scientificName}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="caption">AI 추천이라 틀릴 수 있어요. 사진과 비교해 보고 골라 주세요.</p>
-        </>
-      )}
-      {result && !trusted && (
-        <>
-          <p className="caption">이 사진에서 가능성 높은 종을 찾지 못했어요.</p>
-          <button className="btn btn--outline btn--block" onClick={onManual}>이름으로 직접 찾기</button>
-        </>
-      )}
-    </section>
-  );
+function identifiedCandidates(content: Content, result: ReturnType<typeof usePhotoIdentification>['result']): Taxon[] {
+  return visibleIdentifyCandidates(result, (id) => !!taxonById(content, id))
+    .map(({ taxonId }) => taxonById(content, taxonId)!);
 }
 
-/** S5 생물 확인: 예상 결과 + 다른 후보 2개(PRD F06 후보 3개), 목록에 없어요, 아직 모르겠어요 */
+/** 자동으로 찾은 후보를 확인하고 이름을 직접 찾거나 미확인으로 저장합니다. */
 export function RecordPick() {
   const draft = useDraft();
   const { content } = useContent();
@@ -643,37 +593,28 @@ export function RecordPick() {
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
 
-  useEffect(() => {
-    if (!draft || draft.candidateIds.length) return;
-    const where = draft.subject ?? draft.observer;
-    const zone = where ? findZone(where, content.zones) : null;
-    const ids = draft.sourceTaxonId
-      ? candidatesFromTaxon(content, draft.sourceTaxonId, draft.draftId)
-      : candidatesFromZone(content, zone?.id ?? null, season, draft.draftId);
-    void updateDraft({ candidateIds: ids });
-  }, [draft, content, season]);
+  const photo = draft?.photos.find((item) => item.id === selectedPhotoId) ?? draft?.photos[0];
+  const identification = usePhotoIdentification(photo);
 
   if (draft === undefined) return null;
   if (draft === null) return <Navigate to="/" replace />;
-  if (!draft.photos.length) return <Navigate to="/record/photo" replace />;
+  if (!photo) return <Navigate to="/record/photo" replace />;
   if (!draft.subject) return <Navigate to="/record/where" replace />;
-  if (!draft.candidateIds.length) return null;
-  const photo = draft.photos.find((item) => item.id === selectedPhotoId) ?? draft.photos[0];
-
-  // 예상 결과: 카드에서 왔으면 찾던 종, 아니면 이 구역 후보 중 공개 기록이 가장 많은 종(AI 판별 아님, PRD F18)
-  const fromCard = !!draft.sourceTaxonId && draft.candidateIds.includes(draft.sourceTaxonId);
-  const predictedId = fromCard ? draft.sourceTaxonId! : [...draft.candidateIds].sort((a, b) => (season.recordCounts[b] ?? 0) - (season.recordCounts[a] ?? 0))[0];
+  const aiTaxa = identifiedCandidates(content, identification.result);
+  const aiIds = aiTaxa.map((taxon) => taxon.id);
+  const zone = findZone(draft.subject, content.zones);
   const candidateSource: PickSource = draft.sourceTaxonId ? 'card' : 'zone';
-  const current: Choice = choice ?? { taxonId: predictedId, source: candidateSource, freeText: null };
-  const taxon = taxonById(content, current.taxonId);
-  const name = taxon?.koreanName ?? (current.freeText ? `‘${current.freeText}’` : '');
-  const basis =
-    current.source === 'photo_ai' ? '사진 추천(AI)에서 고른 생물이에요' : current.source === 'search' ? '이름으로 찾은 생물이에요' : current.source === 'free_text' ? '직접 적은 이름이에요' : current.taxonId !== predictedId ? '직접 고른 후보예요' : fromCard ? '찾으러 온 생물이에요' : '이 구역에서 가장 많이 기록됐어요';
-  const alternatives = (current.candidateIds ?? draft.candidateIds).filter((id) => id !== current.taxonId).slice(0, current.source === 'card' || current.source === 'zone' ? 2 : 3);
+  const localIds = draft.sourceTaxonId
+    ? candidatesFromTaxon(content, draft.sourceTaxonId, draft.draftId)
+    : candidatesFromZone(content, zone?.id ?? null, season, draft.draftId);
+  const current: Choice | null = choice ?? (aiIds.length ? { taxonId: aiIds[0], source: 'photo_ai', freeText: null, candidateIds: aiIds } : null);
+  const taxon = taxonById(content, current?.taxonId);
+  const name = taxon?.koreanName ?? current?.freeText;
+  const alternatives = (aiIds.length ? aiIds : localIds).filter((id) => id !== current?.taxonId);
   const results = query.trim() ? searchTaxa(content, query) : season.dex.map((id) => taxonById(content, id)).filter((t): t is Taxon => !!t);
 
   const confirm = async () => {
-    if (saving) return;
+    if (!current || saving) return;
     setSaving(true);
     setSaveFailed(false);
     const audio = prepareRewardAudio();
@@ -706,7 +647,7 @@ export function RecordPick() {
         help={
           <>
             <h2>이름이 맞는지 비교해요</h2>
-            <p>예상 결과는 찾으러 온 생물이나 이 구역에서 자주 기록된 생물이에요. 사진과 생김새를 비교하고, 다르면 ‘다른 생물이에요’를 눌러요. 몰라도 괜찮아요. 팀이 사진을 보고 확인해요.</p>
+            <p>사진과 추천된 생김새를 비교해 주세요. 다른 종이면 이름을 직접 고를 수 있어요. 미확인으로 남긴 사진은 팀이 확인해요.</p>
           </>
         }
       />
@@ -716,24 +657,25 @@ export function RecordPick() {
           if (id !== photo.id && choice?.source === 'photo_ai') setChoice(null);
         }} />
 
-        {BACKEND_MODE === 'supabase' && (
-          <PhotoSuggest
-            key={photo.id}
-            photo={photo}
-            onManual={() => setOthers(true)}
-            onPick={(taxonId, candidateIds) => choose({ taxonId, source: 'photo_ai', freeText: null, candidateIds })}
-          />
+        {identification.pending && <p className="notice" role="status">AI가 사진 속 생물을 살펴보는 중이에요.</p>}
+        {identification.error && (
+          <div className="stack stack--tight">
+            <p className="caption" role="status">{IDENTIFY_ERROR_TEXT[identification.error] ?? '사진을 분석하지 못했어요. 다시 시도하거나 이름을 직접 찾아 주세요.'}</p>
+            {!['daily_limit', 'global_limit'].includes(identification.error) && <button className="btn btn--outline btn--block" onClick={identification.retry}>AI 분석 다시 시도</button>}
+          </div>
         )}
+        {identification.result && !aiIds.length && <p className="caption" role="status">사진에서 종을 확실히 구별할 특징을 찾지 못했어요.</p>}
 
-        <section className="guess">
-          <p className="kicker">
-            {current.source === 'card' || current.source === 'zone' ? '예상 결과' : '고른 이름'}
-            {taxon ? ` · ${CATEGORY_LABEL[taxon.category]}` : ''}
-          </p>
-          <h2 className="guess__name">{withRo(name)} 보여요</h2>
-          {taxon && <p className="sci">{taxon.scientificName}</p>}
-          <p className="guess__basis">{basis}</p>
-        </section>
+        {name && (
+          <section className="guess" aria-live="polite">
+            <p className="kicker">
+              {choice ? '고른 이름' : 'AI 추정'}
+              {taxon ? ` · ${CATEGORY_LABEL[taxon.category]}` : ''}
+            </p>
+            <h2 className="guess__name">{name}</h2>
+            {taxon && <p className="sci">{taxon.scientificName}</p>}
+          </section>
+        )}
 
         {taxon && taxon.clue.looks.length > 0 && (
           <section className="sec">
@@ -743,13 +685,12 @@ export function RecordPick() {
                 <li key={line}>{line}</li>
               ))}
             </ul>
-            <p className="caption">자동 판별이 아니에요. 팀이 사진을 한 번 더 확인해요.</p>
           </section>
         )}
 
-        {alternatives.length > 0 && (
+        {!identification.pending && alternatives.length > 0 && (
           <section className="sec">
-            <h2 className="sec__title">혹시 이 생물인가요?</h2>
+            <h2 className="sec__title">{aiIds.length ? 'AI가 제안한 다른 후보' : '지도와 도감에서 찾아본 후보'}</h2>
             <ul className="alt-list">
               {alternatives.map((id) => {
                 const t = taxonById(content, id);
@@ -758,9 +699,9 @@ export function RecordPick() {
                   <li key={id}>
                     <button className="alt" onClick={() => choose({
                       taxonId: id,
-                      source: current.source === 'photo_ai' ? 'photo_ai' : candidateSource,
+                      source: aiIds.length ? 'photo_ai' : candidateSource,
                       freeText: null,
-                      candidateIds: current.candidateIds,
+                      candidateIds: aiIds.length ? aiIds : localIds,
                     })}>
                       <SpeciesArt taxon={t} size="sm" />
                       <span>
@@ -779,11 +720,11 @@ export function RecordPick() {
 
         <div className="stack stack--tight">
           {saveFailed && <p className="notice" role="alert">기록을 저장하지 못했어요. 다시 저장해 주세요.</p>}
-          <button className="btn btn--primary btn--block btn--big" disabled={saving} onClick={() => void confirm()}>
+          {current && <button className="btn btn--primary btn--block btn--big" disabled={saving} onClick={() => void confirm()}>
             {saving ? '저장 중…' : '맞아요, 도감에 등록'}
-          </button>
-          <button className="btn btn--outline btn--block btn--big" onClick={() => setOthers(true)}>
-            다른 생물이에요
+          </button>}
+          <button className={`btn btn--${current ? 'outline' : 'primary'} btn--block btn--big`} onClick={() => setOthers(true)}>
+            이름으로 직접 찾기
           </button>
           <Link to="/record/unknown" className="link-btn">
             아직 모르겠어요 · 미확인으로 저장
@@ -801,11 +742,11 @@ export function RecordPick() {
               <Icon name="search" />
               <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="이름으로 찾기 (예: 쇠물닭)" enterKeyHint="search" aria-label="이름으로 찾기" />
             </label>
-            {!query.trim() && <p className="caption">이번 계절 도감에 있는 생물이에요. 없으면 이름을 적어 찾아 주세요.</p>}
+            {!query.trim() && <p className="caption">공원에서 찾아볼 만한 생물이에요. 다른 생물은 이름을 적어 찾아 주세요.</p>}
             <ul className="search-results">
               {results.map((t) => (
                 <li key={t.id}>
-                  <button className="species-row species-row--button" onClick={() => choose({ taxonId: t.id, source: draft.candidateIds.includes(t.id) ? candidateSource : 'search', freeText: null })}>
+                  <button className="species-row species-row--button" onClick={() => choose({ taxonId: t.id, source: 'search', freeText: null })}>
                     <SpeciesArt taxon={t} size="xs" />
                     <span className="species-row__text">
                       <strong>{t.koreanName}</strong>
@@ -910,9 +851,15 @@ export function RecordUnknown() {
             onClick={() =>
               void pickPhotos('album', MAX_PHOTOS).then(async (files) => {
                 if (!files.length) return;
-                await updateDraft({ photos: [] });
-                await addPhotos(files, 'album');
-                navigate('/record/pick', { replace: true });
+                try {
+                  if (await addPhotos(files, 'album', true)) {
+                    navigate('/record/pick', { replace: true });
+                    return;
+                  }
+                } catch {
+                  // 기존 사진은 그대로 남기고 다시 고를 수 있게 합니다.
+                }
+                setSaveFailed(true);
               })
             }
           >
@@ -933,46 +880,4 @@ export function RecordDone() {
   if (!obs) return null;
   if (!obs.o) return <Navigate to="/records" replace />;
   return <Navigate to={obs.o.taxonId ? `/species/${obs.o.taxonId}?saved=${id}` : `/records?saved=${id}`} replace />;
-}
-
-/** 다음 단서: 이름은 숨기고 장소와 생김새로 찾게 합니다. */
-export function NextClue({ taxonId }: { taxonId: string }) {
-  const { content } = useContent();
-  const t = taxonById(content, taxonId);
-  if (!t) return null;
-  return <ClueCard taxon={t} />;
-}
-
-/** 물가의 친구를 찾아보세요: 생김새 단서 + 지도에서 찾기 */
-export function ClueCard({ taxon }: { taxon: Taxon }) {
-  const { content } = useContent();
-  const zone = zoneById(content, taxon.clue.zoneIds[0]);
-  return (
-    <section className="clue">
-      <p className="kicker">
-        <Icon name="binoculars" size={16} /> 다음 단서
-      </p>
-      <h2>{withEul(friendOf(taxon))} 찾아보세요</h2>
-      <ul className="ticks">
-        {taxon.clue.looks.slice(0, 1).map((line) => (
-          <li key={line}>{line}</li>
-        ))}
-        <li>
-          {zone ? `${zone.name} — ` : ''}
-          {taxon.clue.where}
-        </li>
-      </ul>
-      <div className="clue__foot">
-        <span className="caption">사진을 찍고 확인하면 칸이 열려요</span>
-        <Link to={`/?public=0&focus=${taxon.id}`} className="btn btn--secondary btn--small">
-          <Icon name="pin" size={18} /> 지도에서 찾기
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/** 못 찾은 칸 이름 대신 쓰는 말(‘물가의 친구’) */
-export function friendOf(taxon: Taxon): string {
-  return taxon.category === 'waterbird' ? '물가의 친구' : taxon.category === 'townbird' ? '나무 위 친구' : taxon.category === 'tree' ? '숲속 친구' : '풀밭의 친구';
 }

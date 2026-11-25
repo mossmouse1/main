@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run",
+    "eval:identify": "node --env-file-if-exists=.env.local scripts/eval-identify.mjs",
     "seed:sql": "node scripts/gen-seed.mjs",
     "data:observations": "node scripts/update-park-observations.mjs"
   },

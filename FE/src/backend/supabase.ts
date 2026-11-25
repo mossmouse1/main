@@ -7,7 +7,7 @@ import type { HistoryRow } from '@shared/dwc';
 import { isAlreadyUploaded } from '../lib/storageErrors';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../config';
 import type { MyStatus } from '../data/types';
-import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
+import { IdentifyError, type AdminBackend, type AdminFilters, type AdminRow, type CommunityCell, type FamilyBackend, type IdentifyErrorCode, type IdentifyResult, type ReviewChanges } from './types';
 
 const BUCKET = 'photos';
 const SIGNED_URL_SECONDS = 600; // 10분
@@ -158,6 +158,17 @@ export const supabaseFamily: FamilyBackend = {
       throw new IdentifyError(known.find((c) => c === body?.error) ?? (error.context.status === 404 ? 'unavailable' : 'failed'));
     }
     throw new IdentifyError('network');
+  },
+
+  async fetchCommunityMap() {
+    return check(await family.rpc('community_map_snapshot')) as CommunityCell[];
+  },
+
+  watchCommunityMap(onChange) {
+    const channel = family.channel('park-community-map')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_map_cells' }, onChange)
+      .subscribe((status) => { if (status === 'SUBSCRIBED') onChange(); });
+    return () => { void family.removeChannel(channel); };
   },
 };
 

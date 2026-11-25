@@ -14,9 +14,6 @@ export const WALK_MAX_MS = 3 * 60 * 60 * 1000;
 
 export const MAX_PHOTOS = 3;
 export const DISPLAY_LONG_EDGE = 1280;
-export const IDENTIFY_LONG_EDGE = 768;
 
 export const RADIUS_CHOICES = [10, 25, 50] as const;
 export const DEFAULT_RADIUS = 25;
-/** ‘내 근처예요’ 반경 = 이 값 + GPS 정확도 */
-export const NEAR_ME_BASE_RADIUS = 50;

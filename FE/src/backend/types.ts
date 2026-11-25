@@ -1,5 +1,8 @@
 import type { ExportRow, HistoryRow, IdStatus } from '@shared/dwc';
+import type { IdentifyResult } from '@shared/identify';
 import type { MediaSource, MyStatus, ObservationPayload, UsageEvent, WalkPayload } from '../data/types';
+
+export type { IdentifyResult } from '@shared/identify';
 
 /** 가족 앱이 서버에 하는 일(PRD 8장 서버 인터페이스) */
 export interface FamilyBackend {
@@ -28,11 +31,17 @@ export interface FamilyBackend {
   linkedEmail(): Promise<string | null>;
   /** 사진으로 종 후보 추천(서버 AI). 로컬 모드에서는 쓸 수 없습니다. */
   identifySpecies(image: Blob): Promise<IdentifyResult>;
+  fetchCommunityMap(): Promise<CommunityCell[]>;
+  watchCommunityMap(onChange: () => void): () => void;
 }
 
-export interface IdentifyResult {
-  candidates: { taxonId: string; koreanName: string; confidence: number }[];
-  noMatch: boolean;
+export interface CommunityCell {
+  taxon_id: string;
+  cell_x: number;
+  cell_y: number;
+  lat: number;
+  lng: number;
+  family_count: number;
 }
 
 /** identifySpecies 실패 이유(화면에서 한국어로 바꿉니다) */

@@ -23,7 +23,7 @@ export function TabLayout() {
         <Outlet />
       </div>
       <nav className="dock" aria-label="주요 화면">
-        <NavLink to={onReceipt ? questMapUrl(dex?.nextClue) : '/'} replace={onReceipt} end className={onMap ? 'active' : undefined}>
+        <NavLink to={onReceipt ? questMapUrl() : '/'} replace={onReceipt} end className={onMap ? 'active' : undefined}>
           <span className="dock__btn">
             <Icon name="explore" size={22} />
             <span>지도</span>

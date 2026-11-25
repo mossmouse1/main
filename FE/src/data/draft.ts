@@ -39,10 +39,10 @@ export async function discardDraft(): Promise<void> {
 }
 
 /** 고른 사진을 기기에 바로 넣습니다(원본 그대로 + 화면용 사본). */
-export async function addPhotos(files: File[], mediaSource: MediaSource): Promise<void> {
+export async function addPhotos(files: File[], mediaSource: MediaSource, replace = false): Promise<number> {
   const draft = await db.drafts.get('current');
-  if (!draft) return;
-  const room = MAX_PHOTOS - draft.photos.length;
+  if (!draft) return 0;
+  const room = replace ? MAX_PHOTOS : MAX_PHOTOS - draft.photos.length;
   const added: DraftPhoto[] = [];
   for (const file of files.slice(0, room)) {
     try {
@@ -62,8 +62,15 @@ export async function addPhotos(files: File[], mediaSource: MediaSource): Promis
       console.warn('addPhotos: skipped a photo', { type: file.type, size: file.size, reason: err instanceof Error ? err.message : 'unknown' });
     }
   }
-  const latest = await db.drafts.get('current');
-  if (latest) await db.drafts.update('current', { photos: packBlobs([...latest.photos, ...added].slice(0, MAX_PHOTOS)) });
+  if (!added.length) return 0;
+  return db.transaction('rw', db.drafts, async () => {
+    const latest = await db.drafts.get('current');
+    if (latest?.draftId !== draft.draftId) return 0;
+    const existing = replace ? [] : latest.photos;
+    const photos = [...existing, ...added].slice(0, MAX_PHOTOS);
+    await db.drafts.update('current', { photos: packBlobs(photos) });
+    return photos.length - existing.length;
+  });
 }
 
 export async function removePhoto(photoId: string): Promise<void> {
@@ -71,8 +78,8 @@ export async function removePhoto(photoId: string): Promise<void> {
   if (draft) await db.drafts.update('current', { photos: packBlobs(draft.photos.filter((p) => p.id !== photoId)) });
 }
 
-export async function setObserver(observer: ObserverFix | null): Promise<void> {
-  await db.drafts.update('current', { observer });
+export async function setObserver(draftId: string, observer: ObserverFix): Promise<void> {
+  await db.drafts.where('id').equals('current').and((draft) => draft.draftId === draftId).modify({ observer });
 }
 
 export async function pickTaxon(taxonId: string | null, pickSource: PickSource, freeTextName: string | null = null): Promise<void> {

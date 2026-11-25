@@ -3,12 +3,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { Icon } from '../components/Icon';
+import { MapAttribution } from '../components/MapAttribution';
 import { ParkMap, type PhotoPin } from '../components/ParkMap';
 import { SpeciesArt } from '../components/SpeciesArt';
 import { useContent } from '../content/ContentProvider';
-import { seasonContains, taxonById, zoneById } from '../content/helpers';
+import { taxonById, zoneById } from '../content/helpers';
 import type { Content, Taxon } from '../content/types';
 import { Tour, type TourStep } from '../components/Tour';
+import { useCommunityMap } from '../data/communityMap';
 import { db } from '../data/db';
 import { startDraft } from '../data/draft';
 import { appendFix, loadTrack, onTrack, trackSegments, type TrackPoint } from '../data/trackLog';
@@ -36,7 +38,7 @@ const EXPLORATION_GUIDE: TourStep[] = [
   {
     target: () => document.querySelector('.quest-invitation') ?? document.querySelector('.next'),
     title: '지도에서 찾아볼 생물을 골라요',
-    body: '이번 계절의 식물 8종과 흰뺨검둥오리·물닭을 찾아요. 지도 핀을 누르면 참고 사진과 관찰 지점을 볼 수 있어요.',
+    body: '이번 계절에 찾아볼 수 있는 생물 중 원하는 종부터 찍어요. 위치를 켜면 가까운 관찰 기록부터 볼 수 있어요.',
   },
   {
     target: () => document.querySelector('.dock__shoot-btn'),
@@ -46,7 +48,7 @@ const EXPLORATION_GUIDE: TourStep[] = [
   {
     target: () => document.querySelector('.dock__dex'),
     title: '아래 도감에서 모은 종을 확인해요',
-    body: '하단 ‘도감’의 ‘계절 퀘스트’에서 체크 표시가 붙은 칸을 확인하세요. 저장 화면에서는 다음 생물로 바로 이어갈 수 있어요.',
+    body: '하단 ‘도감’의 ‘계절 퀘스트’에서 체크 표시가 붙은 칸을 확인하세요.',
   },
   {
     target: () => document.querySelector('.dock__dex'),
@@ -59,12 +61,13 @@ const FOCUS_SCALE = 1.05;
 
 const walkMinutes = (m: number) => Math.max(1, Math.round(m / WALK_M_PER_MIN));
 const toLatLng = ([lat, lng]: [number, number, number]): LatLng => ({ lat, lng });
-type MapSpot = LatLng & { kind: 'record' | 'area' | 'hint'; label?: string };
+type MapSpot = LatLng & { kind: 'record' | 'area' | 'hint' | 'community'; label?: string; key?: string };
+const canRouteTo = (spot?: MapSpot | null) => spot?.kind === 'record' || spot?.kind === 'hint';
 
 function mapSpots(content: Content, taxon: Taxon, publicOnly = false): MapSpot[] {
   const observations = taxon.publicObservations ?? [];
   const field = (content.fieldPhotos ?? []).flatMap((photo) => photo.taxonId === taxon.id && photo.location
-    ? [{ ...photo.location, kind: 'record' as const, label: '조사팀 촬영 위치' }] : []);
+    ? [{ ...photo.location, kind: 'record' as const }] : []);
   const points = [...field, ...observations.flatMap((record) => 'lat' in record ? [{ lat: record.lat, lng: record.lng, kind: 'record' as const }] : [])];
   if (points.length && !publicOnly) return points;
   const seenAreas = new Set<string | undefined>();
@@ -72,8 +75,9 @@ function mapSpots(content: Content, taxon: Taxon, publicOnly = false): MapSpot[]
   for (const record of observations) {
     if (!('area' in record) || seenAreas.has(record.zoneId)) continue;
     seenAreas.add(record.zoneId);
-    const at = zoneById(content, record.zoneId)?.center ?? content.map.focus;
-    if (at) areas.push({ lat: at[0], lng: at[1], kind: 'area', label: record.area });
+    const zone = zoneById(content, record.zoneId);
+    const at = zone?.center ?? content.map.focus;
+    if (at) areas.push({ lat: at[0], lng: at[1], kind: 'area', label: zone?.name ?? `${content.park.name} 일대` });
   }
   if (points.length || areas.length) return [...points, ...areas];
   return publicOnly ? [] : (taxon.sightings ?? []).filter((s) => s[2] === 0).map((s) => ({ ...toLatLng(s), kind: 'hint' }));
@@ -83,11 +87,10 @@ function mapSpots(content: Content, taxon: Taxon, publicOnly = false): MapSpot[]
  * S1 탐험(지도 홈). 쿼터뷰 블록 지도가 화면 전체를 채우고, 그 위에는 꼭 필요한 것만 둡니다.
  *
  * 위계(중요한 순서)
- * 1. 지도와 그 위의 ‘빈 칸’(못 찾은 생물) · ‘사진 딱지’(찾은 생물) — 무엇을 찾을지
+ * 1. 공개 관찰·가족 관찰 격자와 내가 찍은 위치
  * 2. 아래 가운데 촬영 버튼(Layout의 아래쪽 버튼) — 찾았을 때 할 일
  * 3. 계절 퀘스트 칸 — 얼마나 채웠는지
  * 4. 그때그때만 나오는 것: 근처 생물 알림, 고른 생물 카드, 탐험 중 표시
- * 거르기·가까운 생물 목록·나침반·탐험 시작 버튼은 뺐습니다(도감 화면과 자동 시작이 대신함).
  */
 export function MapHome() {
   const { content, mapUrl, isoUrl, trails } = useContent();
@@ -101,9 +104,21 @@ export function MapHome() {
   const showGuide = startingGuide || guide === '1';
   const fieldTaxa = useMemo(() => new Set((content.fieldPhotos ?? []).flatMap((photo) => photo.taxonId ? [photo.taxonId] : [])), [content]);
   const publicTaxa = useMemo(() => content.taxa.filter((taxon) => taxon.publicObservations?.length || fieldTaxa.has(taxon.id)), [content, fieldTaxa]);
-  const showPublic = publicTaxa.length > 0 && params.get('public') !== '0';
-  const publicRecords = useMemo(() => publicTaxa.flatMap((taxon) => taxon.publicObservations ?? []), [publicTaxa]);
-  const pointCount = publicRecords.filter((record) => 'lat' in record).length;
+  const showPublic = params.get('public') !== '0';
+  const community = useCommunityMap();
+  const mine = useMyPhotoPins();
+  const communityByTaxon = useMemo(() => {
+    const byTaxon = new Map<string, MapSpot[]>();
+    for (const cell of community) {
+      const spots = byTaxon.get(cell.taxon_id) ?? [];
+      spots.push({
+        lat: cell.lat, lng: cell.lng, key: `grid:${cell.taxon_id}:${cell.cell_x}:${cell.cell_y}`,
+        kind: 'community',
+      });
+      byTaxon.set(cell.taxon_id, spots);
+    }
+    return byTaxon;
+  }, [community]);
   const [me, setMe] = useState<LiveFix | null>(null);
   const [denied, setDenied] = useState(false);
   const [locationEnabled, setLocationEnabled] = useState(false);
@@ -158,57 +173,46 @@ export function MapHome() {
   );
   const found = useCallback((id: string) => !!dex?.foundIds.has(id), [dex]);
 
-  // 아직 못 찾은 생물의 공개 기록 지점이 바로 옆이면 알려 줍니다(오늘 6종이 아니어도).
-  const alert = useMemo(() => {
-    if (!myFix) return null;
-    let best: { t: Taxon; d: number } | null = null;
-    for (const t of seasonTaxa) {
-      if (found(t.id)) continue;
-      for (const spot of mapSpots(content, t)) {
-        if (spot.kind !== 'record') continue;
-        const d = distanceM(myFix, spot);
-        if (d <= ALERT_M && (!best || d < best.d)) best = { t, d };
-      }
-    }
-    return best;
-  }, [content, myFix, seasonTaxa, found]);
-  const alertId = alert?.t.id ?? null;
-
-  /**
-   * 공개 지도에는 모든 공개 기록을, 오늘의 6종 지도에는 탐험 대상과 우리 가족이 찍은 사진을 표시합니다.
-   */
-  const mine = useMyPhotoPins(season, !showPublic);
+  const spotsFor = useCallback(
+    (t: Taxon) => [...mapSpots(content, t, showPublic), ...(communityByTaxon.get(t.id) ?? [])],
+    [content, showPublic, communityByTaxon],
+  );
   const photoPins = useMemo<PhotoPin[]>(() => {
-    const shown = new Set(showPublic ? publicTaxa.map((t) => t.id) : season.todaySix);
+    const shown = new Set(showPublic ? [...publicTaxa.map((t) => t.id), ...communityByTaxon.keys()] : seasonTaxa.map((t) => t.id));
     if (selectedId) shown.add(selectedId);
-    if (alertId) shown.add(alertId);
     const pins: PhotoPin[] = [];
     for (const id of shown) {
       const t = taxonById(content, id);
       if (!t) continue;
       const isFound = found(t.id);
-      const all = mapSpots(content, t, showPublic);
-      const spots = !showPublic && isFound && t.id !== selectedId ? (mine.some((p) => p.taxonId === t.id) ? [] : all.slice(0, 1)) : all;
-      spots.forEach(({ lat, lng, kind }, i) =>
-        pins.push({ key: `${t.id}:${i}`, taxonId: t.id, lat, lng, label: t.koreanName, category: t.category, photo: t.photo?.src ?? null, kind, found: !showPublic && isFound }),
+      const all = spotsFor(t);
+      all.forEach(({ lat, lng, kind, key }, i) =>
+        pins.push({ key: key ?? `${t.id}:${i}`, taxonId: t.id, lat, lng, label: t.koreanName, category: t.category, photo: t.photo?.src ?? null, kind, found: !showPublic && isFound }),
       );
     }
-    return showPublic ? pins : [...pins, ...mine];
-  }, [content, publicTaxa, showPublic, season.todaySix, selectedId, alertId, found, mine]);
+    return [...pins, ...mine];
+  }, [content, publicTaxa, communityByTaxon, showPublic, seasonTaxa, selectedId, found, mine, spotsFor]);
 
   /** 종마다 내게서 가장 가까운 지점 */
   const nearest = useCallback(
-    (t: Taxon): { at: MapSpot; d: number | null } | null => {
-      const spots = mapSpots(content, t, showPublic);
+    (t: Taxon, observationsOnly = false): { at: MapSpot; d: number | null } | null => {
+      const all = spotsFor(t);
+      const spots = observationsOnly ? all.filter((spot) =>
+        (spot.kind === 'record' || spot.kind === 'community') && inBounds(spot, content.park.bounds)) : all;
       if (!spots.length) return null;
-      if (!myFix || spots[0].kind === 'area') return { at: spots[0], d: null };
-      return spots.filter((at) => at.kind !== 'area').map((at) => ({ at, d: distanceM(myFix, at) })).sort((a, b) => a.d - b.d)[0];
+      if (!myFix) return { at: spots[0], d: null };
+      return spots.filter((at) => at.kind !== 'area').map((at) => ({ at, d: distanceM(myFix, at) }))
+        .sort((a, b) => a.d - b.d)[0] ?? { at: spots[0], d: null };
     },
-    [content, myFix, showPublic],
+    [content.park.bounds, myFix, spotsFor],
   );
 
   const select = useCallback(
     (id: string | null, pin?: PhotoPin) => {
+      if (pin?.observationId) {
+        navigate(`/records?focus=${pin.observationId}`);
+        return;
+      }
       setSelectedId(id);
       setClusterPins(null);
       setRoute(null);
@@ -216,7 +220,7 @@ export function MapHome() {
       setNotice(null);
       if (id) setPreview(false);
       const t = taxonById(content, id);
-      const clicked = t && pin && mapSpots(content, t, showPublic).find((spot) => spot.kind === pin.kind && spot.lat === pin.lat && spot.lng === pin.lng);
+      const clicked = t && pin && spotsFor(t).find((spot) => spot.kind === pin.kind && spot.lat === pin.lat && spot.lng === pin.lng);
       setSelectedSpot(clicked || null);
       const at = clicked || (t ? nearest(t)?.at : null);
       if (at) {
@@ -224,7 +228,7 @@ export function MapHome() {
         setFlyTo({ to: at, key: Date.now(), scale: 2 });
       }
     },
-    [content, nearest, showPublic],
+    [content, navigate, nearest, spotsFor],
   );
 
   const onClusterPick = (pins: PhotoPin[]) => {
@@ -301,10 +305,12 @@ export function MapHome() {
   };
 
   const target = taxonById(content, selectedId);
-  const targetSpot = selectedSpot ?? (target ? nearest(target)?.at : null);
+  const targetSpot = target && selectedSpot?.key
+    ? spotsFor(target).find((spot) => spot.key === selectedSpot.key) ?? nearest(target)?.at
+    : selectedSpot ?? (target ? nearest(target)?.at : null);
   const access = targetSpot?.kind === 'record' ? snapToTrail(trails, targetSpot)?.point : targetSpot;
   const goWalk = () => {
-    if (!target || !targetSpot || targetSpot.kind === 'area' || !access) return;
+    if (!target || !targetSpot || !canRouteTo(targetSpot) || !access) return;
     track('go_find', { taxonId: target.id });
     if (myFix) {
       const path = trails.pts.length ? routeOnTrail(trails, myFix, access) : null;
@@ -324,22 +330,21 @@ export function MapHome() {
   const segments = useMemo(() => trackSegments(trackPts), [trackPts]);
   // 지금 걷는 곳은 버튼이 아니라 내 위치 점 아래 이름표로 보여 줍니다.
   const place = myFix ? describePlace(content, myFix) : null;
-  const sixTaxa = useMemo(() => season.todaySix.map((id) => taxonById(content, id)).filter((t): t is Taxon => !!t), [content, season.todaySix]);
-  const foundSix = sixTaxa.filter((t) => found(t.id)).length;
-
-  // 위치가 있으면 가장 가까운 미수집 종, 없으면 오늘의 목록 첫 번째 종.
-  const next = useMemo(() => {
-    const left = sixTaxa.filter((t) => !found(t.id));
-    if (!left.length) return null;
-    const withD = left.map((t) => ({ t, spot: nearest(t) }));
-    if (myFix) withD.sort((a, b) => (a.spot?.d ?? Infinity) - (b.spot?.d ?? Infinity));
-    return withD[0];
-  }, [sixTaxa, found, nearest, myFix]);
-  const nearQuest = !showPublic && alert && alert.t.id !== selectedId ? alert : null;
-  const quest = nearQuest ? { t: nearQuest.t, spot: nearest(nearQuest.t) } : next;
-  const questSpot = quest?.spot?.at;
-  const questPinKey = !showPublic && quest && questSpot ? photoPins.find((pin) => pin.taxonId === quest.t.id && pin.lat === questSpot.lat && pin.lng === questSpot.lng)?.key : undefined;
-  const questEntry = dex?.completion ? '/dex/complete' : questMapUrl(dex?.nextClue ?? next?.t);
+  const ranked = useMemo(() => seasonTaxa.map((taxon) => ({ taxon, spot: nearest(taxon, true) }))
+    .sort((a, b) => Number(found(a.taxon.id)) - Number(found(b.taxon.id)) ||
+      (a.spot?.d ?? Infinity) - (b.spot?.d ?? Infinity)), [seasonTaxa, found, nearest]);
+  const recommendation = myFix ? ranked.find(({ taxon, spot }) => !found(taxon.id) && spot?.d != null) : undefined;
+  const recommendedSpot = recommendation?.spot;
+  const recommendedDistance = recommendedSpot?.d;
+  const recommendedPin = recommendation && recommendedSpot ? photoPins.find((item) =>
+    item.taxonId === recommendation.taxon.id && item.kind === recommendedSpot.at.kind &&
+    item.lat === recommendedSpot.at.lat && item.lng === recommendedSpot.at.lng) : undefined;
+  const nearby = recommendedDistance != null && recommendedDistance <= ALERT_M;
+  const questEntry = dex?.completion ? '/dex/complete' : questMapUrl();
+  const visibleClusters = clusterPins?.flatMap(({ key }) => {
+    const pin = photoPins.find((item) => item.key === key);
+    return pin ? [pin] : [];
+  });
 
   const finishCoach = useCallback(
     (finished: boolean) => {
@@ -366,7 +371,7 @@ export function MapHome() {
           onZoneClick={onZoneClick}
           facilities={content.facilities}
           photoPins={photoPins}
-          questPinKey={questPinKey}
+          questPinKey={showPublic ? undefined : recommendedPin?.key}
           waterZone={preview ? zoneById(content, 'Z1') : undefined}
           scanZones={preview ? scanZones : null}
           onClusterPick={onClusterPick}
@@ -385,39 +390,44 @@ export function MapHome() {
           focus={overviewFocus}
           focusScale={FOCUS_SCALE}
           topInset={TOP_INSET}
-          bottomInset={target || clusterPins ? BOTTOM_INSET_CARD : BOTTOM_INSET}
+          bottomInset={target || visibleClusters?.length ? BOTTOM_INSET_CARD : BOTTOM_INSET}
         />
       </div>
 
       <header className="hud-top">
         <div className="hud-overview">
           {showPublic ? (
-            <div className="next public-map-summary">
-              <strong>{content.park.name}</strong>
-              <p>{publicTaxa.length}종 · 좌표 {pointCount}건 · 구역 {publicRecords.length - pointCount}건</p>
-              {fieldTaxa.size > 0 && <p>조사팀 현장 사진 {fieldTaxa.size}종</p>}
-            </div>
-          ) : <div className={`next${nearQuest ? ' is-alert' : ''}`}>
+            <h1 className="map-title">{content.park.name}</h1>
+          ) : <div className={`next${nearby ? ' is-alert' : ''}`}>
             <div className="next__row">
-              {quest ? (
-                <button className="next__main" onClick={() => select(quest.t.id)} aria-label={`${quest.t.koreanName} 지도에서 보기`}>
-                  <span className="next__photo"><SpeciesArt taxon={quest.t} size="fill" /></span>
+              {recommendation && recommendedDistance != null ? (
+                <button className="next__main" onClick={() => select(recommendation.taxon.id, recommendedPin)} aria-label={`${recommendation.taxon.koreanName} 지도에서 보기`}>
+                  <span className="next__photo"><SpeciesArt taxon={recommendation.taxon} size="fill" /></span>
                   <span className="next__text">
-                    <small>{nearQuest ? '근처에서 관찰된 생물' : '다음에 찾을 생물'}</small>
-                    <strong>{quest.t.koreanName}</strong>
+                    <small>주변 관찰 추천 · 약 {formatDistance(recommendedDistance)}</small>
+                    <strong>{recommendation.taxon.koreanName}</strong>
                   </span>
                 </button>
-              ) : (
-                <Link to={dex?.completion ? '/dex/complete' : '/dex'} className="next__main">
+              ) : dex?.completion ? (
+                <Link to="/dex/complete" className="next__main">
                   <span className="next__badge"><Icon name="check" size={23} /></span>
-                  <span className="next__text"><small>계절 퀘스트 완료</small><strong>{dex?.completion ? '완료 사진 보기' : '도감 열기'}</strong></span>
+                  <span className="next__text"><small>계절 퀘스트 완료</small><strong>완료 사진 보기</strong></span>
                 </Link>
+              ) : myFix ? (
+                <Link to="/dex" className="next__main">
+                  <span className="next__badge"><Icon name="book" size={23} /></span>
+                  <span className="next__text"><small>{season.season} 관찰 후보</small><strong>도감에서 보기</strong></span>
+                </Link>
+              ) : (
+                <button className="next__main" onClick={() => void locate()}>
+                  <span className="next__badge"><Icon name="locate" size={23} /></span>
+                  <span className="next__text"><small>{season.season} 관찰 후보</small><strong>내 위치로 추천받기</strong></span>
+                </button>
               )}
-              {nearQuest && <button className="next__act" onClick={() => void shoot(nearQuest.t.id)} aria-label={`${nearQuest.t.koreanName} 촬영`}><Icon name="viewfinder" size={22} /></button>}
             </div>
             <div className="next__progress">
-              <progress max={sixTaxa.length || 1} value={foundSix} aria-label="계절 퀘스트 진행도" />
-              <span>{foundSix}/{sixTaxa.length}</span>
+              <progress max={seasonTaxa.length || 1} value={dex?.filled ?? 0} aria-label="계절 퀘스트 진행도" />
+              <span>{dex?.filled ?? 0}/{seasonTaxa.length}</span>
             </div>
             <button className="next__scan" onClick={togglePreview} aria-pressed={preview} aria-label={parkDistance ? `공원 밖 ${parkDistance} · 레이더 미리보기` : '호수공원 레이더 미리보기'}>
               <span><Icon name="radar" size={16} />{preview ? '레이더 스캔 중' : parkDistance ? `공원 밖 · ${parkDistance}` : '공원 미리보기'}</span>
@@ -430,6 +440,7 @@ export function MapHome() {
             <button className={`hud-tool hud-tool--locate${follow && myFix ? ' is-on' : ''}`} onClick={() => void locate()} aria-label={denied ? '위치 권한 안내' : '내 위치로'} aria-pressed={follow && !!myFix}>
               <Icon name={denied ? 'question' : 'locate'} size={23} />
             </button>
+            {content.map.attribution && <MapAttribution text={content.map.attribution} />}
           </div>
         </div>
         <WalkPill />
@@ -445,8 +456,7 @@ export function MapHome() {
         )}
       </header>
 
-      <section className="hud-bottom" aria-label={target ? `${target.koreanName} 찾기` : showPublic ? '공개 관찰 지도' : '계절 퀘스트'}>
-        {content.map.attribution && <p className="hud-credit">{content.map.attribution}</p>}
+      <section className="hud-bottom" aria-label={target ? `${target.koreanName} 찾기` : showPublic ? '공원 지도' : '계절 퀘스트'}>
         {publicTaxa.length > 0 && (
           <div className="map-record-controls">
             {!showPublic && <Link className="chip" to="/">전체 지도</Link>}
@@ -456,9 +466,8 @@ export function MapHome() {
         {target ? (
           <FocusCard
             taxon={target}
-            found={found(target.id)}
             questMode={!showPublic}
-            distance={route ? route.meters : access && myFix && targetSpot?.kind !== 'area' ? distanceM(myFix, access) : null}
+            distance={route ? route.meters : access && myFix && canRouteTo(targetSpot) ? distanceM(myFix, access) : null}
             spot={targetSpot ?? undefined}
             routing={!!route}
             hint={hint}
@@ -467,15 +476,15 @@ export function MapHome() {
             onShoot={() => void shoot(target.id)}
             onClose={() => select(null)}
           />
-        ) : clusterPins ? (
-          <ClusterTray pins={clusterPins} onPick={select} onClose={() => setClusterPins(null)} />
+        ) : visibleClusters?.length ? (
+          <ClusterTray pins={visibleClusters} onPick={select} onClose={() => setClusterPins(null)} />
         ) : showPublic ? (
           <section className="quest-invitation" aria-label="계절 퀘스트">
             <div>
               <h2>{season.season} 생물 도감{dex?.completion ? ' 완성!' : ''}</h2>
               <p>{dex?.completion ? '완료 사진을 현장에서 보여 주세요.' : dex?.filled
-                ? `${dex.filled}/${dex.total}종을 찾았어요. 다음 생물을 만나러 가요.`
-                : '공원에서 식물 8종과 물새 2종을 찍고 도감을 채워요.'}</p>
+                ? `${dex.filled}/${dex.total}종을 찾았어요. 후보 중 원하는 생물을 골라요.`
+                : '이번 계절에 찾아볼 수 있는 생물 중 원하는 종부터 찍어요.'}</p>
             </div>
             <Link to={dex?.filled ? questEntry : '/?guide=quest'} className="btn btn--primary btn--block">
               <Icon name={dex?.completion ? 'check' : 'binoculars'} size={20} />
@@ -483,14 +492,15 @@ export function MapHome() {
             </Link>
           </section>
         ) : (
-          <SlotTray title={`${season.season} 퀘스트`} count={foundSix} total={sixTaxa.length} taxa={sixTaxa} found={found} photos={mine} onPick={select} />
+          <SlotTray title={recommendation ? '이번 계절 · 주변 관찰 후보' : `${season.season} 관찰 후보`} count={dex?.filled ?? 0} total={seasonTaxa.length}
+            taxa={ranked.map(({ taxon }) => taxon)} found={found} photos={mine} onPick={select} />
         )}
       </section>
 
       {showGuide && <Tour
         steps={EXPLORATION_GUIDE}
         label={startingGuide ? '퀘스트 안내' : '탐험 가이드'}
-        finishLabel={dex?.completion ? '완료 사진 보기' : '첫 생물 찾기'}
+        finishLabel={dex?.completion ? '완료 사진 보기' : '관찰 후보 보기'}
         skipLabel={startingGuide ? '건너뛰고 시작' : undefined}
         onDone={finishCoach}
       />}
@@ -507,19 +517,19 @@ function ClusterTray({ pins, onPick, onClose }: {
   return (
     <div className="tray">
       <div className="tray__head">
-        <h2>이곳의 생물 {pins.length}종</h2>
+        <h2>이곳의 관찰</h2>
         <button className="tray__close" onClick={onClose} aria-label="관찰 묶음 닫기">
           <Icon name="close" size={16} />
         </button>
       </div>
       <ul className="map-cluster-list" aria-label="이곳의 생물">
         {sorted.map((pin) => (
-          <li key={pin.taxonId}>
+          <li key={pin.key}>
             <button className="chip" onClick={() => onPick(pin.taxonId, pin)}>
               <span className="map-cluster-list__photo">
                 {pin.photo ? <img src={pin.photo} alt="" loading="lazy" decoding="async" /> : <CategoryIcon category={pin.category} size={20} />}
               </span>
-              {pin.label}
+              {pin.label}{pin.kind === 'mine' ? ' · 내 기록' : ''}
             </button>
           </li>
         ))}
@@ -580,9 +590,8 @@ function SlotTray({ title, count, total, taxa, found, photos, onPick }: {
 }
 
 /** 고른 생물: 무엇인지(사진·이름·어디) + 할 일 하나(찾으러 가기 → 찾았어요). 자세한 내용은 사진을 눌러 생물 카드에서 봅니다. */
-function FocusCard({ taxon, found, questMode, distance, spot, routing, hint, onHint, onGo, onShoot, onClose }: {
+function FocusCard({ taxon, questMode, distance, spot, routing, hint, onHint, onGo, onShoot, onClose }: {
   taxon: Taxon;
-  found: boolean;
   questMode: boolean;
   distance: number | null;
   spot?: MapSpot;
@@ -595,7 +604,7 @@ function FocusCard({ taxon, found, questMode, distance, spot, routing, hint, onH
 }) {
   const { content } = useContent();
   const referenceUrl = `/species/${taxon.id}${taxon.photo ? '?photo=reference' : ''}`;
-  const canRoute = !!spot && spot.kind !== 'area';
+  const canRoute = canRouteTo(spot);
   const showRouteButton = questMode && canRoute && !routing;
   return (
     <article className="focus">
@@ -607,7 +616,6 @@ function FocusCard({ taxon, found, questMode, distance, spot, routing, hint, onH
           <SpeciesArt taxon={taxon} size="fill" />
         </Link>
         <div className="focus__text">
-          <p className="kicker">{spot?.kind === 'area' ? '구역 기록' : spot?.kind === 'record' ? '공개 관찰 지점' : found ? '우리 가족이 찾은 생물' : '찾아볼 생물'}</p>
           <h3>
             <Link to={`/species/${taxon.id}`}>{taxon.koreanName}</Link>
           </h3>
@@ -629,7 +637,7 @@ function FocusCard({ taxon, found, questMode, distance, spot, routing, hint, onH
             <Icon name="walk" size={22} /> 찾으러 가기
           </button>
         ) : (
-          <Link className="btn btn--primary focus__go" to={referenceUrl}>관찰 자료 보기</Link>
+          <Link className="btn btn--primary focus__go" to={referenceUrl}>생물 카드 보기</Link>
         )}
         {showRouteButton && <button className="btn btn--secondary" onClick={onGo}>길 안내</button>}
         <button className={`btn btn--secondary${hint ? ' is-on' : ''}`} onClick={onHint} aria-expanded={hint}>
@@ -677,32 +685,34 @@ function WalkPill() {
   );
 }
 
-/** 우리 가족이 이번 계절에 찍은 사진을 찍은 자리에 딱지로(가장 최근 40장) */
-function useMyPhotoPins(season: ReturnType<typeof useSeason>, enabled: boolean): PhotoPin[] {
+/** 모든 개인 기록의 위치와 최근 40건의 사진을 표시합니다. */
+function useMyPhotoPins(): PhotoPin[] {
   const { content } = useContent();
   const rows = useLiveQuery(async () => {
-    if (!enabled) return [];
-    const obs = (await db.observations.orderBy('createdAt').reverse().toArray()).filter((o) => !o.hidden && o.taxonId && seasonContains(season, o.observedAt)).slice(0, 40);
-    return Promise.all(
-      obs.map(async (o) => {
-        const photo = o.photoIds[0] ? await db.photos.get(o.photoIds[0]) : undefined;
-        return { obs: o, blob: photo?.display ?? photo?.original ?? null };
-      }),
-    );
-  }, [enabled, season.id]);
+    const observations = (await db.observations.orderBy('createdAt').reverse().toArray())
+      .filter((o) => !o.hidden && inBounds(o.subject, content.park.bounds));
+    const photoIds = observations.slice(0, 40).flatMap((o) => o.photoIds.slice(0, 1));
+    const photos = new Map((await db.photos.bulkGet(photoIds)).flatMap((p) => p ? [[p.id, p] as const] : []));
+    return observations.map((obs) => {
+      const photo = photos.get(obs.photoIds[0]);
+      return { obs, blob: photo?.display ?? photo?.original ?? null };
+    });
+  }, [content.park.bounds]);
   const [pins, setPins] = useState<PhotoPin[]>([]);
   useEffect(() => {
     const urls: string[] = [];
     setPins(
-      (rows ?? []).flatMap(({ obs, blob }) => {
+      (rows ?? []).map(({ obs, blob }) => {
         const t = taxonById(content, obs.taxonId);
-        if (!t) return [];
-        let photo = t.photo?.src ?? null;
+        let photo = t?.photo?.src ?? null;
         if (blob) {
           photo = URL.createObjectURL(blob);
           urls.push(photo);
         }
-        return [{ key: `mine:${obs.id}`, taxonId: t.id, lat: obs.subject.lat, lng: obs.subject.lng, label: t.koreanName, category: t.category, photo, kind: 'mine' as const, found: true }];
+        return {
+          key: `mine:${obs.id}`, observationId: obs.id, taxonId: t?.id ?? `unknown:${obs.id}`, ...obs.subject,
+          label: t?.koreanName ?? '미확인 생물', category: t?.category ?? 'other', photo, kind: 'mine' as const, found: true,
+        };
       }),
     );
     return () => urls.forEach((u) => URL.revokeObjectURL(u));

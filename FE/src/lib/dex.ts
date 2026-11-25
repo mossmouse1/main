@@ -27,8 +27,6 @@ export interface DexState {
   cells: DexCell[];
   filled: number;
   total: number;
-  /** 아직 못 찾은 종 하나(오늘 6종 먼저) */
-  nextClue: Taxon | null;
   foundIds: Set<string>;
   /** 검토에서 종이 바뀌었는데 가족이 아직 못 본 기록 수(칸이 비게 된 경우 포함) */
   changedUnseen: number;
@@ -44,8 +42,8 @@ export interface DexCompletion {
 
 export type QuestReward = 'discovery' | 'completion';
 
-export function questMapUrl(nextClue?: Taxon | null): string {
-  return nextClue ? `/?public=0&focus=${encodeURIComponent(nextClue.id)}` : '/?public=0';
+export function questMapUrl(): string {
+  return '/?public=0';
 }
 
 export function isQuestObservation(content: Content, season: SeasonSet, observation: DexObservation): boolean {
@@ -72,7 +70,6 @@ export function computeDex(content: Content, season: SeasonSet, observations: De
       isNew: foundIds.has(taxon.id) && !seenSet.has(taxon.id),
       changedByReview: valid.some((o) => o.taxonId === taxon.id && o.reviewChanged && !o.reviewSeen),
     }));
-  const nextId = [...season.todaySix, ...season.dex].find((id) => !foundIds.has(id));
   const filled = cells.filter((c) => c.filled).length;
   let completion: DexCompletion | null = null;
   if (filled === 10 && filled === season.dex.length && filled === cells.length) {
@@ -93,7 +90,6 @@ export function computeDex(content: Content, season: SeasonSet, observations: De
     cells,
     filled,
     total: cells.length,
-    nextClue: taxonById(content, nextId) ?? null,
     foundIds,
     changedUnseen: observations.filter((o) => !o.hidden && o.reviewChanged && !o.reviewSeen).length,
     completion,

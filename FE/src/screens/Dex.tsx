@@ -7,13 +7,12 @@ import { useContent } from '../content/ContentProvider';
 import { searchTaxa } from '../content/helpers';
 import { db, getMeta, setMeta } from '../data/db';
 import { useDex, useSeason } from '../hooks';
-import type { DexState } from '../lib/dex';
-import { ClueCard } from './Record';
+import { questMapUrl, type DexState } from '../lib/dex';
 
 type Kind = 'all' | 'animal' | 'plant';
 const KIND_LABEL: Record<Kind, string> = { all: '전체', animal: '동물', plant: '식물' };
 
-/** S8 나의 도감: 번호 칸 격자, 진행률, NEW, 다음 단서 */
+/** S8 나의 도감: 번호 칸 격자, 진행률, NEW */
 export function Dex() {
   const dex = useDex();
   const season = useSeason();
@@ -108,10 +107,13 @@ export function Dex() {
             <Icon name="check" size={20} /> 퀘스트 완료 사진 보기
           </Link>
         ) : (
-          <p className="caption">공원에서 이번 계절의 생물을 찍어 도감을 채워요. 완료 사진은 현장에서 리워드를 받을 때 보여 주세요.</p>
+          <>
+            <p className="caption">이번 계절에 찾아볼 수 있는 후보 중 원하는 생물부터 찍어요.</p>
+            <Link className="btn btn--secondary btn--block" to={questMapUrl()}><Icon name="map" size={20} /> 지도에서 주변 후보 보기</Link>
+          </>
         )}
         {!collection && <p className="caption">
-          흰뺨검둥오리와 물닭은 필수예요. {season.recordCountsBasis}를 바탕으로 식물 8종을 골랐어요.
+          {season.recordCountsBasis}를 바탕으로 이번 계절의 식물 8종과 물새 2종을 골랐어요.
         </p>}
         <div className="dex-filters">
           <div className="seg" role="group" aria-label="분류">
@@ -143,7 +145,7 @@ export function Dex() {
               <li key={cell.taxon.id}>
                 <Link
                   to={`/species/${cell.taxon.id}`}
-                  className={`dex-tile dex-tile--${cell.taxon.category}${cell.filled ? ' is-filled' : ''}${dex.nextClue?.id === cell.taxon.id ? ' is-next' : ''}`}
+                  className={`dex-tile dex-tile--${cell.taxon.category}${cell.filled ? ' is-filled' : ''}`}
                   aria-label={`${cell.taxon.koreanName}, ${cell.filled ? '찾음' : '미발견'}`}
                 >
                   <span className="dex-tile__no">No.{String(cell.no).padStart(3, '0')}</span>
@@ -175,13 +177,11 @@ export function Dex() {
             </ul>
           </section>
         )}
-        {!collection && (dex.nextClue ? (
-          <ClueCard taxon={dex.nextClue} />
-        ) : (
+        {!collection && dex.completion && (
           <p className="notice notice--ok">
             <Icon name="check" size={18} /> 이번 계절 칸을 모두 채웠어요. 계절이 바뀌면 새 칸이 열려요.
           </p>
-        ))}
+        )}
       </div>
       {searching && <SearchOverlay onClose={() => setSearching(false)} />}
     </main>
