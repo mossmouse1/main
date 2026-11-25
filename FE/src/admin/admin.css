@@ -10,7 +10,8 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 10px 24px;
+  /* 본문과 같은 최대 너비(1200px)로 맞춥니다. */
+  padding: 10px calc(max(0px, (100% - 1200px) / 2) + 24px);
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
@@ -39,14 +40,26 @@
 }
 .admin__banner {
   margin: 0;
-  padding: 8px 24px;
+  padding: 8px calc(max(0px, (100% - 1200px) / 2) + 24px);
   background: var(--warn-bg);
   color: var(--warn-ink);
   font-weight: 600;
 }
+.admin__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 .admin__page {
-  max-width: 960px;
   padding: 24px;
+}
+/* 표가 넓으면 표만 가로로 밀어 봅니다. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
 }
 .admin-login {
   width: min(400px, 100%);
@@ -278,5 +291,188 @@
   .table {
     display: block;
     overflow-x: auto;
+  }
+}
+
+/* 보고서: 평평한 표 중심 스타일. 값과 규칙은 전부 .report 안에만 둡니다(가족 화면·전역에 영향 없음). */
+.report {
+  --r-ink: var(--ink);
+  --r-sub: var(--ink-2);
+  --r-accent: var(--brand-2);
+  --r-rule: var(--line-2);
+  --r-row: var(--line);
+  --r-head: var(--paper-2);
+  gap: 40px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--r-ink);
+  page: report; /* 인쇄 여백은 아래 @page report */
+}
+.report section {
+  gap: 12px;
+}
+.report section + section {
+  padding-top: 24px;
+  border-top: 1px solid var(--r-rule);
+}
+.report h1,
+.report h2 {
+  font-family: var(--font);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.report h1 {
+  font-size: 24px;
+}
+.report h2 {
+  font-size: 18px;
+  break-after: avoid;
+}
+.report .card {
+  border-radius: 8px;
+  border: 1px solid var(--r-rule);
+  box-shadow: none;
+}
+.report .btn {
+  font-family: var(--font);
+  font-weight: 700;
+  box-shadow: none;
+}
+.report__controls {
+  align-items: flex-end;
+}
+.report__print-head {
+  display: none;
+}
+
+/* 요약 숫자 카드: 평평한 4칸 */
+.report .stats {
+  grid-template-columns: repeat(4, 1fr);
+  padding: 16px 0;
+  border: 1px solid var(--r-rule);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.report .stats > div + div {
+  border-left: 1px solid var(--r-rule);
+}
+.report .stats strong {
+  font-family: var(--font);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--r-accent);
+  font-variant-numeric: tabular-nums;
+}
+.report .stats span {
+  font-size: 13px;
+  color: var(--r-sub);
+}
+
+/* 표: 가로선만, 머리글은 연한 초록 + 굵은 아래선 */
+.report .table {
+  font-size: 14px;
+  background: var(--surface);
+}
+.report .table th {
+  background: var(--r-head);
+  color: var(--r-ink);
+  font-weight: 700;
+  border-bottom: 2px solid var(--r-accent);
+}
+.report .table th,
+.report .table td {
+  padding: 10px 12px;
+}
+.report .table td {
+  border-bottom: 1px solid var(--r-row);
+}
+.report .table tr {
+  break-inside: avoid;
+}
+.report .table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.report .table .nowrap {
+  white-space: nowrap;
+}
+.report .badge {
+  font-weight: 700;
+}
+
+/* 인쇄(Ctrl+P): 머리글·조작 요소를 빼고 위에 한 줄(제목 / 기간 / 출력일), 흑백에서도 읽히게 */
+@page report {
+  margin: 15mm;
+}
+@media print {
+  .admin__header,
+  .admin__banner,
+  .report__controls,
+  .report h1 {
+    display: none;
+  }
+  .admin {
+    background: #fff;
+  }
+  .admin__page {
+    padding: 0;
+  }
+  .admin__body {
+    max-width: none;
+  }
+  .report {
+    --r-ink: #000;
+    --r-sub: #333;
+    --r-accent: #000;
+    --r-rule: #999;
+    --r-row: #bbb;
+    --r-head: #eee;
+    gap: 24px;
+    font-size: 10.5pt;
+  }
+  .report__print-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #000;
+    font-size: 10pt;
+  }
+  .report__print-head strong {
+    font-weight: 700;
+  }
+  .report .stats strong {
+    font-size: 22pt;
+  }
+  /* 모바일 폭 규칙(.table를 block으로)이 A4 폭에서도 걸리므로 되돌립니다. 그래야 머리글이 쪽마다 반복됩니다. */
+  .table-scroll {
+    overflow: visible;
+  }
+  .report .table {
+    display: table;
+    overflow: visible;
+    font-size: 9.5pt;
+  }
+  .report .table thead {
+    display: table-header-group;
+  }
+  .report .table th,
+  .report .table td {
+    padding: 4px 6px;
+  }
+  .report section + section {
+    padding-top: 0;
+    border-top: none; /* 쪽 끝에 선만 남는 것을 막습니다 */
+  }
+  .report .badge {
+    margin-left: 4px;
+    padding: 0 4px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: none;
+    color: #000;
+    font-size: 8pt;
   }
 }
